@@ -116,12 +116,13 @@ export default function DashboardPage({ onNavigate }: DashboardPageProps) {
 
       {error && <div className="surface border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">{error}</div>}
 
-      {session?.savedCareers.length ? (
-        <div className="gradient-card">
+      <div className="gradient-card">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-extrabold text-teal-100">Saved Paths</p>
-              <h2 className="mt-2 text-2xl font-black">Continue from your saved careers.</h2>
+              <p className="text-sm font-extrabold text-teal-100">Advanced Workspace</p>
+              <h2 className="mt-2 text-2xl font-black">
+                {session?.savedCareers.length ? 'Continue from your saved careers.' : 'Ask, save, compare, and build roadmaps from AI answers.'}
+              </h2>
             </div>
             <button
               onClick={() => onNavigate('chat')}
@@ -131,15 +132,23 @@ export default function DashboardPage({ onNavigate }: DashboardPageProps) {
             </button>
           </div>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {session.savedCareers.slice(-3).map((career) => (
+            {session?.savedCareers.length ? session.savedCareers.slice(-3).map((career) => (
               <div key={`${career.title}-${career.savedAt}`} className="rounded-2xl border border-white/10 bg-white/10 p-4">
                 <p className="font-extrabold text-white">{career.title}</p>
                 <p className="mt-1 text-xs text-slate-300">{career.source || 'saved'}</p>
               </div>
+            )) : [
+              { label: 'Best-match cards', desc: 'Backend decision score' },
+              { label: 'Saved careers', desc: 'Persisted in session' },
+              { label: 'Roadmap actions', desc: 'Prompt from AI result' },
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+                <p className="font-extrabold text-white">{item.label}</p>
+                <p className="mt-1 text-xs text-slate-300">{item.desc}</p>
+              </div>
             ))}
           </div>
-        </div>
-      ) : null}
+      </div>
 
       <div className="surface overflow-hidden">
         <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">

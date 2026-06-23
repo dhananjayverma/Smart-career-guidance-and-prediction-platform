@@ -7,24 +7,36 @@ const roadmapRoutes = require('./routes/roadmap.routes');
 const collegeRoutes = require('./routes/college.routes');
 const contentRoutes = require('./routes/content.routes');
 const env = require('./config/env');
+const { getProviderStatus } = require('./services/aiProvider');
+const { getCacheStats } = require('./services/cache.service');
+const { getQueueStats } = require('./services/requestQueue.service');
+const { getTemplateStats } = require('./services/templateEngine.service');
 
 const app = express();
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : true,
+  origin: true,
   credentials: true,
 }));
 app.use(express.json({ limit: '1mb' }));
 
 app.get('/health', (_req, res) => {
+  const providers = getProviderStatus();
   res.json({
     status: 'ok',
     service: 'Career Mentor AI',
     ai: {
       provider: env.aiProvider,
       model: env.aiModel || 'default',
-      configured: Boolean(env.groqApiKey || env.openAiApiKey),
+      configured: Boolean(
+        providers.groq || providers.openrouter || providers.together || providers.openai
+      ),
+      providers,
+      pipeline: ['cache', 'template', 'queue', 'groq', 'openrouter', 'together', 'local', 'static'],
     },
+    cache: getCacheStats(),
+    queue: getQueueStats(),
+    templates: getTemplateStats(),
     timestamp: new Date().toISOString(),
   });
 });

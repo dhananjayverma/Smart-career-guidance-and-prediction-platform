@@ -11,9 +11,10 @@ import {
   Route,
   ShieldCheck,
   Target,
+  TrendingUp,
 } from 'lucide-react';
-import { getChatSession, getQuickQuestions, saveCareerToSession, sendChatMessage } from '../lib/api';
-import type { ChatResponse, SessionSnapshot } from '../lib/api';
+import { getChatSession, getQuickQuestions, resolveChatSource, saveCareerToSession, sendChatMessageStream } from '../lib/api';
+import type { ChatResponse, RoadmapPhase, SessionSnapshot } from '../lib/api';
 
 interface Message {
   id: string;
@@ -22,6 +23,7 @@ interface Message {
   timestamp: Date;
   type?: 'text' | 'options';
   options?: Option[];
+  roadmap?: RoadmapPhase[];
   source?: string;
   decision?: ChatResponse['metadata']['decision'];
   nextQuestions?: string[];
@@ -41,6 +43,34 @@ interface UserProfile {
   language: 'hindi' | 'hinglish' | 'english';
 }
 
+function getWelcomeMessage(userProfile: UserProfile): Message {
+  const name = userProfile.name ? ` ${userProfile.name}` : '';
+  const isEnglish = userProfile.language === 'english';
+  const content = isEnglish
+    ? `Hello${name}! I'm NextStep AI, your personal career mentor. I'm here to listen, understand your goals, and help you with careers, exams, colleges, and complete roadmaps. What's on your mind today?`
+    : `Namaste${name}! Main NextStep AI hoon — aapka career mentor. Main aapki baat sununga, samjhunga, aur careers, exams, colleges aur complete roadmaps me help karunga. Aaj aap kya discuss karna chahte ho?`;
+
+  return {
+    id: 'welcome',
+    role: 'assistant',
+    content,
+    timestamp: new Date(),
+    source: 'NextStep AI',
+    nextQuestions: isEnglish
+      ? ['What career should I choose after 12th?', 'Give me a roadmap to become a software developer', 'I am confused about my career']
+      : ['12th ke baad kya career choose karun?', 'Software developer banne ka roadmap do', 'Career me bahut confusion hai'],
+  };
+}
+
+function sessionToMessages(sessionMessages: SessionSnapshot['messages']): Message[] {
+  return sessionMessages.map((msg, index) => ({
+    id: `session-${index}`,
+    role: msg.role,
+    content: msg.content,
+    timestamp: msg.createdAt ? new Date(msg.createdAt) : new Date(),
+    source: msg.role === 'assistant' ? 'NextStep AI' : undefined,
+  }));
+}
 function getChatUserId() {
   const storageKey = 'nextstepai_chat_user_id';
   const existing = window.localStorage.getItem(storageKey);
@@ -73,9 +103,20 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
     getQuickQuestions<string[]>()
       .then(setQuickQuestions)
       .catch((error) => console.warn('Quick questions unavailable:', error));
+
     getChatSession(chatUserId)
-      .then(setSession)
-      .catch((error) => console.warn('Chat session unavailable:', error));
+      .then((data) => {
+        setSession(data);
+        if (data.messages?.length) {
+          setMessages(sessionToMessages(data.messages));
+        } else {
+          setMessages([getWelcomeMessage(userProfile)]);
+        }
+      })
+      .catch((error) => {
+        console.warn('Chat session unavailable:', error);
+        setMessages([getWelcomeMessage(userProfile)]);
+      });
   }, [chatUserId]);
 
   useEffect(() => {
@@ -87,38 +128,59 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
   const handleSend = async () => {
     if (!input.trim()) return;
 
+    const outgoing = input.trim();
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: outgoing,
       timestamp: new Date(),
     };
 
+    const assistantId = (Date.now() + 1).toString();
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
 
+    const chatInput = {
+      message: outgoing,
+      userId: chatUserId,
+      education: userProfile.education,
+      language: userProfile.language,
+      profile: {
+        name: userProfile.name,
+        interests: userProfile.interests,
+      },
+    };
+
     try {
-      const apiResponse = await sendChatMessage({
-        message: input,
-        userId: userProfile.name || chatUserId,
-        education: userProfile.education,
-        language: userProfile.language,
+      let streamedPreview = '';
+
+      const apiResponse = await sendChatMessageStream(chatInput, (preview) => {
+        streamedPreview = preview;
+        setMessages((prev) => {
+          const withoutDraft = prev.filter((msg) => msg.id !== assistantId);
+          return [
+            ...withoutDraft,
+            {
+              id: assistantId,
+              role: 'assistant',
+              content: preview,
+              timestamp: new Date(),
+              source: 'NextStep AI',
+            },
+          ];
+        });
+        setIsTyping(false);
       });
 
-      const source = apiResponse.metadata?.aiMode === 'groq'
-        ? `Groq AI${apiResponse.metadata.model ? ` - ${apiResponse.metadata.model}` : ''}`
-        : apiResponse.metadata?.aiMode === 'langchain-groq'
-          ? `LangChain Groq${apiResponse.metadata.model ? ` - ${apiResponse.metadata.model}` : ''}`
-        : apiResponse.metadata?.aiMode === 'rule-based'
-          ? 'Career Mentor'
-        : 'Local fallback';
+      const source = resolveChatSource(apiResponse.metadata);
 
-      const response = {
-        content: [
-          apiResponse.message,
-          apiResponse.recommendation ? `\nRecommendation: ${apiResponse.recommendation}` : '',
-        ].join(''),
+      const assistantMessage: Message = {
+        id: assistantId,
+        role: 'assistant',
+        content: apiResponse.message,
+        timestamp: new Date(),
+        type: apiResponse.options?.length ? 'options' : 'text',
         options: apiResponse.options?.map((option) => ({
           title: option.title || option.name || 'Career option',
           duration: option.duration,
@@ -129,21 +191,17 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
             option.riskLevel ? `Risk: ${option.riskLevel}` : '',
           ].filter(Boolean).join(' | '),
         })),
-      };
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response.content,
-        timestamp: new Date(),
-        type: response.options?.length ? 'options' : 'text',
-        options: response.options,
+        roadmap: apiResponse.roadmap?.length ? apiResponse.roadmap : undefined,
         source,
         decision: apiResponse.metadata?.decision,
         nextQuestions: apiResponse.nextQuestions,
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      if (!assistantMessage.content && streamedPreview) {
+        assistantMessage.content = streamedPreview;
+      }
+
+      setMessages((prev) => [...prev.filter((msg) => msg.id !== assistantId), assistantMessage]);
       getChatSession(chatUserId).then(setSession).catch(() => undefined);
     } catch (error) {
       const assistantMessage: Message = {
@@ -172,7 +230,7 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
   };
 
   return (
-    <div className="mx-auto grid min-h-[calc(100vh-7rem)] max-w-[1500px] gap-5 xl:grid-cols-[1fr_360px]">
+    <div className="mx-auto grid h-[calc(100vh-7rem)] max-w-[1500px] gap-4 overflow-hidden lg:grid-cols-[minmax(0,1fr)_340px]">
       {toast && (
         <div className="fixed right-5 top-20 z-50 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-bold text-white shadow-2xl">
           {toast}
@@ -180,14 +238,14 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
       )}
 
       <div className="flex min-h-0 flex-col">
-      <div className="page-hero mb-4">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="page-hero mb-3 px-5 py-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-slate-950">
+            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-slate-950">
             <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-2xl font-extrabold">NextStep AI Mentor</h2>
+              <h2 className="text-xl font-extrabold">NextStep AI Mentor</h2>
               <div className="flex items-center gap-2 text-xs font-bold text-teal-100">
                 <span className="h-2 w-2 rounded-full bg-teal-300"></span>
                 Online
@@ -208,16 +266,16 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
         </div>
       </div>
 
-      <div className="surface mb-4 min-h-0 flex-1 overflow-hidden">
-        <div className="h-[calc(100vh-23rem)] min-h-[420px] overflow-y-auto p-4 space-y-4">
-          {messages.length === 0 && (
-            <div className="grid h-full place-items-center rounded-2xl bg-gradient-to-br from-teal-50 via-white to-indigo-50 p-6 text-center">
+      <div className="surface mb-3 min-h-0 flex-1 overflow-hidden">
+        <div className="h-full overflow-hidden p-3">
+          {messages.length <= 1 && messages[0]?.id === 'welcome' && (
+            <div className="mb-3 rounded-2xl bg-gradient-to-br from-teal-50 via-white to-indigo-50 p-4 text-center">
               <div>
-                <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-slate-950 text-white">
-                  <MessageSquare className="h-6 w-6" />
+                <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-slate-950 text-white">
+                  <MessageSquare className="h-5 w-5" />
                 </div>
-                <p className="text-xl font-black text-slate-950">Quick Questions</p>
-                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <p className="text-lg font-black text-slate-950">Quick Questions</p>
+                <div className="mt-3 flex flex-wrap justify-center gap-2">
                   {quickQuestions.map((question) => (
                     <button key={question} onClick={() => setInput(question)} className="pill">
                       {question}
@@ -228,6 +286,7 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
             </div>
           )}
 
+          <div className="h-full space-y-3 overflow-y-auto pr-1">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -246,7 +305,7 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
               </div>
 
               <div
-                className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                className={`max-w-[86%] rounded-lg px-4 py-3 ${
                   message.role === 'user'
                     ? 'bg-slate-950 text-white'
                     : 'bg-slate-100 text-slate-800'
@@ -256,19 +315,43 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
                   {message.content}
                 </div>
 
+                {message.roadmap?.length ? (
+                  <div className="mt-4 space-y-3">
+                    <p className="text-xs font-black uppercase tracking-wide text-teal-700">Complete Roadmap</p>
+                    {message.roadmap.map((phase, phaseIndex) => (
+                      <div key={`${phase.title}-${phaseIndex}`} className="rounded-2xl border border-teal-200 bg-white p-3 text-slate-800">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-bold text-slate-950">{phaseIndex + 1}. {phase.title}</p>
+                          <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-bold text-teal-700">{phase.duration}</span>
+                        </div>
+                        {phase.tasks?.length ? (
+                          <ul className="mt-2 space-y-1 text-xs text-slate-600">
+                            {phase.tasks.map((task, taskIndex) => (
+                              <li key={taskIndex} className="flex gap-2">
+                                <span className="text-teal-600">•</span>
+                                <span>{typeof task === 'string' ? task : task.title}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
                 {/* Options Cards */}
                 {message.type === 'options' && message.options && (
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
-                    {message.options.map((option, index) => (
+                  <div className="mt-3 grid gap-2 md:grid-cols-2">
+                    {message.options.slice(0, 2).map((option, index) => (
                       <div
                         key={index}
-                        className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-800"
+                        className="rounded-2xl border border-slate-200 bg-white p-2.5 text-slate-800"
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-bold text-slate-950">{option.title}</span>
                           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs">{option.duration}</span>
                         </div>
-                        <p className="text-xs text-slate-600">{option.description}</p>
+                        <p className="line-clamp-2 text-xs text-slate-600">{option.description}</p>
                         <p className="text-xs font-medium text-emerald-700 mt-1">{option.salary}</p>
                         <div className="mt-3 flex gap-2">
                           <button
@@ -290,19 +373,19 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
                 )}
 
                 {message.decision?.bestPath && (
-                  <div className="mt-4 rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-4 text-slate-900">
+                  <div className="mt-3 rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-3 text-slate-900">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-xs font-black uppercase text-teal-700">Best Match</p>
-                        <h3 className="mt-1 text-lg font-black">{message.decision.bestPath.title}</h3>
-                        <p className="mt-1 text-xs leading-5 text-slate-600">{message.decision.bestPath.reason}</p>
+                        <h3 className="mt-1 text-base font-black">{message.decision.bestPath.title}</h3>
+                        <p className="line-clamp-2 mt-1 text-xs leading-5 text-slate-600">{message.decision.bestPath.reason}</p>
                       </div>
                       <div className="rounded-2xl bg-slate-950 px-3 py-2 text-center text-white">
                         <p className="text-xl font-black">{message.decision.bestPath.outcome.successProbability}%</p>
                         <p className="text-[10px] font-bold text-teal-100">match</p>
                       </div>
                     </div>
-                    <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                    <div className="mt-3 grid gap-2 sm:grid-cols-3">
                       <div className="rounded-xl bg-white p-3">
                         <ShieldCheck className="mb-2 h-4 w-4 text-teal-700" />
                         <p className="text-xs font-bold text-slate-500">Risk</p>
@@ -371,10 +454,11 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
           )}
 
           <div ref={messagesEndRef} />
+          </div>
         </div>
       </div>
 
-      <div className="surface p-3">
+      <div className="surface p-2.5">
         <div className="flex gap-2">
           <button className="icon-button" aria-label="Voice input">
             <Mic className="w-5 h-5" />
@@ -397,48 +481,68 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
           </button>
         </div>
       </div>
+
       </div>
 
-      <aside className="hidden xl:flex xl:flex-col xl:gap-4">
-        <div className="gradient-card">
-          <p className="text-sm font-extrabold text-teal-100">Quick Questions</p>
-          <div className="mt-4 space-y-2">
+      <aside className="hidden min-h-0 grid-rows-[auto_auto_1fr_auto] gap-3 overflow-hidden lg:grid">
+        <div className="grid grid-cols-2 gap-2">
+          {(session?.stats || [
+            { label: 'Messages', value: '0' },
+            { label: 'Saved Careers', value: '0' },
+          ]).slice(0, 4).map((stat) => (
+            <div key={stat.label} className="surface p-3">
+              <p className="text-xl font-black text-slate-950">{stat.value}</p>
+              <p className="text-[11px] font-bold text-slate-500">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+        <div className="gradient-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-extrabold text-teal-100">Quick Questions</p>
+            <TrendingUp className="h-4 w-4 text-teal-100" />
+          </div>
+          <div className="mt-3 space-y-2">
             {quickQuestions.map((question) => (
               <button
                 key={question}
                 onClick={() => setInput(question)}
-                className="w-full rounded-2xl border border-white/10 bg-white/10 p-3 text-left text-sm font-bold text-white transition hover:bg-white/15"
+                className="w-full rounded-2xl border border-white/10 bg-white/10 p-2.5 text-left text-xs font-bold text-white transition hover:bg-white/15"
               >
                 {question}
               </button>
             ))}
           </div>
         </div>
-        {session && (
-          <div className="surface p-4">
-            <p className="section-title">Your Session</p>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              {session.stats.map((stat) => (
-                <div key={stat.label} className="rounded-2xl bg-gradient-to-br from-slate-50 to-indigo-50 p-3">
-                  <p className="text-2xl font-black text-slate-950">{stat.value}</p>
-                  <p className="text-[11px] font-bold text-slate-500">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        {session?.savedCareers.length ? (
-          <div className="surface p-4">
-            <p className="section-title">Saved Careers</p>
-            <div className="mt-3 space-y-2">
-              {session.savedCareers.slice(-4).map((career) => (
-                <div key={`${career.title}-${career.savedAt}`} className="rounded-2xl bg-white/80 p-3 text-sm font-bold text-slate-800">
+        <div className="surface min-h-0 overflow-hidden p-3">
+          <p className="section-title">Saved Careers</p>
+          <div className="mt-3 space-y-2 overflow-hidden">
+            {session?.savedCareers.length ? (
+              session.savedCareers.slice(-4).map((career) => (
+                <div key={`${career.title}-${career.savedAt}`} className="rounded-2xl bg-white/80 p-2.5 text-sm font-bold text-slate-800">
                   {career.title}
                 </div>
-              ))}
-            </div>
+              ))
+            ) : (
+              <div className="rounded-2xl bg-gradient-to-br from-teal-50 to-indigo-50 p-3 text-sm font-bold text-slate-700">
+                Saved career cards will appear here.
+              </div>
+            )}
           </div>
-        ) : null}
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="accent-card p-3">
+            <Target className="mb-2 h-4 w-4 text-teal-700" />
+            <p className="text-xs font-black text-slate-950">Match</p>
+          </div>
+          <div className="accent-card p-3">
+            <Bookmark className="mb-2 h-4 w-4 text-indigo-700" />
+            <p className="text-xs font-black text-slate-950">Save</p>
+          </div>
+          <div className="accent-card p-3">
+            <Route className="mb-2 h-4 w-4 text-slate-700" />
+            <p className="text-xs font-black text-slate-950">Plan</p>
+          </div>
+        </div>
       </aside>
     </div>
   );

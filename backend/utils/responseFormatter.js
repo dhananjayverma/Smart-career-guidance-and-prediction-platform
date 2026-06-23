@@ -1,3 +1,5 @@
+const { sanitizeAssistantMessage } = require('./aiResponseParser');
+
 function normalizeOption(option = {}) {
   return {
     name: option.name || option.title || 'Career option',
@@ -22,8 +24,12 @@ function formatCareerResponse(raw = {}, fallback = {}) {
     ? response.metadata
     : {};
 
+  const message = sanitizeAssistantMessage(
+    response.message || fallback.message || 'Career options mil gaye. Neeche best paths dekho.'
+  );
+
   return {
-    message: response.message || fallback.message || 'Career options mil gaye. Neeche best paths dekho.',
+    message,
     options,
     roadmap: Array.isArray(response.roadmap) ? response.roadmap : [],
     recommendation: response.recommendation || fallback.recommendation || '',

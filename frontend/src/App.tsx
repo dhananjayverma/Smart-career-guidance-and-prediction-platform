@@ -175,22 +175,26 @@ function App() {
     }
   };
 
+  const handleNavigate = (page: string) => {
+    setActivePage(page);
+    setSidebarOpen(false);
+  };
+
   const renderNavGroup = (items: NavItem[]) => (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       {items.map((item) => {
         const Icon = iconMap[item.icon] || Compass;
         const selected = activePage === item.id;
         return (
           <button
             key={item.id}
-            onClick={() => {
-              setActivePage(item.id);
-              setSidebarOpen(false);
-            }}
+            onClick={() => handleNavigate(item.id)}
             className={`nav-item ${selected ? 'nav-item-active' : ''}`}
           >
-            <Icon className="h-4 w-4" />
-            <span>{item.label}</span>
+            <span className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-xl bg-white/5">
+              <Icon className="h-4 w-4" />
+            </span>
+            <span className="truncate">{item.label}</span>
           </button>
         );
       })}
@@ -198,17 +202,17 @@ function App() {
   );
 
   const sidebar = (
-    <aside className="flex h-full w-72 flex-col border-r border-white/10 bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950 px-4 py-5 text-white shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
-      <div className="mb-8 flex items-center justify-between">
+    <aside className="flex h-full w-72 flex-col overflow-hidden border-r border-white/10 bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950 px-4 py-5 text-white shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+      <div className="mb-6 flex items-center justify-between">
         <button
-          onClick={() => setActivePage('dashboard')}
-          className="flex items-center gap-3 text-left"
+          onClick={() => handleNavigate('dashboard')}
+          className="flex min-w-0 items-center gap-3 text-left"
           aria-label="Open dashboard"
         >
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-slate-950 shadow-lg shadow-teal-400/20">
             <Sparkles className="h-5 w-5" />
           </span>
-          <span>
+          <span className="min-w-0">
             <span className="block text-base font-extrabold text-white">{productName}</span>
             <span className="block text-xs font-medium text-teal-100/80">Career intelligence</span>
           </span>
@@ -222,7 +226,7 @@ function App() {
         </button>
       </div>
 
-      <nav className="flex-1 space-y-6">
+      <nav className="min-h-0 flex-1 space-y-6 overflow-y-auto pr-1">
         {renderNavGroup(groupedNav.primary)}
         {groupedNav.secondary.length > 0 && (
           <div>
@@ -233,11 +237,13 @@ function App() {
       </nav>
 
       <button
-        onClick={() => setActivePage('settings')}
+        onClick={() => handleNavigate('settings')}
         className={`nav-item mt-4 ${activePage === 'settings' ? 'nav-item-active' : ''}`}
       >
-        <Settings className="h-4 w-4" />
-        <span>Settings</span>
+        <span className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-xl bg-white/5">
+          <Settings className="h-4 w-4" />
+        </span>
+        <span className="truncate">Settings</span>
       </button>
     </aside>
   );
@@ -250,8 +256,8 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-50 to-teal-50 text-slate-950">
       <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(120deg,rgba(20,184,166,0.16),transparent_34%,rgba(99,102,241,0.16)),repeating-linear-gradient(90deg,rgba(15,23,42,0.035)_0_1px,transparent_1px_96px)]" />
 
-      <div className="relative flex min-h-screen">
-        <div className="hidden lg:block">{sidebar}</div>
+      <div className="relative min-h-screen">
+        <div className="fixed inset-y-0 left-0 z-40 hidden lg:block">{sidebar}</div>
 
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />
@@ -264,7 +270,7 @@ function App() {
           {sidebar}
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col lg:pl-72">
           <header className="sticky top-0 z-30 border-b border-white/60 bg-white/75 shadow-sm shadow-slate-900/[0.03] backdrop-blur-xl">
             <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
               <div className="flex min-w-0 items-center gap-3">
@@ -281,7 +287,7 @@ function App() {
                 </div>
               </div>
               <button
-                onClick={() => setActivePage('chat')}
+                onClick={() => handleNavigate('chat')}
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-slate-950 to-indigo-950 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-indigo-950/20 transition hover:scale-[1.02]"
               >
                 <MessageSquare className="h-4 w-4" />

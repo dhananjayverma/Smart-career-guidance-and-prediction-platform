@@ -1,54 +1,75 @@
 # Job Prediction
 
-A complete career guidance platform for students, built with a React + Vite frontend and an Express backend. This project provides career recommendations, college comparisons, roadmaps, AI chat help, dashboards, simulations, and study resources.
+A complete career guidance and prediction platform for students.
 
-## Project Overview
+This project combines:
+- **Backend**: Node.js + Express APIs for career data, college search, roadmaps, AI chat, and content pages.
+- **Frontend**: React + TypeScript + Vite user interface for an interactive mentor-style experience.
 
-- `backend/` contains the Node.js Express server and all API routes.
-- `frontend/` contains the React + TypeScript application built with Vite.
-- The backend loads optional environment variables from a `.env` file at the repository root.
+---
 
 ## What this app does
 
-- Provides career suggestion and prediction data
-- Lets users explore colleges and compare options
-- Builds roadmaps and study plans
-- Includes an AI-powered chat assistant
-- Displays dashboard metrics, simulations, and materials
+This app helps students and job seekers to:
+- discover career options and recommendations
+- compare colleges and educational paths
+- generate roadmaps and study plans
+- chat with an AI guidance assistant
+- view dashboards, simulations, and study materials
+
+The frontend loads data from the backend via REST endpoints.
+
+---
 
 ## Prerequisites
 
-Before you start, make sure you have:
+Before running the project, make sure you have:
+- Node.js version **18 or higher**
+- npm installed (`npm --version`)
+- Optional: `yarn` if you prefer it
+- Optional: MongoDB running locally or a database URI
 
-- Node.js 18 or higher installed
-- npm available (`npm --version`)
-- Optional: `yarn` if you prefer it instead of npm
+You can verify Node.js with:
 
-## Setup Instructions
+```bash
+node --version
+npm --version
+```
 
-Follow these steps one by one. Do not skip any part.
+---
+
+## Project folders
+
+- `backend/` - Express server and API implementation
+- `frontend/` - Vite-powered React application
+- `.env` - optional environment configuration file at the repository root
+
+---
+
+## Backend setup (step-by-step)
 
 ### 1. Install backend dependencies
 
-1. Open a terminal.
-2. Go to the backend folder:
+Open a terminal and run:
 
 ```bash
 cd /Users/laptopbazaar/Desktop/job-predction/backend
-```
-3. Install packages:
-
-```bash
 npm install
 ```
 
-This installs the backend dependencies like `express`, `cors`, `mongoose`, `socket.io`, and `nodemon`.
+This installs backend packages including:
+- `express`
+- `cors`
+- `mongoose`
+- `socket.io`
+- `nodemon`
+- `@langchain/*`
 
 ### 2. Configure backend environment variables
 
-The backend can read settings from a `.env` file in the repository root. Create a file named `.env` if it does not exist.
+The backend reads `.env` from the project root. Create a file named `.env` next to `backend/`.
 
-Example `.env` values:
+Example `.env`:
 
 ```env
 PORT=5001
@@ -60,117 +81,286 @@ AI_MODEL=your_model_name
 CORS_ORIGIN=http://localhost:5173
 ```
 
-Important:
+Explanation of keys:
+- `PORT` — server port for the backend (default: `5001`)
+- `MONGO_URI` — MongoDB connection string
+- `AI_PROVIDER` — AI provider identifier (`groq`, etc.)
+- `GROQ_API_KEY` / `GROQ_API` — API key for GROQ AI
+- `OPENAI_API_KEY` — API key for OpenAI
+- `AI_MODEL` — AI model name to use
+- `CORS_ORIGIN` — allowed frontend origin, usually `http://localhost:5173`
 
-- `PORT` controls the backend port.
-- `MONGO_URI` defines the MongoDB connection string.
-- `AI_PROVIDER` can be `groq` or another supported provider.
-- `CORS_ORIGIN` controls which frontend origins can call the backend.
+> If you do not have AI keys, the backend may still run, but AI-related endpoints may not function.
 
 ### 3. Start the backend server
 
-Run this command from the backend folder:
+From the `backend` folder run:
 
 ```bash
 npm run dev
 ```
 
-This starts the server with `nodemon`, which reloads automatically when backend files change.
+This command uses `nodemon` to restart automatically when backend files change.
 
-If you want to run the server without automatic reload:
+If you want to run without auto-reload:
 
 ```bash
 npm start
 ```
 
-### 4. Verify backend is running
+### 4. Verify backend health
 
-Open your browser or use a tool like `curl` to check the health endpoint:
+After starting the backend, open a new terminal and run:
 
 ```bash
 curl http://localhost:5001/health
 ```
 
-The response should include JSON with status and AI provider details.
+You should receive JSON similar to:
 
-### 5. Install frontend dependencies
+```json
+{
+  "status": "ok",
+  "service": "Career Mentor AI",
+  "ai": {
+    "provider": "groq",
+    "model": "default",
+    "configured": true
+  },
+  "timestamp": "..."
+}
+```
 
-Open another terminal and go to the frontend folder:
+If the request fails:
+- confirm backend is running
+- confirm `PORT` is set correctly
+- confirm `CORS_ORIGIN` includes the frontend URL
+
+---
+
+## Frontend setup (step-by-step)
+
+### 1. Install frontend dependencies
+
+Open a second terminal and run:
 
 ```bash
 cd /Users/laptopbazaar/Desktop/job-predction/frontend
 npm install
 ```
 
-This installs the frontend dependencies like `react`, `react-dom`, `vite`, `typescript`, and `tailwindcss`.
+This installs frontend packages including:
+- `react`
+- `react-dom`
+- `vite`
+- `typescript`
+- `tailwindcss`
+- `lucide-react`
+- `@supabase/supabase-js`
 
-### 6. Start the frontend app
+### 2. Start the frontend
 
-Run the frontend dev server:
+In the `frontend` folder run:
 
 ```bash
 npm run dev
 ```
 
-Vite will show a local development URL, usually `http://localhost:5173`.
+Vite will display a local development URL, usually:
 
-### 7. Open the app in your browser
+```bash
+http://localhost:5173
+```
 
-Visit the URL shown by Vite. The frontend should connect to the backend APIs automatically if the backend is running.
+Open that URL in your browser.
 
-## Folder Structure Explained
+### 3. Frontend environment
+
+The frontend uses `VITE_API_URL` if configured. By default it points to:
+
+```text
+http://localhost:5001
+```
+
+If your backend runs on a different port or host, create a `.env` file in `frontend/` with:
+
+```env
+VITE_API_URL=http://localhost:5001
+```
+
+---
+
+## How to use the app
+
+1. Start the backend first.
+2. Start the frontend second.
+3. Open the frontend URL in a browser.
+4. Navigate through pages like:
+   - Home
+   - Career
+   - College
+   - Roadmap
+   - Chat
+   - Dashboard
+   - Compare
+   - Simulations
+   - Study Material
+5. Use the chat assistant for career questions and save recommended careers.
+
+---
+
+## Backend API endpoints
+
+The backend exposes these REST endpoints:
+
+### Chat
+- `POST /api/chat` — send a user message and get AI career guidance
+- `GET /api/chat/session/:userId` — retrieve saved chat session data
+- `POST /api/chat/session/:userId/saved-careers` — save a career recommendation
+
+### Career
+- `GET /api/career` — list careers
+- `GET /api/career/suggestions` — request career suggestions by filters
+
+### College
+- `GET /api/colleges` — get college listings and filter results
+
+### Roadmap
+- `GET /api/roadmap` — list roadmap templates
+- `POST /api/roadmap` — create a roadmap for a selected career
+
+### Content
+- `GET /api/content/compare` — comparison data for colleges/careers
+- `GET /api/content/dashboard` — dashboard content
+- `GET /api/content/home` — home page content
+- `GET /api/content/materials` — study materials
+- `GET /api/content/navigation` — nav menu content
+- `GET /api/content/quick-questions` — quick chat questions
+- `GET /api/content/settings` — app settings content
+- `GET /api/content/simulations` — simulation data
+
+---
+
+## Frontend API helper
+
+The frontend uses `frontend/src/lib/api.ts` to call backend APIs.
+
+Important functions include:
+- `sendChatMessage(...)`
+- `getChatSession(userId)`
+- `saveCareerToSession(userId, input)`
+- `getCareers(category)`
+- `getCareerSuggestions(filters)`
+- `getColleges(filters)`
+- `getRoadmapTemplates()`
+- `createRoadmap(career)`
+- `getCompareOptions()`
+- `getDashboard()`
+- `getHome()`
+- `getNavigation()`
+- `getMaterials(filters)`
+- `getQuickQuestions()`
+- `getSimulations()`
+
+---
+
+## Folder structure explained
 
 ### backend/
-
-- `server.js` - starts the HTTP server and connects to the database
-- `app.js` - defines Express routes and middleware
-- `config/env.js` - loads environment variables from `.env`
-- `config/db.js` - connects to MongoDB
-- `routes/` - route definitions for chat, career, college, roadmap, and content APIs
-- `controllers/` - controller functions for each route
-- `services/` - business logic and data processing services
-- `data/` - static JSON data used by the app
-- `models/` - Mongoose models for database entities
-- `utils/` - utility helpers like prompt builders and response formatters
+- `server.js` — starts the HTTP server and connects MongoDB
+- `app.js` — Express app, routes, middleware, error handling
+- `config/env.js` — loads `.env` variables and exports config
+- `config/db.js` — MongoDB connection logic
+- `routes/` — route definitions for API endpoints
+- `controllers/` — route handlers that process requests
+- `services/` — business logic and data processing
+- `models/` — Mongoose schemas and database models
+- `data/` — static JSON datasets used by the app
+- `utils/` — helper functions for language, prompts, responses
 
 ### frontend/
+- `src/` — React application code
+- `src/pages/` — page components like `HomePage`, `ChatPage`, `CollegePage`
+- `src/lib/api.ts` — backend API calls and data fetching helpers
+- `index.css` — global styling and Tailwind directives
+- `vite.config.ts` — Vite configuration
 
-- `src/` - main React application code
-- `src/pages/` - page components such as Home, Chat, College, Career, Roadmap, Dashboard, etc.
-- `src/lib/api.ts` - frontend API helper functions
-- `index.css` - global CSS and Tailwind setup
-- `vite.config.ts` - Vite build configuration
+---
 
 ## Common commands
 
-### Backend commands
-
+### Backend
 ```bash
 cd backend
 npm install
-npm run dev      # run with nodemon
-npm start        # run once
-npm run health   # check health endpoint
+npm run dev      # start backend in development mode with nodemon
+npm start        # start backend once
+npm run health   # check backend health endpoint
 ```
 
-### Frontend commands
-
+### Frontend
 ```bash
 cd frontend
 npm install
-npm run dev      # run development server
-npm run build    # build production files
-npm run preview  # preview production build
-npm run lint     # run ESLint checks
-npm run typecheck# run TypeScript type check
+npm run dev      # start frontend dev server
+npm run build    # build frontend for production
+npm run preview  # preview production build locally
+npm run lint     # run ESLint
+npm run typecheck # run TypeScript type check
 ```
+
+---
 
 ## Troubleshooting
 
-- If the backend fails to start, verify your `.env` file and MongoDB connection.
-- If the frontend cannot connect to the backend, make sure `CORS_ORIGIN` includes the frontend host.
-- If dependencies fail to install, update Node.js to version 18 or newer.
+### Backend issues
+- If the server fails to start, check `.env` values, especially `PORT` and `MONGO_URI`.
+- If MongoDB is not running, start your local database or use a hosted MongoDB URI.
+- If the backend cannot reach the AI service, confirm your API key variables are correct.
 
-## Final Notes
+### Frontend issues
+- If Vite fails to start, verify all dependencies installed successfully.
+- If the frontend is blank or broken, open browser console for network and JavaScript errors.
+- If the frontend cannot call backend APIs, make sure `VITE_API_URL` or `CORS_ORIGIN` settings are correct.
 
-This README gives complete step-by-step instructions for both backend and frontend. Update the file if you add new features, deployment steps, or environment variables.
+### Common fixes
+- Run `npm install` again in the failing folder.
+- Restart both backend and frontend servers.
+- Clear browser cache or use an incognito window.
+
+---
+
+## Deployment notes
+
+This repository is currently set up for local development.
+
+For production deployment, you will need to:
+- build the frontend with `npm run build`
+- host the frontend static files on a web server
+- host the backend on a Node.js server
+- configure environment variables securely
+- enable a production MongoDB database
+- set `CORS_ORIGIN` to the production frontend URL
+
+---
+
+## Keep improving this README
+
+Add details for:
+- new environment variables
+- deployment instructions
+- backend database models
+- frontend routing and pages
+- any third-party services used
+
+Thank you for using this project.
+
+
+
+
+
+
+
+
+
+

@@ -1,8 +1,9 @@
 const emotionPatterns = [
-  { mood: 'depressed', words: ['depress', 'dukhi', 'hopeless', 'worthless', 'rona', 'marna'], weight: 5 },
-  { mood: 'stressed', words: ['stress', 'stressed', 'tension', 'pareshan', 'presan', 'pareshaan', 'pressure'], weight: 4 },
-  { mood: 'confused', words: ['confused', 'confusion', 'samajh nahi', 'kya karu', 'kya kru', 'doubt', 'unclear'], weight: 3 },
-  { mood: 'motivated', words: ['motivated', 'ready', 'karna hai', 'banna hai', 'goal', 'dream'], weight: 2 },
+  { mood: 'depressed', words: ['depress', 'dukhi', 'hopeless', 'worthless', 'rona', 'marna', 'give up', 'kuch nahi', 'faida nahi'], weight: 5 },
+  { mood: 'stressed', words: ['stress', 'stressed', 'tension', 'pareshan', 'presan', 'pareshaan', 'pressure', 'dar', 'scared', 'anxiety', 'ghabra'], weight: 4 },
+  { mood: 'confused', words: ['confused', 'confusion', 'samajh nahi', 'kya karu', 'kya kru', 'doubt', 'unclear', 'lost', 'kya banaun'], weight: 3 },
+  { mood: 'motivated', words: ['motivated', 'ready', 'karna hai', 'banna hai', 'goal', 'dream', 'excited', 'passion'], weight: 2 },
+  { mood: 'curious', words: ['batao', 'tell me', 'explain', 'kaise', 'how', 'what is', 'kya hai', 'sikhao', 'teach'], weight: 1 },
 ];
 
 function analyzeEmotion(message = '') {
@@ -20,7 +21,7 @@ function analyzeEmotion(message = '') {
     mood,
     confidence: Number(confidence.toFixed(2)),
     needsSupport: ['depressed', 'stressed'].includes(mood),
-    tone: mood === 'motivated' ? 'energetic' : mood === 'neutral' ? 'calm' : 'supportive',
+    tone: mood === 'motivated' ? 'energetic' : mood === 'curious' ? 'informative' : mood === 'neutral' ? 'calm' : 'supportive',
   };
 }
 

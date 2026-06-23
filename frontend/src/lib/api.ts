@@ -34,10 +34,16 @@ export interface ChatOption {
   riskLevel?: string;
 }
 
+export interface RoadmapPhase {
+  title: string;
+  duration: string;
+  tasks?: (string | { title: string })[];
+}
+
 export interface ChatResponse {
   message: string;
   options: ChatOption[];
-  roadmap: unknown[];
+  roadmap: RoadmapPhase[];
   recommendation: string;
   nextQuestions: string[];
   metadata: {
@@ -46,6 +52,8 @@ export interface ChatResponse {
     education: string;
     aiMode?: string;
     model?: string;
+    pipeline?: string;
+    templateId?: string;
     fallbackReason?: string;
     decision?: {
       bestPath?: {
@@ -90,12 +98,89 @@ export function sendChatMessage(input: {
   education?: string;
   interest?: string;
   language?: string;
+  profile?: { name?: string; interests?: string[]; skills?: string[] };
 }) {
   return request<ChatResponse>('/api/chat', {
     method: 'POST',
     body: JSON.stringify(input),
   });
 }
+
+export async function sendChatMessageStream(
+  input: {
+    message: string;
+    userId: string;
+    education?: string;
+    interest?: string;
+    language?: string;
+    profile?: { name?: string; interests?: string[]; skills?: string[] };
+  },
+  onDelta: (chunk: string) => void
+): Promise<ChatResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok || !response.body) {
+    throw new Error(`Stream failed: ${response.status}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let finalPayload: ChatResponse | null = null;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith('data:')) continue;
+
+      const payload = JSON.parse(trimmed.slice(5).trim());
+      if (payload.type === 'delta' && payload.content) {
+        onDelta(payload.content);
+      }
+      if (payload.type === 'done' && payload.data) {
+        finalPayload = payload.data as ChatResponse;
+      }
+      if (payload.type === 'error') {
+        throw new Error(payload.message || 'Stream error');
+      }
+    }
+  }
+
+  if (!finalPayload) {
+    throw new Error('Stream ended without final response');
+  }
+
+  return finalPayload;
+}
+
+function resolveChatSource(metadata?: ChatResponse['metadata']) {
+  const pipeline = metadata?.pipeline as string | undefined;
+  const aiMode = metadata?.aiMode;
+  const model = metadata?.model;
+
+  if (pipeline === 'cache') return 'Instant · Cached';
+  if (pipeline === 'template' || aiMode === 'template-engine') return 'Instant · Guide';
+  if (pipeline === 'local-engine' || aiMode === 'local-engine') return 'Career Mentor';
+  if (pipeline === 'static-fallback' || aiMode === 'static-fallback') return 'Offline Guide';
+  if (aiMode === 'openrouter') return `OpenRouter${model ? ` · ${model}` : ''}`;
+  if (aiMode === 'groq' || pipeline === 'ai-stream') return `Groq${model ? ` · ${model}` : ''}`;
+  if (aiMode === 'together') return `Together AI${model ? ` · ${model}` : ''}`;
+  if (aiMode === 'openai') return `OpenAI${model ? ` · ${model}` : ''}`;
+  return 'NextStep AI';
+}
+
+export { resolveChatSource };
 
 export interface SessionSnapshot {
   messages: { role: 'user' | 'assistant'; content: string; metadata?: Record<string, unknown>; createdAt?: string }[];

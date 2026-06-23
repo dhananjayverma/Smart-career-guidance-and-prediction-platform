@@ -1,79 +1,123 @@
-const env = require('../config/env');
 const { getCareerSuggestions } = require('./career.service');
 const { createRoadmap } = require('./roadmap.service');
-const { buildCareerPrompt, isCareerIntent } = require('../utils/promptBuilder');
+const { askAI, streamAI } = require('./aiProvider');
+const { executeMentorRequest, executeMentorStream } = require('./mentorPipeline.service');
+const { getStaticResponse } = require('./templateEngine.service');
+const { parseAiResponse, extractStreamingMessagePreview } = require('../utils/aiResponseParser');
+const {
+  buildCareerPrompt,
+  buildSystemPrompt,
+  extractCareerTarget,
+  isCareerIntent,
+} = require('../utils/promptBuilder');
 const { formatCareerResponse } = require('../utils/responseFormatter');
 const { retrieveRelevantContext } = require('./rag.service');
 
-function parseAiJson(content = '{}') {
-  const raw = typeof content === 'string' ? content.trim() : JSON.stringify(content);
-  const withoutFence = raw
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```$/i, '')
-    .trim();
+const MAX_CONTEXT_CHARS = 2000;
 
-  try {
-    return JSON.parse(withoutFence);
-  } catch (error) {
-    const start = withoutFence.indexOf('{');
-    const end = withoutFence.lastIndexOf('}');
-
-    if (start !== -1 && end !== -1 && end > start) {
-      return JSON.parse(withoutFence.slice(start, end + 1));
-    }
-
-    throw error;
-  }
+function normalizeRoadmapMilestones(milestones = []) {
+  return milestones.map((milestone) => ({
+    title: milestone.title,
+    duration: milestone.duration,
+    tasks: (milestone.tasks || []).map((task) => (
+      typeof task === 'string' ? task : task.title || String(task)
+    )),
+  }));
 }
 
-function createSmallTalkAnswer({ intent, language }) {
+function formatRoadmapMessage(roadmap, careerTitle, language) {
   const isEnglish = language === 'english';
-  const message = intent === 'greeting'
-    ? (isEnglish
-      ? 'Hi! I am NextStep AI, your career mentor. Tell me your class, stream, interest, or confusion and I will guide you step by step.'
-      : 'Hi! Main NextStep AI hoon, aapka career mentor. Apni class, stream, interest ya confusion batao, main step-by-step guide karunga.')
-    : (isEnglish
-      ? 'Got it. Ask me anything about careers, exams, colleges, skills, or roadmaps.'
-      : 'Samajh gaya. Career, exam, college, skills ya roadmap ke baare me kuch bhi pooch sakte ho.');
+  const header = isEnglish
+    ? `Here is your complete roadmap to become a ${careerTitle}:`
+    : `Yeh raha ${careerTitle} ka complete step-by-step roadmap:`;
 
-  return formatCareerResponse({
-    message,
-    options: [],
-    roadmap: [],
-    recommendation: '',
-    nextQuestions: [
-      'Aap abhi kaunsi class ya course me ho?',
-      'Aapko tech, government, medical, commerce ya business me kya pasand hai?',
-      'Aapka main confusion kya hai?',
-    ],
-    metadata: { aiMode: 'rule-based' },
-  });
+  const phases = roadmap.map((phase, index) => {
+    const tasks = phase.tasks.map((task) => `  • ${task}`).join('\n');
+    return `${index + 1}. ${phase.title} (${phase.duration})\n${tasks}`;
+  }).join('\n\n');
+
+  return `${header}\n\n${phases}`;
 }
 
-function createFallbackAnswer({ message, language, education, intent, careerData, examData, collegeData, analysis }) {
-  if (!isCareerIntent(intent)) {
-    const isEnglish = language === 'english';
-    const supportive = intent === 'support';
+function buildFullRoadmapContext(message, careerData, intent) {
+  if (intent !== 'roadmap' && !/roadmap|road map|step.?by.?step|kaise banu|how to become|study plan|learning path/i.test(message)) {
+    return null;
+  }
 
+  const careerTitle = extractCareerTarget(message, careerData);
+  const roadmapData = createRoadmap(careerTitle);
+  const milestones = normalizeRoadmapMilestones(
+    roadmapData.milestones.map((m) => ({
+      title: m.title,
+      duration: m.duration,
+      tasks: m.tasks.map((t) => t.title || t),
+    }))
+  );
+
+  return {
+    title: roadmapData.title,
+    totalDuration: roadmapData.totalDuration,
+    skills: roadmapData.skills,
+    milestones,
+  };
+}
+
+function createFallbackAnswer(input) {
+  const {
+    message,
+    language,
+    intent,
+    careerData = [],
+    analysis,
+    userProfile = {},
+    fullRoadmap = null,
+  } = input;
+  const isEnglish = language === 'english';
+  const userName = userProfile.name ? `${userProfile.name}, ` : '';
+  const emotion = analysis?.emotion || {};
+
+  if (intent === 'greeting') {
     return formatCareerResponse({
-      message: supportive
-        ? (isEnglish
-          ? 'I hear you. It sounds like you are feeling stressed right now. Take one slow breath, drink some water, and tell me what happened. I am here with you.'
-          : 'Main samajh raha hoon. Aap abhi stressed ya pareshan feel kar rahe ho. Ek slow breath lo, thoda paani piyo, aur batao kya hua. Main yahin hoon.')
-        : (isEnglish
-          ? `I can help with that. Tell me a little more about: "${message}".`
-          : `Haan, main help kar sakta hoon. Thoda aur batao: "${message}".`),
+      message: isEnglish
+        ? `Hello ${userName}I'm NextStep AI, your career mentor. What would you like to talk about today?`
+        : `Namaste ${userName}Main NextStep AI hoon. Aaj kis cheez me help chahiye?`,
       options: [],
       roadmap: [],
       recommendation: '',
-      nextQuestions: supportive
-        ? ['Kya hua?', 'Ye feeling kab se ho rahi hai?', 'Aap abhi safe ho?']
-        : ['Aap exactly kya samajhna chahte ho?', 'Short answer chahiye ya detail me?', 'Hindi, Hinglish ya English?'],
-      metadata: { aiMode: 'local-fallback' },
+      nextQuestions: [isEnglish ? 'What class are you in?' : 'Aap kaunsi class me ho?'],
+      metadata: { aiMode: 'local-engine', provider: 'local' },
     });
   }
 
-  const options = careerData.slice(0, 4).map((career) => ({
+  if (!isCareerIntent(intent)) {
+    const supportive = intent === 'support' || emotion.needsSupport;
+    return formatCareerResponse({
+      message: supportive
+        ? (isEnglish
+          ? "I hear you. What you're feeling is valid. Tell me what's going on."
+          : 'Main samajh sakta hoon. Jo feel kar rahe ho valid hai. Batao kya ho raha hai?')
+        : (isEnglish ? `I can help with: "${message}".` : `Main help kar sakta hoon: "${message}".`),
+      options: [],
+      roadmap: [],
+      recommendation: '',
+      nextQuestions: [],
+      metadata: { aiMode: 'local-engine', provider: 'local' },
+    });
+  }
+
+  if (intent === 'roadmap' && fullRoadmap) {
+    const roadmap = fullRoadmap.milestones;
+    return formatCareerResponse({
+      message: formatRoadmapMessage(roadmap, fullRoadmap.title, language),
+      options: [],
+      roadmap,
+      recommendation: isEnglish ? `Start with: "${roadmap[0]?.title}".` : `Shuru karo: "${roadmap[0]?.title}".`,
+      nextQuestions: [],
+      metadata: { aiMode: 'local-engine', provider: 'local' },
+    });
+  }
+
+  const options = careerData.slice(0, 3).map((career) => ({
     name: career.title,
     duration: career.duration,
     salary: career.salary,
@@ -81,196 +125,192 @@ function createFallbackAnswer({ message, language, education, intent, careerData
     pros: career.pros,
     cons: career.cons,
     skills: career.skills,
-    successProbability: analysis?.decision?.rankedPaths?.find((path) => path.title === career.title)?.successProbability,
-    riskLevel: analysis?.decision?.rankedPaths?.find((path) => path.title === career.title)?.riskLevel,
   }));
 
-  const first = careerData[0];
   const bestPath = analysis?.decision?.bestPath;
-  const roadmap = first ? createRoadmap(first.title).milestones : [];
-  const tone = language === 'english'
-    ? 'I analyzed your education, interests, and available Indian career paths.'
-    : 'Maine aapki education, interest aur India ke career options analyze kiye.';
-
-  const intentLine = {
-    college: `College angle se ${collegeData.length} options match hue.`,
-    exam: `Exam path ke liye ${examData.length} useful exams mil rahe hain.`,
-    roadmap: 'Roadmap ke liye step-by-step plan ready hai.',
-    career_confusion: 'Confusion normal hai, isliye maine balanced options rakhe hain.',
-    general_guidance: 'Aapke question ke hisaab se best next steps ye hain.',
-  }[intent] || 'Best next steps ye hain.';
-
-  const directMessage = bestPath
-    ? `Bhai simple answer: ${bestPath.title} tumhare liye strongest path lag raha hai. Success chance approx ${bestPath.outcome.successProbability}% hai, risk ${bestPath.outcome.riskLevel} hai. Missing skills: ${bestPath.skillGap.missingSkills.join(', ') || 'basic skills clear hain'}.`
-    : `${tone} ${intentLine}`;
 
   return formatCareerResponse({
-    message: directMessage,
+    message: bestPath
+      ? (isEnglish
+        ? `${bestPath.title} looks like your strongest path (~${bestPath.outcome.successProbability}% match).`
+        : `${bestPath.title} sabse strong path lag raha hai.`)
+      : (isEnglish ? 'Here are practical career options for you.' : 'Yeh practical career options hain.'),
     options,
-    roadmap,
-    recommendation: bestPath
-      ? `${bestPath.title} start karo. Backup option: ${analysis?.decision?.backupPath?.title || 'Diploma/skill route'}.`
-      : first
-      ? `${first.title} strong option hai agar aap ${first.skills.slice(0, 2).join(' + ')} daily practice kar sakte ho.`
-      : 'Pehle apni education, interest aur budget clear karo, phir path choose karo.',
-    nextQuestions: [
-      'Aapki current class/qualification kya hai?',
-      'Aapko tech, business, medical ya government me se kya pasand hai?',
-      'Aap job jaldi chahte ho ya long-term degree path?',
-    ],
-    metadata: { aiMode: 'local-fallback', analysis },
+    roadmap: [],
+    recommendation: bestPath?.title || careerData[0]?.title || '',
+    nextQuestions: [isEnglish ? 'Want a full roadmap?' : 'Full roadmap chahiye?'],
+    metadata: { aiMode: 'local-engine', provider: 'local', analysis },
   });
 }
 
-async function callOpenAiCompatible({ prompt }) {
-  const isOpenAi = env.aiProvider === 'openai';
-  const apiKey = isOpenAi ? env.openAiApiKey : env.groqApiKey;
-  if (!apiKey) return null;
+function buildChatMessages(input) {
+  const conversationHistory = input.conversationHistory || [];
+  const hasHistory = conversationHistory.length > 0;
 
-  if (!isOpenAi) {
-    const langChainResult = await callLangChainGroq({ prompt, apiKey });
-    if (langChainResult) return langChainResult;
-  }
+  const history = conversationHistory
+    .slice(-5)
+    .map((turn) => ({
+      role: turn.role === 'assistant' ? 'assistant' : 'user',
+      content: String(turn.content || '').slice(0, 280),
+    }))
+    .filter((turn) => turn.content);
 
-  const endpoint = isOpenAi
-    ? 'https://api.openai.com/v1/chat/completions'
-    : 'https://api.groq.com/openai/v1/chat/completions';
-  const model = env.aiModel || (isOpenAi ? 'gpt-4o-mini' : 'llama-3.1-8b-instant');
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model,
-      temperature: 0.4,
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: 'You generate practical Indian career guidance in strict JSON.' },
-        { role: 'user', content: prompt },
-      ],
-    }),
+  const systemPrompt = buildSystemPrompt(input);
+  let userPrompt = buildCareerPrompt({
+    ...input,
+    hasHistory,
+    sessionSummary: input.sessionSummary,
+    context: input.promptContext,
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`AI provider failed with ${response.status}: ${errorText.slice(0, 300)}`);
+  if (userPrompt.length > MAX_CONTEXT_CHARS) {
+    userPrompt = userPrompt.slice(0, MAX_CONTEXT_CHARS);
   }
 
-  const payload = await response.json();
-  const content = payload.choices?.[0]?.message?.content || '{}';
-  const parsed = parseAiJson(content);
+  const summaryBlock = !hasHistory && input.sessionSummary
+    ? [{ role: 'system', content: `Session summary: ${input.sessionSummary.slice(0, 300)}` }]
+    : [];
+
+  return [
+    { role: 'system', content: systemPrompt },
+    ...summaryBlock,
+    ...history,
+    { role: 'user', content: userPrompt },
+  ];
+}
+
+function mergeRoadmapIntoResponse(formatted, fullRoadmap, intent) {
+  if (!fullRoadmap || intent !== 'roadmap') return formatted;
+
+  const aiRoadmap = Array.isArray(formatted.roadmap) && formatted.roadmap.length
+    ? formatted.roadmap
+    : fullRoadmap.milestones;
 
   return {
-    ...parsed,
-    metadata: {
-      ...(parsed.metadata || {}),
-      aiMode: isOpenAi ? 'openai' : 'groq',
-      model,
-    },
+    ...formatted,
+    roadmap: normalizeRoadmapMilestones(aiRoadmap),
+    message: formatted.message || formatRoadmapMessage(fullRoadmap.milestones, fullRoadmap.title, 'hinglish'),
   };
 }
 
-async function callLangChainGroq({ prompt, apiKey }) {
-  try {
-    const [{ ChatGroq }, { HumanMessage, SystemMessage }] = await Promise.all([
-      import('@langchain/groq'),
-      import('@langchain/core/messages'),
-    ]);
-    const model = env.aiModel || 'llama-3.1-8b-instant';
-    const llm = new ChatGroq({
-      apiKey,
-      model,
-      temperature: 0.4,
-      modelKwargs: {
-        response_format: { type: 'json_object' },
-      },
-    });
-    const response = await llm.invoke([
-      new SystemMessage('You are NextStep AI. Return only valid JSON without markdown fences.'),
-      new HumanMessage(prompt),
-    ]);
-    const content = typeof response.content === 'string'
-      ? response.content
-      : JSON.stringify(response.content);
-    const parsed = parseAiJson(content);
+function finalizeResponse(raw, input, fallback) {
+  let formatted = formatCareerResponse(raw, fallback);
+  formatted = mergeRoadmapIntoResponse(formatted, input.fullRoadmap, input.intent);
 
+  if (!isCareerIntent(input.intent)) {
     return {
-      ...parsed,
-      metadata: {
-        ...(parsed.metadata || {}),
-        aiMode: 'langchain-groq',
-        model,
-      },
+      ...formatted,
+      options: formatted.options?.length ? formatted.options : [],
+      roadmap: input.intent === 'roadmap' ? formatted.roadmap : [],
+      recommendation: formatted.recommendation || '',
     };
-  } catch (error) {
-    console.warn(`LangChain Groq unavailable: ${error.message}`);
-    return null;
   }
+
+  return formatted;
 }
 
-async function generateCareerAdvice(input) {
-  if (input.intent === 'greeting') {
-    return createSmallTalkAnswer(input);
-  }
-
+function prepareInput(input) {
   const careerMode = isCareerIntent(input.intent);
   const careerData = careerMode
     ? (input.careerData.length ? input.careerData : getCareerSuggestions({ education: input.education, interest: input.message }))
     : [];
-  const context = {
-    careers: careerData,
-    exams: careerMode ? input.examData : [],
-    colleges: careerMode ? input.collegeData : [],
-  };
-  const rag = await retrieveRelevantContext(input.message, 6);
+  const fullRoadmap = buildFullRoadmapContext(input.message, careerData, input.intent);
 
-  const enrichedInput = {
+  return {
     ...input,
-    analysis: {
-      ...(input.analysis || {}),
-      ragMode: rag.mode,
-      ragDocuments: rag.documents.map((doc) => doc.metadata),
+    careerData,
+    fullRoadmap,
+    userProfile: input.userProfile || {},
+    fallback: createFallbackAnswer({ ...input, careerData, fullRoadmap }),
+    promptContext: {
+      careers: careerData,
+      exams: careerMode ? input.examData?.slice(0, 2) : [],
+      colleges: careerMode ? input.collegeData?.slice(0, 2) : [],
+      fullRoadmap: fullRoadmap || undefined,
+      retrievedDocuments: input.ragDocuments || [],
     },
   };
-
-  const fallback = createFallbackAnswer({ ...enrichedInput, careerData });
-  const prompt = buildCareerPrompt({
-    ...enrichedInput,
-    context: {
-      ...context,
-      ragMode: rag.mode,
-      retrievedDocuments: rag.documents,
-    },
-  });
-
-  try {
-    const aiResult = await callOpenAiCompatible({ prompt });
-    if (!aiResult) return fallback;
-    const formatted = formatCareerResponse(aiResult, fallback);
-
-    if (!careerMode) {
-      return {
-        ...formatted,
-        options: [],
-        roadmap: [],
-        recommendation: '',
-      };
-    }
-
-    return formatted;
-  } catch (error) {
-    console.warn(`AI fallback used: ${error.message}`);
-    return {
-      ...fallback,
-      metadata: {
-        ...fallback.metadata,
-        fallbackReason: error.message,
-      },
-    };
-  }
 }
 
-module.exports = { generateCareerAdvice };
+async function generateCareerAdvice(input) {
+  const rag = await retrieveRelevantContext(input.message, 2);
+  const prepared = prepareInput({
+    ...input,
+    ragDocuments: rag.documents,
+    analysis: { ...(input.analysis || {}), ragMode: rag.mode },
+  });
+
+  return executeMentorRequest({
+    input: prepared,
+    buildFallback: () => prepared.fallback || getStaticResponse({ language: prepared.language }),
+    getAiResponse: async (ctx) => {
+      const messages = buildChatMessages(ctx);
+      const aiResult = await askAI({ messages });
+      if (!aiResult) return null;
+
+      const response = finalizeResponse(aiResult, ctx, ctx.fallback);
+      return {
+        ...response,
+        metadata: {
+          ...response.metadata,
+          ...aiResult.metadata,
+          pipeline: 'ai',
+        },
+      };
+    },
+  });
+}
+
+async function generateCareerAdviceStream(input, { onDelta, onDone }) {
+  const rag = await retrieveRelevantContext(input.message, 2);
+  const prepared = prepareInput({
+    ...input,
+    ragDocuments: rag.documents,
+    analysis: { ...(input.analysis || {}), ragMode: rag.mode },
+  });
+
+  return executeMentorStream({
+    input: prepared,
+    buildFallback: () => prepared.fallback || getStaticResponse({ language: prepared.language }),
+    onDelta,
+    onDone,
+    streamAiResponse: async (ctx, emitDelta) => {
+      const messages = buildChatMessages(ctx);
+      let fullText = '';
+      let lastPreview = '';
+
+      await streamAI({
+        messages,
+        onDelta: (chunk) => {
+          fullText += chunk;
+          const preview = extractStreamingMessagePreview(fullText);
+          if (preview && preview.length > lastPreview.length) {
+            lastPreview = preview;
+            emitDelta(preview);
+          }
+        },
+      });
+
+      const parsed = parseAiResponse(fullText);
+      const response = finalizeResponse(parsed, ctx, ctx.fallback);
+
+      if (response.message && response.message !== lastPreview) {
+        emitDelta(response.message);
+      }
+
+      return {
+        ...response,
+        metadata: {
+          ...response.metadata,
+          pipeline: 'ai-stream',
+          provider: 'groq',
+        },
+      };
+    },
+  });
+}
+
+module.exports = {
+  generateCareerAdvice,
+  generateCareerAdviceStream,
+};

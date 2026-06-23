@@ -1,0 +1,373 @@
+[
+  {
+    "id": "react-roadmap",
+    "patterns": ["react roadmap", "react ka roadmap", "learn react", "react sikho", "react developer"],
+    "message": "React Developer Roadmap (3-6 months):\n\nPhase 1 — Foundations (2-3 weeks)\n• HTML, CSS, Flexbox, Grid\n• JavaScript ES6+: arrow functions, destructuring, async/await\n\nPhase 2 — React Core (4-5 weeks)\n• JSX, components, props, state\n• useState, useEffect, useRef\n• Lists, keys, conditional rendering\n• React Router for multi-page apps\n\nPhase 3 — Production Skills (4-6 weeks)\n• API integration with fetch/axios\n• Context API or Redux basics\n• Form handling and validation\n• Build 2-3 portfolio projects\n\nPhase 4 — Job Ready (2-3 weeks)\n• Git/GitHub, deploy on Vercel/Netlify\n• Resume + LinkedIn\n• Apply for internships and junior roles",
+    "roadmap": [
+      { "title": "Web Foundations", "duration": "2-3 weeks", "tasks": ["HTML/CSS", "JavaScript ES6+", "DOM basics"] },
+      { "title": "React Core", "duration": "4-5 weeks", "tasks": ["JSX & components", "Hooks", "React Router", "Mini projects"] },
+      { "title": "Production Skills", "duration": "4-6 weeks", "tasks": ["APIs", "State management", "Forms", "Portfolio apps"] },
+      { "title": "Job Ready", "duration": "2-3 weeks", "tasks": ["Git/GitHub", "Deploy projects", "Resume & apply"] }
+    ],
+    "recommendation": "Start with JavaScript fundamentals today — React builds on JS, not the other way around.",
+    "nextQuestions": ["Want a weekly study plan?", "Need React project ideas?", "Should I compare React vs Angular?"]
+  },
+  {
+    "id": "node-roadmap",
+    "patterns": ["node roadmap", "node.js roadmap", "nodejs roadmap", "learn node", "backend developer"],
+    "message": "Node.js Backend Roadmap:\n\n1. JavaScript fundamentals (2 weeks)\n2. Node.js + npm basics (1 week)\n3. Express.js REST APIs (3 weeks)\n4. MongoDB + Mongoose (2 weeks)\n5. Authentication with JWT (1 week)\n6. File uploads, validation, error handling (2 weeks)\n7. Deploy on Render/Railway + build one full project",
+    "roadmap": [
+      { "title": "JavaScript Core", "duration": "2 weeks", "tasks": ["Functions", "Async/await", "Modules", "Error handling"] },
+      { "title": "Express APIs", "duration": "3 weeks", "tasks": ["Routing", "Middleware", "REST design", "Postman testing"] },
+      { "title": "Database Layer", "duration": "2 weeks", "tasks": ["MongoDB", "Mongoose schemas", "CRUD operations"] },
+      { "title": "Auth & Deploy", "duration": "3 weeks", "tasks": ["JWT login", "Validation", "Deploy backend", "Portfolio API"] }
+    ],
+    "recommendation": "Build one CRUD API with auth — that single project teaches 70% of backend hiring skills.",
+    "nextQuestions": ["Want MongoDB vs SQL comparison?", "Need Express project ideas?", "Full stack path chahiye?"]
+  },
+  {
+    "id": "fullstack-roadmap",
+    "patterns": ["full stack", "fullstack", "mern", "mean stack", "full stack developer"],
+    "message": "Full Stack Developer Roadmap (MERN):\n\nMonth 1-2: HTML, CSS, JavaScript, Git\nMonth 3-4: React (components, hooks, routing, APIs)\nMonth 5-6: Node.js + Express + MongoDB\nMonth 7: Connect frontend + backend, auth, deployment\nMonth 8: DSA basics + 2 strong portfolio projects + interviews",
+    "roadmap": [
+      { "title": "Frontend Base", "duration": "Month 1-2", "tasks": ["HTML/CSS", "JavaScript", "Git/GitHub"] },
+      { "title": "React", "duration": "Month 3-4", "tasks": ["Components", "Hooks", "Router", "API calls"] },
+      { "title": "Backend", "duration": "Month 5-6", "tasks": ["Node.js", "Express", "MongoDB", "JWT"] },
+      { "title": "Ship & Interview", "duration": "Month 7-8", "tasks": ["Full app deploy", "DSA basics", "Portfolio", "Mock interviews"] }
+    ],
+    "recommendation": "Pick MERN and stick to it for 6 months — switching stacks too early slows progress.",
+    "nextQuestions": ["12th ke baad full stack possible hai?", "Best free courses?", "Salary expectations kya hain?"]
+  },
+  {
+    "id": "interview-prep",
+    "patterns": ["interview preparation", "interview prep", "interview tips", "placement preparation", "campus placement"],
+    "message": "Interview Preparation Plan:\n\nWeek 1-2: Resume + LinkedIn + GitHub cleanup\nWeek 3-4: DSA basics (arrays, strings, recursion, sorting)\nWeek 5-6: Core subject revision + 2 mock projects explanation\nWeek 7-8: Mock interviews + HR questions + company research\n\nDaily: 1 DSA problem + 30 min project revision + 1 HR answer practice",
+    "roadmap": [
+      { "title": "Profile Setup", "duration": "Week 1-2", "tasks": ["Resume", "LinkedIn", "GitHub README", "Project demos"] },
+      { "title": "Technical Prep", "duration": "Week 3-6", "tasks": ["DSA basics", "OOP/DBMS revision", "Explain projects clearly"] },
+      { "title": "Interview Drills", "duration": "Week 7-8", "tasks": ["Mock interviews", "HR answers", "Salary negotiation basics"] }
+    ],
+    "recommendation": "Practice explaining your best project in 2 minutes — interviewers love clarity over buzzwords.",
+    "nextQuestions": ["Common HR questions?", "DSA kitne questions daily?", "Fresher salary kitni expect karein?"]
+  },
+  {
+    "id": "resume-review",
+    "patterns": ["resume review", "resume tips", "cv tips", "resume kaise banaye", "resume improve"],
+    "message": "Resume Review Checklist (Fresher/Student):\n\n1. One page only — clear contact info + GitHub/LinkedIn\n2. Strong headline: \"BCA Student | React & Node Projects\"\n3. Projects section > marks (unless top tier college)\n4. Each project: problem, tech stack, your role, live link\n5. Skills: list only what you can explain in interview\n6. Remove: \"hardworking\", \"team player\" without proof\n7. Use action verbs: Built, Deployed, Designed, Optimized",
+    "recommendation": "Add 2 deployed projects with live links — that alone puts you ahead of 80% freshers.",
+    "nextQuestions": ["Resume template chahiye?", "Projects section kaise likhein?", "Cover letter tips?"]
+  },
+  {
+    "id": "python-roadmap",
+    "patterns": ["python roadmap", "learn python", "python developer", "python sikho"],
+    "message": "Python Roadmap:\n1. Syntax, loops, functions, OOP (3 weeks)\n2. Libraries: NumPy, Pandas (2 weeks)\n3. Choose path: Web (Django/Flask) OR Data/ML\n4. Build 2 projects + GitHub portfolio\n5. Apply for internships",
+    "roadmap": [
+      { "title": "Python Basics", "duration": "3 weeks", "tasks": ["Syntax", "Functions", "OOP", "File handling"] },
+      { "title": "Libraries", "duration": "2 weeks", "tasks": ["NumPy", "Pandas", "Data cleaning"] },
+      { "title": "Specialize", "duration": "4-8 weeks", "tasks": ["Django OR ML basics", "2 projects", "Deploy/notebooks"] }
+    ],
+    "recommendation": "Pick one path after basics — web dev or data science. Don't try both at once.",
+    "nextQuestions": ["Python vs Java?", "Data science path?", "Django project ideas?"]
+  },
+  {
+    "id": "java-roadmap",
+    "patterns": ["java roadmap", "learn java", "java developer"],
+    "message": "Java Developer Roadmap:\n1. Core Java: OOP, collections, exceptions (4 weeks)\n2. JDBC + MySQL basics (2 weeks)\n3. Spring Boot REST APIs (4-6 weeks)\n4. Build 2 backend projects\n5. DSA + interview prep for placements",
+    "roadmap": [
+      { "title": "Core Java", "duration": "4 weeks", "tasks": ["OOP", "Collections", "Exception handling", "Multithreading intro"] },
+      { "title": "Backend Stack", "duration": "6 weeks", "tasks": ["JDBC", "Spring Boot", "REST APIs", "MySQL"] },
+      { "title": "Job Ready", "duration": "4 weeks", "tasks": ["2 projects", "DSA", "Mock interviews"] }
+    ],
+    "recommendation": "Spring Boot + one CRUD API project is the fastest route to Java backend jobs in India.",
+    "nextQuestions": ["Java vs Python for jobs?", "Spring Boot resources?", "Fresher Java salary?"]
+  },
+  {
+    "id": "dsa-roadmap",
+    "patterns": ["dsa roadmap", "data structures", "coding interview", "leetcode", "competitive programming"],
+    "message": "DSA Preparation Roadmap (3 months):\n\nMonth 1: Arrays, strings, hashing, two pointers\nMonth 2: Stacks, queues, linked lists, trees basics\nMonth 3: DP intro, graphs basics, mock contests\n\nDaily: 1 easy + 1 medium problem, revise on weekends",
+    "roadmap": [
+      { "title": "Fundamentals", "duration": "Month 1", "tasks": ["Arrays", "Strings", "Hashing", "Two pointers"] },
+      { "title": "Intermediate", "duration": "Month 2", "tasks": ["Stacks/Queues", "Linked lists", "Trees", "Binary search"] },
+      { "title": "Advanced Intro", "duration": "Month 3", "tasks": ["DP basics", "Graphs", "Mock tests", "Revision"] }
+    ],
+    "recommendation": "Consistency beats intensity — 2 problems daily for 90 days beats 10 problems for 2 weeks.",
+    "nextQuestions": ["Best platforms for beginners?", "DSA for service vs product companies?", "How many problems enough?"]
+  },
+  {
+    "id": "after-12th",
+    "patterns": ["after 12th", "12th ke baad", "12th k baad", "after 12", "pcm career", "commerce career"],
+    "message": "After 12th — Top Paths in India:\n\nScience PCM: B.Tech, BCA, Diploma (polytechnic), Defence\nScience PCB: MBBS, BDS, B.Sc Nursing, Pharma\nCommerce: B.Com, BBA, CA foundation, CS\nArts: BA, Law (CLAT), Journalism, Design\n\nConfused? Tell me your stream, marks range, and interest (tech/govt/medical/business).",
+    "nextQuestions": ["PCM me best career?", "Commerce se CA kaise?", "Low budget options?"]
+  },
+  {
+    "id": "after-10th",
+    "patterns": ["after 10th", "10th ke baad", "10th k baad", "matric ke baad"],
+    "message": "After 10th — Choose Stream Wisely:\n\nScience: Engineering, Medical, Research paths\nCommerce: CA, Banking, Business, BBA\nArts: Law, Civil Services, Media, Design\nVocational: ITI, Polytechnic Diploma (fast job route)\n\nAsk yourself: Do you enjoy maths/science, business, or creative work?",
+    "nextQuestions": ["Diploma vs 11th-12th?", "Polytechnic IT worth it?", "Government job after 10th?"]
+  },
+  {
+    "id": "software-developer",
+    "patterns": ["software developer", "software engineer", "coder banna", "programming career"],
+    "message": "Software Developer Path (India):\n\nRoute A: B.Tech CS/IT → placements (4 years)\nRoute B: BCA/MCA → developer roles (3-5 years)\nRoute C: Self-taught + portfolio → internships (6-12 months intensive)\n\nCore skills: Programming, DSA basics, Git, one stack (MERN/Java), 2-3 projects",
+    "roadmap": [
+      { "title": "Programming Base", "duration": "2-3 months", "tasks": ["Pick Python or JavaScript", "Logic building", "Git basics"] },
+      { "title": "Stack Mastery", "duration": "3-4 months", "tasks": ["MERN or Java Spring", "APIs", "Database", "Projects"] },
+      { "title": "Job Hunt", "duration": "1-2 months", "tasks": ["Resume", "DSA basics", "Internships", "Interviews"] }
+    ],
+    "recommendation": "Route C works if you code daily 2-3 hours — but degree route still gives more campus opportunities.",
+    "nextQuestions": ["B.Tech vs BCA?", "Self-taught possible hai?", "Fresher salary kitni?"]
+  },
+  {
+    "id": "data-science",
+    "patterns": ["data science", "data scientist", "machine learning", "ml roadmap", "ai career"],
+    "message": "Data Science Roadmap:\n1. Python + Statistics (6 weeks)\n2. Pandas, NumPy, visualization (4 weeks)\n3. ML: regression, classification (6 weeks)\n4. 3 Kaggle-style projects + SQL\n5. Portfolio + internship applications",
+    "roadmap": [
+      { "title": "Math + Python", "duration": "6 weeks", "tasks": ["Python", "Statistics", "Probability basics"] },
+      { "title": "Data Skills", "duration": "4 weeks", "tasks": ["Pandas", "NumPy", "Matplotlib/Seaborn", "SQL"] },
+      { "title": "Machine Learning", "duration": "6 weeks", "tasks": ["Scikit-learn", "Model evaluation", "3 projects"] }
+    ],
+    "recommendation": "Strong maths + 3 solid notebook projects matter more than certificates for data roles.",
+    "nextQuestions": ["Math weak hai — possible?", "Best free courses?", "Data analyst vs scientist?"]
+  },
+  {
+    "id": "jee-prep",
+    "patterns": ["jee preparation", "jee roadmap", "iit kaise", "jee ke liye"],
+    "message": "JEE Preparation Roadmap:\n\nClass 11: Physics, Chemistry, Maths NCERT + coaching modules\nClass 12: Revision + mock tests + weak topic drills\nDaily: 6-8 hours focused study, weekly full mock\n\nBackup: State CET, BITSAT, VITEEE, good NIT/state colleges",
+    "recommendation": "NCERT is non-negotiable for JEE — master it before jumping to advanced books.",
+    "nextQuestions": ["JEE without coaching?", "PCM weak area fix?", "Backup colleges?"]
+  },
+  {
+    "id": "neet-prep",
+    "patterns": ["neet preparation", "neet roadmap", "mbbs kaise", "doctor banna"],
+    "message": "NEET Preparation Roadmap:\n\nYear 1-2: Biology NCERT (line by line), Chemistry, Physics\nDaily: 100+ MCQs, weekly full mock\nFocus: Biology 50% weightage — highest ROI subject\n\nBackup: BDS, BAMS, B.Sc Nursing, Pharma",
+    "recommendation": "Biology NCERT revision 3+ times is the single biggest NEET score booster.",
+    "nextQuestions": ["NEET drop year worth it?", "Biology weak hai?", "MBBS abroad safe?"]
+  },
+  {
+    "id": "upsc-prep",
+    "patterns": ["upsc preparation", "upsc roadmap", "ias kaise", "civil services"],
+    "message": "UPSC Preparation Roadmap:\n\nPhase 1 (3 months): NCERT 6-12, newspaper habit, syllabus mapping\nPhase 2 (6-9 months): GS papers, optional subject, answer writing\nPhase 3 (3 months): Prelims mocks, revision, current affairs\n\nDiscipline > motivation. Consistent 6-8 hours daily.",
+    "recommendation": "Start answer writing early — UPSC is won on writing quality, not just reading volume.",
+    "nextQuestions": ["Best optional subject?", "UPSC after graduation?", "Coaching necessary?"]
+  },
+  {
+    "id": "ssc-banking",
+    "patterns": ["ssc preparation", "bank exam", "banking job", "government job ssc", "railway exam"],
+    "message": "SSC/Banking Job Roadmap:\n\nMonth 1-2: Quant, Reasoning, English basics\nMonth 3-4: Daily mocks + previous year papers\nMonth 5-6: Speed drills + weak topic revision\n\nExams: SSC CGL, IBPS PO/Clerk, RRB — pick based on eligibility",
+    "recommendation": "Previous year papers are your best teacher — solve them twice before any new book.",
+    "nextQuestions": ["12th pass eligible exams?", "Quant weak hai?", "Sarkari job timeline?"]
+  },
+  {
+    "id": "ca-path",
+    "patterns": ["chartered accountant", "ca course", "ca kaise", "commerce ca"],
+    "message": "CA Path in India:\n\nFoundation → Intermediate → Articleship (3 years) → Final\n\nNeeds: Strong accounts, discipline, long-term commitment (4-5 years)\nCareer: Audit, taxation, corporate finance, own practice\n\nAlternative: CMA, CS, B.Com + MBA if CA feels too long",
+    "recommendation": "CA is a marathon — start only if you can commit 4+ years with consistent study.",
+    "nextQuestions": ["CA vs CMA?", "12th commerce next step?", "CA salary after completion?"]
+  },
+  {
+    "id": "digital-marketing",
+    "patterns": ["digital marketing", "seo career", "social media marketing", "marketing career"],
+    "message": "Digital Marketing Roadmap (3-6 months):\n1. SEO basics + Google Analytics\n2. Social media marketing (Instagram, LinkedIn)\n3. Google Ads / Meta Ads basics\n4. Content writing + Canva\n5. Run 1 real campaign (even for a local shop)\n6. Freelance on Fiverr/Internshala",
+    "roadmap": [
+      { "title": "Foundations", "duration": "4 weeks", "tasks": ["SEO", "Analytics", "Content basics"] },
+      { "title": "Paid Ads", "duration": "4 weeks", "tasks": ["Google Ads", "Meta Ads", "Budget basics"] },
+      { "title": "Real Experience", "duration": "4 weeks", "tasks": ["Live campaign", "Case study", "Freelance profile"] }
+    ],
+    "recommendation": "One real campaign with measurable results beats 10 certificates on your resume.",
+    "nextQuestions": ["Freelancing possible?", "No degree needed?", "Salary expectations?"]
+  },
+  {
+    "id": "freelancing",
+    "patterns": ["freelancing", "freelance career", "side income", "online earning student"],
+    "message": "Student Freelancing Path:\n\n1. Pick skill: web dev, design, writing, video editing, marketing\n2. Build 2-3 sample works (even free for friends)\n3. Profiles: Fiverr, Upwork, Internshala, LinkedIn\n4. Start small gigs → collect reviews → raise rates\n\nRealistic timeline: 2-4 months to first paid client with daily effort",
+    "recommendation": "Specialize in one skill first — \"I build React landing pages\" wins over \"I do everything\".",
+    "nextQuestions": ["Best skill for beginners?", "Fiverr profile tips?", "How much to charge?"]
+  },
+  {
+    "id": "career-confusion",
+    "patterns": ["career confusion", "confused about career", "kya karu", "kya kru", "samajh nahi aa raha"],
+    "message": "Career confusion is completely normal — especially at your age. Let's simplify:\n\n1. What class/course are you in right now?\n2. What subjects do you enjoy (not just marks)?\n3. Do you want quick job, stable govt job, or long degree path?\n4. What's your biggest fear — wrong choice, money, or family pressure?\n\nAnswer these and I'll give you 2-3 clear paths with honest pros/cons.",
+    "recommendation": "Don't chase what friends choose — match career to your interest + realistic timeline.",
+    "nextQuestions": ["Tech vs government?", "Short course options?", "Parents ko kaise convince karein?"]
+  },
+  {
+    "id": "mongodb",
+    "patterns": ["mongodb", "mongo db", "nosql"],
+    "message": "MongoDB Learning Path:\n1. JSON + JavaScript basics\n2. CRUD operations in MongoDB shell\n3. Mongoose with Node.js\n4. Schema design, indexes, aggregation basics\n5. Build one API with MongoDB + deploy",
+    "recommendation": "Learn MongoDB through a Node.js project — theory alone won't stick.",
+    "nextQuestions": ["MongoDB vs SQL?", "Mongoose tutorial?", "Database for MERN?"]
+  },
+  {
+    "id": "docker-basics",
+    "patterns": ["docker", "container", "devops basics"],
+    "message": "Docker Basics for Developers:\n1. Install Docker Desktop\n2. Understand images vs containers\n3. Dockerfile for a Node/React app\n4. docker-compose for full stack locally\n5. Deploy containerized app on Render/Railway",
+    "recommendation": "Containerize one MERN project — that's enough for fresher resume impact.",
+    "nextQuestions": ["DevOps career path?", "Kubernetes needed?", "Deploy MERN with Docker?"]
+  },
+  {
+    "id": "aws-basics",
+    "patterns": ["aws", "cloud career", "amazon web services"],
+    "message": "AWS Basics Roadmap:\n1. EC2, S3, IAM fundamentals\n2. Deploy a static site on S3\n3. Run backend on EC2 or Elastic Beanstalk\n4. RDS intro for databases\n5. AWS free tier + one cloud project on resume",
+    "recommendation": "AWS Certified Cloud Practitioner is a good entry cert after one hands-on project.",
+    "nextQuestions": ["Cloud vs development?", "Free tier safe?", "AWS cert worth it?"]
+  },
+  {
+    "id": "ui-ux",
+    "patterns": ["ui ux", "ui/ux", "design career", "figma career"],
+    "message": "UI/UX Designer Roadmap:\n1. Figma basics (2 weeks)\n2. Design principles: typography, color, spacing\n3. Copy 3 app screens, then redesign 1 app\n4. Build portfolio on Behance/Dribbble\n5. Learn user research basics + prototyping",
+    "roadmap": [
+      { "title": "Tool Mastery", "duration": "2 weeks", "tasks": ["Figma", "Components", "Auto-layout"] },
+      { "title": "Design Skills", "duration": "4 weeks", "tasks": ["Typography", "Color theory", "Wireframes", "Prototypes"] },
+      { "title": "Portfolio", "duration": "4 weeks", "tasks": ["3 case studies", "Behance", "Apply internships"] }
+    ],
+    "recommendation": "Case studies with problem → solution → result beat pretty screenshots alone.",
+    "nextQuestions": ["UI vs UX difference?", "Coding needed?", "Fresher designer salary?"]
+  },
+  {
+    "id": "android-dev",
+    "patterns": ["android developer", "android app", "kotlin", "mobile app development"],
+    "message": "Android Developer Roadmap:\n1. Kotlin basics (or Java)\n2. Android Studio + XML layouts\n3. Activities, fragments, RecyclerView\n4. API integration + Room database\n5. Publish one app on Play Store",
+    "recommendation": "One published Play Store app — even a simple utility — is your best Android portfolio piece.",
+    "nextQuestions": ["Kotlin vs Flutter?", "Android vs iOS?", "App monetization?"]
+  },
+  {
+    "id": "flutter",
+    "patterns": ["flutter", "flutter roadmap", "cross platform app"],
+    "message": "Flutter Roadmap:\n1. Dart language basics\n2. Widgets, state management (Provider/Riverpod)\n3. API calls + local storage\n4. Build 2 apps (todo + one unique idea)\n5. Publish on Play Store",
+    "recommendation": "Flutter lets you target Android + iOS with one codebase — great for indie developers.",
+    "nextQuestions": ["Flutter vs React Native?", "Dart hard hai?", "Freelance app dev?"]
+  },
+  {
+    "id": "cybersecurity",
+    "patterns": ["cyber security", "cybersecurity", "ethical hacking", "hacking career"],
+    "message": "Cybersecurity Career Path:\n1. Networking basics (TCP/IP, DNS, HTTP)\n2. Linux command line\n3. Web security: OWASP Top 10\n4. TryHackMe / HackTheBox beginner paths\n5. Certifications: CEH, Security+ (after fundamentals)",
+    "recommendation": "Strong networking + Linux fundamentals first — skipping them makes security tools confusing.",
+    "nextQuestions": ["Ethical hacking legal?", "CEH worth it?", "Cybersecurity salary India?"]
+  },
+  {
+    "id": "btech-vs-diploma",
+    "patterns": ["btech vs diploma", "diploma or degree", "polytechnic vs engineering"],
+    "message": "B.Tech vs Diploma Comparison:\n\nDiploma (after 10th):\n+ Faster entry (3 years), practical skills, lower cost\n- Some top companies prefer degree\n\nB.Tech (after 12th):\n+ Better campus placements, broader options\n- 4 years + entrance prep, higher cost\n\nDiploma → lateral entry B.Tech is a popular hybrid path.",
+    "recommendation": "If money is tight and you need job by 19-20, diploma + skills works. If you can wait, B.Tech opens more doors.",
+    "nextQuestions": ["Lateral entry kaise?", "Diploma placement real?", "Best polytechnic branches?"]
+  },
+  {
+    "id": "salary-expectations",
+    "patterns": ["salary kitni", "salary expectation", "kitni salary", "starting salary", "fresher salary"],
+    "message": "Fresher Salary Ranges (India, approximate):\n\nIT/Software: ₹3-8 LPA (varies by city, skills, college)\nGovernment: ₹25k-60k/month starting\nDigital Marketing: ₹2.5-5 LPA\nData Science (with projects): ₹4-10 LPA\n\nSkills + projects + communication often matter more than degree tier for private jobs.",
+    "recommendation": "Focus on becoming hireable first — salary follows skills, not the other way around.",
+    "nextQuestions": ["Remote jobs possible?", "Internship stipend?", "Salary negotiation tips?"]
+  },
+  {
+    "id": "remote-jobs",
+    "patterns": ["remote job", "work from home", "wfh career", "online job"],
+    "message": "Remote Job Path for Students/Freshers:\n\nBest remote-friendly skills: Software dev, design, writing, marketing, data entry (entry level)\n\nPlatforms: LinkedIn, Internshala, RemoteOK, Toptal (advanced)\n\nBuild: Strong portfolio + GitHub + communication skills in English",
+    "recommendation": "Software development and digital marketing have the most remote opportunities for Indian freshers.",
+    "nextQuestions": ["Freelance vs full-time remote?", "English weak hai?", "Best skills for WFH?"]
+  },
+  {
+    "id": "mba-path",
+    "patterns": ["mba career", "mba kaise", "mba after", "cat preparation"],
+    "message": "MBA Path in India:\n\n1. Graduate any stream (preferably 60%+)\n2. Prepare CAT/XAT (6-12 months)\n3. 2-year MBA from good college\n4. Specialize: Finance, Marketing, HR, Operations\n\nROI depends heavily on college tier — IIM/top 50 matter most",
+    "recommendation": "MBA from a average college may not justify cost — research placement reports before enrolling.",
+    "nextQuestions": ["MBA without CAT?", "BBA then MBA?", "MBA vs work experience?"]
+  },
+  {
+    "id": "graphic-design",
+    "patterns": ["graphic design", "graphic designer", "photoshop career"],
+    "message": "Graphic Designer Roadmap:\n1. Photoshop + Illustrator basics\n2. Canva for quick client work\n3. Typography, color, branding basics\n4. Portfolio: logos, social posts, banners\n5. Freelance on Fiverr or local businesses",
+    "recommendation": "Start by redesigning local shop posters for free — real work beats tutorial exercises.",
+    "nextQuestions": ["Design without degree?", "Canva enough?", "Freelance pricing?"]
+  },
+  {
+    "id": "content-writing",
+    "patterns": ["content writing", "content writer", "writing career", "blogging career"],
+    "message": "Content Writing Career:\n1. Grammar + readability practice\n2. Write 5 sample articles (tech, lifestyle, or niche you like)\n3. Learn SEO writing basics\n4. Portfolio on Medium or personal blog\n5. Apply on Internshala, Fiverr, content agencies",
+    "recommendation": "Pick a niche (tech, finance, travel) — niche writers earn more than generalists.",
+    "nextQuestions": ["Hindi content demand?", "AI vs writers?", "Per article rates?"]
+  },
+  {
+    "id": "video-editing",
+    "patterns": ["video editing", "video editor", "youtube career", "premiere pro"],
+    "message": "Video Editor Roadmap:\n1. Premiere Pro or DaVinci Resolve basics\n2. Cuts, transitions, audio sync, color basics\n3. Edit 3 sample videos (reel, vlog, promo)\n4. Portfolio on YouTube/Google Drive\n5. Freelance for creators and small businesses",
+    "recommendation": "Short-form reels editing is in high demand — great first freelancing niche.",
+    "nextQuestions": ["YouTube channel vs editing?", "Mobile editing enough?", "Freelance rates?"]
+  },
+  {
+    "id": "blockchain",
+    "patterns": ["blockchain", "web3", "crypto career"],
+    "message": "Blockchain/Web3 Career Path:\n1. Understand blockchain basics (not just crypto trading)\n2. Solidity + Ethereum smart contracts\n3. Build one dApp (decentralized app)\n4. Learn Web3.js/Ethers.js\n\nNote: Market is volatile — have a backup skill (regular web dev)",
+    "recommendation": "Learn regular web development first, then add Web3 — it's safer than going all-in on blockchain.",
+    "nextQuestions": ["Web3 jobs in India?", "Solidity resources?", "Blockchain vs normal dev?"]
+  },
+  {
+    "id": "government-job",
+    "patterns": ["sarkari naukri", "government job", "govt job", "stable job"],
+    "message": "Government Job Paths in India:\n\nAfter 12th: Railway, SSC CHSL, state police (varies)\nAfter Graduation: SSC CGL, Banking, UPSC, State PSC\n\nPros: Stability, pension benefits, respect\nCons: High competition, long preparation, slower growth\n\nPick exam based on your education level and available study time.",
+    "recommendation": "Choose one exam and commit 12 months — jumping between UPSC/SSC/Bank splits your focus.",
+    "nextQuestions": ["Easiest govt exam?", "12th pass options?", "Sarkari job prep time?"]
+  },
+  {
+    "id": "study-abroad",
+    "patterns": ["study abroad", "foreign university", "ms abroad", "visa student"],
+    "message": "Study Abroad Basics:\n\n1. Target country: USA, Canada, UK, Germany, Australia\n2. Exams: IELTS/TOEFL + GRE (for MS)\n3. Budget planning: tuition + living costs\n4. SOP, LOR, university shortlisting\n5. Scholarships and education loans\n\nGermany has low-tuition public universities — popular for engineering.",
+    "recommendation": "Start IELTS prep 12 months before application deadline — language scores take time.",
+    "nextQuestions": ["Germany free education?", "MS without GRE?", "Loan vs scholarship?"]
+  },
+  {
+    "id": "part-time-student",
+    "patterns": ["part time course", "side course", "along with college"],
+    "message": "Best Part-Time Skills Along With College:\n\nTech: Web dev, Python, digital marketing, UI design\nNon-tech: Communication English, Excel, content writing\n\nTime budget: 1-2 hours daily is enough if consistent for 6 months",
+    "recommendation": "One skill deeply learned beats five courses started and abandoned.",
+    "nextQuestions": ["BCA ke saath kya?", "B.Com ke saath kya?", "Weekend courses worth it?"]
+  },
+  {
+    "id": "linkedin-optimization",
+    "patterns": ["linkedin tips", "linkedin profile", "linkedin optimize"],
+    "message": "LinkedIn Optimization for Students:\n\n1. Professional photo + clear headline with skill\n2. About section: who you are + what you're learning + projects\n3. Add projects with links, not just job titles\n4. Connect with seniors in your target field\n5. Post weekly about what you learned (builds visibility)",
+    "recommendation": "Headline example: \"BCA Student | Building MERN Projects | Open to Internships\"",
+    "nextQuestions": ["What to post on LinkedIn?", "Connect with recruiters?", "Portfolio link kahan?"]
+  },
+  {
+    "id": "github-portfolio",
+    "patterns": ["github portfolio", "github profile", "open source beginner"],
+    "message": "GitHub Portfolio Tips:\n\n1. Pin your 3 best projects on profile\n2. Each repo needs: README, screenshots, live demo link, tech stack\n3. Clean commit history (not one giant upload)\n4. Contribute to one open-source project (even small fixes)\n5. Green squares matter less than project quality",
+    "recommendation": "A recruiter spends 30 seconds on your GitHub — README quality is everything.",
+    "nextQuestions": ["Project ideas for resume?", "Open source kaise start?", "Private repos ok?"]
+  },
+  {
+    "id": "typescript",
+    "patterns": ["typescript", "typescript roadmap", "ts learn"],
+    "message": "TypeScript Roadmap:\n1. Strong JavaScript first (mandatory)\n2. Types, interfaces, enums\n3. Generics and utility types\n4. TypeScript with React (Next.js optional)\n5. Use TS in one full project",
+    "recommendation": "Learn TypeScript after JavaScript — most companies prefer TS for React roles now.",
+    "nextQuestions": ["TS vs JS for jobs?", "Next.js path?", "TS hard hai?"]
+  },
+  {
+    "id": "nextjs",
+    "patterns": ["next.js", "nextjs", "next js roadmap"],
+    "message": "Next.js Roadmap (after React):\n1. React fundamentals solid\n2. Next.js pages vs app router\n3. SSR, SSG, API routes\n4. Deploy on Vercel\n5. Build one full-stack Next.js app",
+    "recommendation": "Next.js is the fastest path from React learner to production-ready full-stack developer.",
+    "nextQuestions": ["Next.js vs React?", "Full stack with Next?", "Vercel deploy free?"]
+  },
+  {
+    "id": "sql-database",
+    "patterns": ["sql roadmap", "learn sql", "database career", "mysql learn"],
+    "message": "SQL/Database Roadmap:\n1. Relational concepts: tables, keys, relationships\n2. SELECT, JOIN, GROUP BY, subqueries\n3. Indexes and basic optimization\n4. MySQL or PostgreSQL hands-on\n5. Connect database to a Node/Python project",
+    "recommendation": "SQL is required for 90% of developer jobs — don't skip it even if you use MongoDB.",
+    "nextQuestions": ["SQL vs MongoDB?", "DBA career path?", "SQL practice platforms?"]
+  },
+  {
+    "id": "communication-skills",
+    "patterns": ["communication skills", "english improve", "speaking skills", "soft skills"],
+    "message": "Communication Skills for Career Growth:\n\n1. Speak English 15 min daily (even to yourself)\n2. Explain technical topics in simple words\n3. Mock interview practice with friends\n4. Read aloud + record yourself weekly\n5. LinkedIn posts to build writing confidence\n\nTechnical skills get interviews — communication wins offers.",
+    "recommendation": "Record yourself explaining a project for 2 minutes — you'll instantly spot areas to improve.",
+    "nextQuestions": ["English weak for IT jobs?", "HR round tips?", "Confidence kaise badhe?"]
+  },
+  {
+    "id": "burnout-stress",
+    "patterns": ["burnout", "exam stress", "padhai nahi ho rahi", "motivation nahi"],
+    "message": "I hear you — feeling stressed or unmotivated is very common, especially with career pressure.\n\nSmall steps that help:\n1. Study in 25-minute blocks with 5-min breaks (Pomodoro)\n2. Sleep 7 hours — tired brain retains less\n3. Talk to one person you trust today\n4. Lower today's goal: just ONE small task done is a win\n\nYour worth is not defined by one exam or one career decision.",
+    "recommendation": "Take one small win today — even 20 minutes of focused study counts.",
+    "nextQuestions": ["Study schedule banao?", "Career pressure se kaise cope?", "Drop year sahi hai?"]
+  }
+]

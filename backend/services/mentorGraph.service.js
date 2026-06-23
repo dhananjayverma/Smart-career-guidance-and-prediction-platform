@@ -21,10 +21,14 @@ function runLocalMentorGraph({ message, intent, careerData, userProfile = {} }) 
     confusion,
     decision,
     coachHint: emotion.needsSupport
-      ? 'Start with emotional support, then ask a gentle clarifying question.'
-      : careerMode
-        ? 'Give direct recommendation first, then options, risk, skills, and next steps.'
-        : 'Answer like a general helpful assistant without forcing career cards.',
+      ? 'Acknowledge their feelings warmly like a caring friend. Ask what happened. Do not jump to career advice yet.'
+      : intent === 'greeting'
+        ? 'Greet warmly, introduce yourself, ask what they need help with today.'
+        : intent === 'roadmap'
+          ? 'Provide a COMPLETE phase-by-phase roadmap with durations and specific tasks. Be thorough.'
+          : careerMode
+            ? 'Listen to their exact question first. Give a direct answer, then options with honest pros/cons.'
+            : 'Answer naturally like ChatGPT. Match their tone. Be helpful and conversational.',
   };
 }
 
@@ -74,10 +78,14 @@ async function runLangGraphMentor(input) {
     })
     .addNode('responseCoach', async (state) => ({
       coachHint: state.emotion?.needsSupport
-        ? 'Start with emotional support, then ask a gentle clarifying question.'
-        : state.careerMode
-          ? 'Give direct recommendation first, then options, risk, skills, and next steps.'
-          : 'Answer like a general helpful assistant without forcing career cards.',
+        ? 'Acknowledge their feelings warmly like a caring friend. Ask what happened. Do not jump to career advice yet.'
+        : state.intent === 'greeting'
+          ? 'Greet warmly, introduce yourself, ask what they need help with today.'
+          : state.intent === 'roadmap'
+            ? 'Provide a COMPLETE phase-by-phase roadmap with durations and specific tasks. Be thorough.'
+            : state.careerMode
+              ? 'Listen to their exact question first. Give a direct answer, then options with honest pros/cons.'
+              : 'Answer naturally like ChatGPT. Match their tone. Be helpful and conversational.',
       nodes: [...(state.nodes || []), 'responseCoach'],
     }))
     .addEdge(START, 'emotion')

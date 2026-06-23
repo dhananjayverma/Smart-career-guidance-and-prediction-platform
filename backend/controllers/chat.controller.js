@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Session = require('../models/session.model');
-const { generateCareerAdvice } = require('../services/ai.service');
+const { generateCareerAdvice, generateCareerAdviceStream } = require('../services/ai.service');
 const { getCareerData, getCollegeData, getExamData } = require('../services/data.service');
 const { detectLanguage } = require('../utils/languageDetector');
 const { cleanMessage, detectIntent, extractEducation } = require('../utils/promptBuilder');
@@ -29,26 +29,39 @@ function buildSessionSnapshot(session = {}) {
   };
 }
 
-async function getSessionSummary(userId) {
-  if (!userId || userId === 'guest') return '';
+async function getConversationHistory(userId, limit = 5) {
+  if (!userId || userId === 'guest') return [];
 
   if (mongoose.connection.readyState === 1) {
     const session = await Session.findOne({ userId }).lean();
-    const recentUserMessages = session?.messages
-      ?.filter((msg) => msg.role === 'user')
-      .slice(-4)
-      .map((msg) => msg.content) || [];
-
-    return recentUserMessages.length
-      ? `Recent user context only: ${recentUserMessages.join(' | ')}`
-      : '';
+    return (session?.messages || []).slice(-limit);
   }
 
-  return (memorySessions.get(userId) || [])
+  return (memorySessions.get(userId) || []).slice(-limit);
+}
+
+async function getSessionSummary(userId, userProfile = {}) {
+  const parts = [];
+
+  if (userProfile.name) parts.push(`Name: ${userProfile.name}`);
+  if (userProfile.education && userProfile.education !== 'unknown') {
+    parts.push(`Education: ${userProfile.education}`);
+  }
+  if (userProfile.interests?.length) {
+    parts.push(`Interests: ${userProfile.interests.slice(0, 4).join(', ')}`);
+  }
+
+  const history = await getConversationHistory(userId, 8);
+  const userTopics = history
     .filter((msg) => msg.role === 'user')
-    .slice(-4)
-    .map((msg) => msg.content)
-    .join(' | ');
+    .slice(-3)
+    .map((msg) => String(msg.content).slice(0, 90));
+
+  if (userTopics.length) {
+    parts.push(`Recent questions: ${userTopics.join(' | ')}`);
+  }
+
+  return parts.join('. ').slice(0, 400);
 }
 
 async function saveSessionTurn(userId, userMessage, assistantMessage, metadata) {
@@ -152,55 +165,87 @@ async function saveCareer(req, res, next) {
   }
 }
 
+async function buildChatContext(req) {
+  const message = cleanMessage(req.body.message);
+  const userId = req.body.userId || 'guest';
+
+  if (!message) {
+    return { error: 'message is required' };
+  }
+
+  const language = req.body.language || detectLanguage(message);
+  const intent = detectIntent(message);
+  const education = req.body.education || extractEducation(message);
+  const careerLikeIntents = ['career_confusion', 'exam', 'roadmap', 'college'];
+  const shouldUseCareerData = careerLikeIntents.includes(intent);
+  const interest = req.body.interest || message;
+  const careerData = shouldUseCareerData ? getCareerData({ education, interest }) : [];
+  const examData = shouldUseCareerData ? getExamData(message) : [];
+  const collegeData = shouldUseCareerData ? getCollegeData({ search: message }).slice(0, 2) : [];
+  const conversationHistory = await getConversationHistory(userId, 5);
+  const userProfile = {
+    name: req.body.profile?.name || '',
+    education: req.body.education || education,
+    interests: req.body.profile?.interests || req.body.interests || [],
+    skills: req.body.profile?.skills || [],
+  };
+  const sessionSummary = await getSessionSummary(userId, userProfile);
+  const analysis = await runMentorGraph({
+    message,
+    intent,
+    careerData,
+    userProfile,
+  });
+
+  return {
+    message,
+    userId,
+    language,
+    intent,
+    education,
+    careerData,
+    examData,
+    collegeData,
+    sessionSummary,
+    conversationHistory,
+    userProfile,
+    analysis,
+    stream: Boolean(req.body.stream),
+  };
+}
+
 async function chat(req, res, next) {
   try {
-    const message = cleanMessage(req.body.message);
-    const userId = req.body.userId || 'guest';
-
-    if (!message) {
-      return res.status(400).json({ success: false, message: 'message is required' });
+    const context = await buildChatContext(req);
+    if (context.error) {
+      return res.status(400).json({ success: false, message: context.error });
     }
 
-    const language = req.body.language || detectLanguage(message);
-    const intent = detectIntent(message);
-    const education = req.body.education || extractEducation(message);
-    const careerLikeIntents = ['career_confusion', 'exam', 'roadmap', 'college'];
-    const shouldUseCareerData = careerLikeIntents.includes(intent);
-    const interest = req.body.interest || message;
-    const careerData = shouldUseCareerData ? getCareerData({ education, interest }) : [];
-    const examData = shouldUseCareerData ? getExamData(message) : [];
-    const collegeData = shouldUseCareerData ? getCollegeData({ search: message }).slice(0, 6) : [];
-    const sessionSummary = await getSessionSummary(userId);
-    const analysis = await runMentorGraph({
-      message,
-      intent,
-      careerData,
-      userProfile: req.body.profile || {},
-    });
-
     const answer = await generateCareerAdvice({
-      message,
-      userId,
-      language,
-      intent,
-      education,
-      careerData,
-      examData,
-      collegeData,
-      sessionSummary,
-      analysis,
+      message: context.message,
+      userId: context.userId,
+      language: context.language,
+      intent: context.intent,
+      education: context.education,
+      careerData: context.careerData,
+      examData: context.examData,
+      collegeData: context.collegeData,
+      sessionSummary: context.sessionSummary,
+      conversationHistory: context.conversationHistory,
+      userProfile: context.userProfile,
+      analysis: context.analysis,
     });
 
     const metadata = {
-      language,
-      intent,
-      education,
-      emotion: analysis.emotion,
-      confusion: analysis.confusion,
-      decision: analysis.decision,
-      workflow: analysis.workflow,
+      language: context.language,
+      intent: context.intent,
+      education: context.education,
+      emotion: context.analysis.emotion,
+      confusion: context.analysis.confusion,
+      decision: context.analysis.decision,
+      workflow: context.analysis.workflow,
     };
-    await saveSessionTurn(userId, message, answer.message, metadata);
+    await saveSessionTurn(context.userId, context.message, answer.message, metadata);
 
     res.json({
       success: true,
@@ -217,4 +262,76 @@ async function chat(req, res, next) {
   }
 }
 
-module.exports = { chat, getSession, saveCareer };
+async function chatStream(req, res, next) {
+  try {
+    const context = await buildChatContext(req);
+    if (context.error) {
+      return res.status(400).json({ success: false, message: context.error });
+    }
+
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+
+    let fullMessage = '';
+
+    await generateCareerAdviceStream(
+      {
+        message: context.message,
+        userId: context.userId,
+        language: context.language,
+        intent: context.intent,
+        education: context.education,
+        careerData: context.careerData,
+        examData: context.examData,
+        collegeData: context.collegeData,
+        sessionSummary: context.sessionSummary,
+        conversationHistory: context.conversationHistory,
+        userProfile: context.userProfile,
+        analysis: context.analysis,
+      },
+      {
+        onDelta: (chunk) => {
+          fullMessage += chunk;
+          res.write(`data: ${JSON.stringify({ type: 'delta', content: chunk })}\n\n`);
+        },
+        onDone: async (answer) => {
+          const metadata = {
+            language: context.language,
+            intent: context.intent,
+            education: context.education,
+            emotion: context.analysis.emotion,
+            confusion: context.analysis.confusion,
+            decision: context.analysis.decision,
+            workflow: context.analysis.workflow,
+          };
+
+          await saveSessionTurn(context.userId, context.message, answer.message || fullMessage, metadata);
+
+          res.write(`data: ${JSON.stringify({
+            type: 'done',
+            data: {
+              ...answer,
+              metadata: {
+                ...answer.metadata,
+                ...metadata,
+              },
+            },
+          })}\n\n`);
+          res.end();
+        },
+      }
+    );
+  } catch (error) {
+    if (!res.headersSent) {
+      next(error);
+      return;
+    }
+
+    res.write(`data: ${JSON.stringify({ type: 'error', message: error.message })}\n\n`);
+    res.end();
+  }
+}
+
+module.exports = { chat, chatStream, getSession, saveCareer };

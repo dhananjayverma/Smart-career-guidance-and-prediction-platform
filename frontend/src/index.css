@@ -86,11 +86,15 @@
   }
 
   .nav-item {
-    @apply flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white;
+    @apply flex w-full items-center gap-3 rounded-2xl px-2.5 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white;
   }
 
   .nav-item-active {
     @apply bg-white text-slate-950 shadow-lg shadow-black/20 hover:bg-white hover:text-slate-950;
+  }
+
+  .nav-item-active span:first-child {
+    @apply bg-slate-950 text-white;
   }
 
   .icon-button {
