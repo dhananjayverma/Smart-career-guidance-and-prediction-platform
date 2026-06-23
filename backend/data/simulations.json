@@ -1,0 +1,44 @@
+[
+  {
+    "id": "software",
+    "title": "Software Developer",
+    "icon": "Briefcase",
+    "investment": "Rs 5-20 Lakhs",
+    "risk": "Low",
+    "outcomes": [
+      { "year": 1, "title": "Junior Developer", "salary": "Rs 4-6 LPA", "status": "growth", "description": "Learning phase" },
+      { "year": 2, "title": "Developer", "salary": "Rs 7-10 LPA", "status": "growth", "description": "Got 1-2 appraisals" },
+      { "year": 3, "title": "Senior Developer", "salary": "Rs 12-18 LPA", "status": "growth", "description": "Leading projects" },
+      { "year": 4, "title": "Tech Lead", "salary": "Rs 18-25 LPA", "status": "stable", "description": "Managing teams" },
+      { "year": 5, "title": "Engineering Manager", "salary": "Rs 30-50 LPA", "status": "growth", "description": "High growth track" }
+    ]
+  },
+  {
+    "id": "govt",
+    "title": "Government Services",
+    "icon": "Award",
+    "investment": "Rs 30K-3 Lakhs",
+    "risk": "High",
+    "outcomes": [
+      { "year": 1, "title": "Preparation", "salary": "Rs 0", "status": "struggle", "description": "Full-time study" },
+      { "year": 2, "title": "Exam Attempts", "salary": "Rs 0", "status": "struggle", "description": "Multiple exams" },
+      { "year": 3, "title": "Selection", "salary": "Rs 4-8 LPA", "status": "stable", "description": "Job offer received" },
+      { "year": 4, "title": "Probation", "salary": "Rs 5-10 LPA", "status": "growth", "description": "Confirmed post" },
+      { "year": 5, "title": "Established", "salary": "Rs 7-15 LPA", "status": "stable", "description": "Job security" }
+    ]
+  },
+  {
+    "id": "startup",
+    "title": "Entrepreneurship",
+    "icon": "Rocket",
+    "investment": "Rs 5-50 Lakhs",
+    "risk": "High",
+    "outcomes": [
+      { "year": 1, "title": "Idea and MVP", "salary": "Rs 0", "status": "struggle", "description": "Building product" },
+      { "year": 2, "title": "Market Entry", "salary": "Rs 1-3 LPA", "status": "struggle", "description": "First customers" },
+      { "year": 3, "title": "Pivot or Growth", "salary": "Rs 3-10 LPA", "status": "struggle", "description": "Critical phase" },
+      { "year": 4, "title": "Scaling", "salary": "Rs 10-50 LPA", "status": "growth", "description": "If survived" },
+      { "year": 5, "title": "Founder", "salary": "Rs 20 LPA-1Cr+", "status": "growth", "description": "Success or restart" }
+    ]
+  }
+]

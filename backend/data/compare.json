@@ -1,0 +1,30 @@
+[
+  {
+    "id": "bca",
+    "title": "BCA",
+    "stats": { "duration": "3 years", "fees": "Rs 1.5-6L", "salary": "Rs 3-6 LPA", "difficulty": 60, "jobRate": 75, "growth": 85 },
+    "pros": ["IT industry ready", "Degree value", "MCA option"],
+    "cons": ["Need extra skills", "Lower starting salary"]
+  },
+  {
+    "id": "diploma",
+    "title": "Diploma",
+    "stats": { "duration": "3 years", "fees": "Rs 0.9-3L", "salary": "Rs 2-4 LPA", "difficulty": 50, "jobRate": 80, "growth": 70 },
+    "pros": ["Practical learning", "Quick job", "Budget friendly"],
+    "cons": ["Limited degree value", "Need upgrade for top jobs"]
+  },
+  {
+    "id": "btech",
+    "title": "B.Tech",
+    "stats": { "duration": "4 years", "fees": "Rs 4-40L", "salary": "Rs 5-15 LPA", "difficulty": 85, "jobRate": 70, "growth": 95 },
+    "pros": ["Higher salary ceiling", "Best growth", "Full recognition"],
+    "cons": ["High fees", "Four year duration"]
+  },
+  {
+    "id": "govt",
+    "title": "Govt Prep",
+    "stats": { "duration": "6-12 months", "fees": "Rs 30K-3L", "salary": "Rs 4-8 LPA", "difficulty": 90, "jobRate": 20, "growth": 70 },
+    "pros": ["Job security", "Social respect", "Clear exam pattern"],
+    "cons": ["High competition", "Vacancy uncertainty"]
+  }
+]

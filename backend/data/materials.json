@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ssc-cgl-course",
+    "title": "SSC CGL Complete Course",
+    "type": "video",
+    "platform": "YouTube",
+    "subject": "SSC CGL",
+    "difficulty": "Beginner",
+    "duration": "200+ hours",
+    "rating": 4.8,
+    "students": "1.2M",
+    "free": true
+  },
+  {
+    "id": "upsc-strategy",
+    "title": "UPSC Civil Services Strategy",
+    "type": "video",
+    "platform": "YouTube",
+    "subject": "UPSC",
+    "difficulty": "Intermediate",
+    "duration": "150+ hours",
+    "rating": 4.9,
+    "students": "800K",
+    "free": true
+  },
+  {
+    "id": "python-beginners",
+    "title": "Python for Beginners",
+    "type": "course",
+    "platform": "freeCodeCamp",
+    "subject": "Programming",
+    "difficulty": "Beginner",
+    "duration": "44 hours",
+    "rating": 4.8,
+    "students": "5M+",
+    "free": true
+  },
+  {
+    "id": "quant-rs-aggarwal",
+    "title": "Quantitative Aptitude by RS Aggarwal",
+    "type": "book",
+    "platform": "Amazon",
+    "subject": "Mathematics",
+    "difficulty": "Beginner",
+    "rating": 4.7,
+    "students": "100K+",
+    "free": false
+  },
+  {
+    "id": "ssc-previous-papers",
+    "title": "SSC Previous Year Papers",
+    "type": "pdf",
+    "platform": "SSC Adda",
+    "subject": "SSC CGL",
+    "difficulty": "Intermediate",
+    "rating": 4.5,
+    "students": "500K",
+    "free": true
+  },
+  {
+    "id": "jee-physics",
+    "title": "JEE Main Physics Complete",
+    "type": "video",
+    "platform": "YouTube",
+    "subject": "JEE",
+    "difficulty": "Intermediate",
+    "duration": "300+ hours",
+    "rating": 4.7,
+    "students": "2M",
+    "free": true
+  }
+]

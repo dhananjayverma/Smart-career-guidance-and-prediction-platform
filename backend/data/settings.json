@@ -1,0 +1,36 @@
+{
+  "tabs": [
+    { "id": "profile", "label": "Profile", "icon": "User" },
+    { "id": "language", "label": "Language", "icon": "Globe" },
+    { "id": "notifications", "label": "Notifications", "icon": "Bell" }
+  ],
+  "educationLevels": [
+    "10th Pass",
+    "12th Pass (Science)",
+    "12th Pass (Commerce)",
+    "Graduate",
+    "Post Graduate"
+  ],
+  "interests": [
+    "Technology",
+    "Government",
+    "Business",
+    "Medical",
+    "Finance",
+    "Design"
+  ],
+  "languages": [
+    { "id": "hindi", "label": "Hindi", "desc": "पूरी तरह से हिंदी में" },
+    { "id": "hinglish", "label": "Hinglish", "desc": "Hindi + English mix (Recommended)" },
+    { "id": "english", "label": "English", "desc": "Full English" }
+  ],
+  "notifications": [
+    { "label": "Career Reminders", "desc": "Get updates about your roadmap progress" },
+    { "label": "New Resources", "desc": "Be notified about new study materials" },
+    { "label": "Tips & Suggestions", "desc": "Receive helpful career tips" }
+  ],
+  "helpLinks": [
+    { "label": "Help & Support", "icon": "Shield" },
+    { "label": "Privacy Policy", "icon": "Shield" }
+  ]
+}

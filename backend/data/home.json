@@ -1,0 +1,41 @@
+{
+  "hero": {
+    "badge": "NextStep AI",
+    "title": "Career clarity without the clutter.",
+    "subtitle": "Ask one question and move directly into paths, colleges, resources, and a roadmap.",
+    "placeholder": "Ask your career question",
+    "buttonLabel": "Ask"
+  },
+  "highlights": [
+    { "label": "AI guidance", "desc": "Personal answers for career doubts" },
+    { "label": "College finder", "desc": "Placement, fees, ranking, and courses" },
+    { "label": "Roadmap builder", "desc": "Step-by-step action plan" }
+  ],
+  "quickActions": [
+    { "id": "chat", "label": "AI Mentor", "desc": "Chat with AI" },
+    { "id": "careers", "label": "Career Paths", "desc": "Explore options" },
+    { "id": "compare", "label": "Compare", "desc": "Side-by-side" },
+    { "id": "roadmap", "label": "Roadmap", "desc": "Step-by-step" }
+  ],
+  "stats": [
+    { "value": "50,000+", "label": "Students Guided" },
+    { "value": "200+", "label": "Career Paths" },
+    { "value": "1000+", "label": "Colleges" },
+    { "value": "95%", "label": "Satisfaction" }
+  ],
+  "steps": [
+    { "step": "1", "title": "Tell About Yourself", "desc": "Share your education, interests" },
+    { "step": "2", "title": "AI Analyzes", "desc": "Multiple career paths generated" },
+    { "step": "3", "title": "Get Roadmap", "desc": "Step-by-step guidance" }
+  ],
+  "cta": {
+    "eyebrow": "Next move",
+    "title": "Start with one question.",
+    "desc": "Your chat result can connect into career options, comparisons, and roadmap steps.",
+    "buttonLabel": "Open Mentor",
+    "target": "chat"
+  },
+  "sectionLabels": {
+    "guidedFlow": "Guided Flow"
+  }
+}

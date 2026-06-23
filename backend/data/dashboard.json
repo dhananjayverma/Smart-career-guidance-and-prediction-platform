@@ -1,0 +1,34 @@
+{
+  "navigation": [
+    { "id": "home", "label": "Home", "icon": "Home", "group": "primary" },
+    { "id": "dashboard", "label": "Dashboard", "icon": "Award", "group": "primary" },
+    { "id": "chat", "label": "AI Mentor", "icon": "MessageSquare", "group": "primary" },
+    { "id": "careers", "label": "Career Paths", "icon": "Compass", "group": "primary" },
+    { "id": "compare", "label": "Compare", "icon": "BarChart2", "group": "primary" },
+    { "id": "roadmap", "label": "Roadmap", "icon": "Target", "group": "primary" },
+    { "id": "colleges", "label": "Colleges", "icon": "Building2", "group": "secondary" },
+    { "id": "materials", "label": "Study Materials", "icon": "BookOpen", "group": "secondary" },
+    { "id": "simulation", "label": "Future Simulator", "icon": "Sparkles", "group": "secondary" }
+  ],
+  "quickLinks": [
+    { "id": "chat", "label": "Talk to AI Mentor", "description": "Get personalized guidance", "icon": "MessageSquare", "color": "bg-blue-600" },
+    { "id": "careers", "label": "Career Paths", "description": "Explore options", "icon": "Compass", "color": "bg-emerald-600" },
+    { "id": "compare", "label": "Compare Careers", "description": "Side-by-side analysis", "icon": "BarChart3", "color": "bg-amber-600" },
+    { "id": "roadmap", "label": "Career Roadmap", "description": "Step-by-step plan", "icon": "Target", "color": "bg-violet-600" }
+  ],
+  "services": [
+    { "id": "colleges", "label": "College Finder", "icon": "Building2", "count": "1000+" },
+    { "id": "materials", "label": "Study Materials", "icon": "BookOpen", "count": "500+" },
+    { "id": "simulation", "label": "Future Simulator", "icon": "Sparkles", "count": "5 Year" }
+  ],
+  "stats": [
+    { "label": "Career Paths Explored", "value": "3" },
+    { "label": "Roadmaps Saved", "value": "2" },
+    { "label": "Colleges Compared", "value": "5" }
+  ],
+  "updates": [
+    { "label": "New career paths added", "time": "Updated recently", "icon": "Compass", "color": "bg-blue-100 text-blue-700" },
+    { "label": "Study materials refreshed", "time": "Updated recently", "icon": "BookOpen", "color": "bg-emerald-100 text-emerald-700" },
+    { "label": "College data updated", "time": "Updated recently", "icon": "Building2", "color": "bg-violet-100 text-violet-700" }
+  ]
+}
