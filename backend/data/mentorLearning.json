@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "updatedAt": "2026-06-24T06:13:21.423Z",
+  "users": {
+    "user-cb3b8b19-437b-4bbb-acd7-a198ba16cf99": {
+      "userId": "user-cb3b8b19-437b-4bbb-acd7-a198ba16cf99",
+      "version": 2,
+      "promptCount": 12,
+      "interests": {},
+      "branches": {
+        "B.Tech CSE": {
+          "count": 1,
+          "weight": 0.77,
+          "lastUsed": "2026-06-24T05:53:57.214Z",
+          "source": "explicit"
+        }
+      },
+      "emotions": {
+        "stressed": 2
+      },
+      "intents": {
+        "greeting": {
+          "count": 1,
+          "weight": 0.59,
+          "lastUsed": "2026-06-24T05:52:25.467Z",
+          "source": "behavioral"
+        },
+        "support": 2,
+        "general_guidance": {
+          "count": 5,
+          "weight": 1,
+          "lastUsed": "2026-06-24T06:13:21.413Z",
+          "source": "behavioral"
+        },
+        "career_confusion": {
+          "count": 1,
+          "weight": 0.59,
+          "lastUsed": "2026-06-24T05:53:57.214Z",
+          "source": "behavioral"
+        }
+      },
+      "languages": {
+        "hinglish": {
+          "count": 7,
+          "weight": 1,
+          "lastUsed": "2026-06-24T06:13:21.413Z",
+          "source": "behavioral"
+        }
+      },
+      "recentNeeds": [
+        "main thora presan hu",
+        "presan hu yr"
+      ],
+      "preferences": {},
+      "meta": {
+        "lastIntent": "general_guidance",
+        "lastEmotion": "neutral"
+      },
+      "updatedAt": "2026-06-24T06:13:21.413Z",
+      "education": "",
+      "preferredBranch": "B.Tech CSE"
+    }
+  },
+  "globalPatterns": {
+    "emotionPhrases": {
+      "presan hu yr": 1,
+      "main thora presan hu": 1
+    },
+    "careerTerms": {},
+    "commonQuestions": {
+      "hii": 2,
+      "presan hu yr": 1,
+      "main thora presan hu": 1,
+      "yr salary thori low hain main mern stack devloper hu so": 1
+    }
+  }
+}

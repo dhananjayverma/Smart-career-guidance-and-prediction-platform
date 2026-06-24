@@ -8,9 +8,18 @@ async function connectDb() {
   }
 
   mongoose.set('strictQuery', true);
-  await mongoose.connect(env.mongoUri);
-  console.log('MongoDB connected');
-  return mongoose.connection;
+  try {
+    await mongoose.connect(env.mongoUri, {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
+    });
+    console.log('MongoDB connected');
+    return mongoose.connection;
+  } catch (error) {
+    console.warn(`MongoDB unavailable: ${error.message}`);
+    console.warn('Continuing with JSON data + in-memory session fallback.');
+    return null;
+  }
 }
 
 module.exports = { connectDb };

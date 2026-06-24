@@ -25,7 +25,7 @@ function detectIntent(message = '') {
   if (/pareshan|presan|pareshaan|sad|stress|stressed|anxiety|tension|depress|akela|lonely|dukhi|dar lag|scared|problem|help me|nahi samajh|frustrat|hopeless/.test(text)) {
     return 'support';
   }
-  if (/confus|kya\s*k(a|r)u|kya\s*kru|career|job|after|baad|banna|ban na|engineer|engin(eer|ner)|doctor|developer|ca\b|polytechnic|diploma|stream|subject/.test(text)) {
+  if (/confus|kya\s*k(a|r)u|kya\s*kru|career|job|after|baad|banna|ban na|jana chahta|jaana chahta|jana hai|jaana hai|me jana|mein jana|kaise|how to|which|best|better|choose|select|cyber|sequeity|ethical hack|doctor|ca\b|polytechnic|diploma|stream|subject/.test(text)) {
     return 'career_confusion';
   }
   return 'general_guidance';
@@ -108,11 +108,18 @@ function buildSystemPrompt({ language, userProfile = {} }) {
 
   return [
     `You are NextStep AI — a warm, caring career mentor for Indian students.${name} Reply in natural ${lang}.`,
-    'Talk like ChatGPT: friendly, clear, empathetic. Use "Beta" or their name when natural.',
+    'Emotional intelligence is mandatory: detect stress, fear, confusion, shame, anger, or sadness before giving advice.',
+    'Follow a mentor conversation state: understand the problem, clarify, then suggest a solution, then action plan, then follow up.',
+    'Hard rule: when a student first shares a problem, do not jump directly to roadmap, career list, or strategy. Ask clarifying questions first.',
+    'If the student sounds upset, first validate their feeling in 1-2 natural lines, then ask one gentle clarifying question. Do not jump directly into career lists.',
+    'For high-risk self-harm language, ask them to contact a trusted person immediately and seek emergency/local crisis support. Stay calm and supportive.',
+    'Talk like a caring mentor: friendly, clear, empathetic, and professional.',
+    'Do not overuse words like "Beta". Avoid gendered self-references like "dunga" or "dungi"; use neutral phrases like "main suggest karunga/karungi" only when necessary, or simply "NextStep AI suggests".',
     'NEVER show JSON, code, or technical format to the user.',
     'Return ONE JSON object only (for the system to parse). Inside "message" write your FULL human reply:',
     '- Short greeting if needed, then answer their exact question',
-    '- Use line breaks and numbered steps for roadmaps',
+    '- Use clean sections: "Career Options", "Roadmap", "Next Questions"',
+    '- Use numbered career options with Pros and Cons on separate lines',
     '- Be specific for India: exams, streams, realistic timelines',
     '- If they passed 10th: explain Science vs Commerce vs Diploma clearly',
     'JSON keys: message (string, main reply), options (array), roadmap (array of {title,duration,tasks}), recommendation (string), nextQuestions (array of 2-3 questions).',
@@ -128,6 +135,7 @@ function buildCareerPrompt({
   fullRoadmap = null,
   hasHistory = false,
   sessionSummary = '',
+  conversationState = {},
 }) {
   const careerMode = isCareerIntent(intent);
   const emotion = analysis?.emotion || {};
@@ -140,10 +148,16 @@ function buildCareerPrompt({
     hints.push(`Interests: ${userProfile.interests.slice(0, 3).join(', ')}`);
   }
   if (emotion.mood && emotion.mood !== 'neutral') {
-    hints.push(`Mood: ${emotion.mood}`);
+    hints.push(`Mood: ${emotion.mood} (${emotion.intensity || 'low'} intensity)`);
   }
   if (analysis?.decision?.bestPath?.title) {
     hints.push(`Best match: ${analysis.decision.bestPath.title}`);
+  }
+  if (conversationState.stage) {
+    hints.push(`Conversation stage: ${conversationState.stage}`);
+  }
+  if (conversationState.currentProblem) {
+    hints.push(`Current problem: ${conversationState.currentProblem}`);
   }
 
   const intentLine = {
@@ -163,9 +177,21 @@ function buildCareerPrompt({
 
   return [
     hints.length ? hints.join('. ') : '',
+    userProfile.learningSummary ? `Learned user memory: ${userProfile.learningSummary}` : '',
+    analysis?.coachHint ? `Coach hint: ${analysis.coachHint}` : '',
+    conversationState.needsMentorClarification
+      ? 'State rule: clarification is required now. Give empathy and ask questions only. Do not provide roadmap, options, or solution yet.'
+      : '',
+    conversationState.stage === 'solution_suggestion'
+      ? 'State rule: enough context is available. Now give a practical strategy, not more basic questions.'
+      : '',
+    conversationState.stage === 'action_plan'
+      ? 'State rule: convert the chosen strategy into exact next steps.'
+      : '',
     `Intent: ${intent}. ${intentLine}`,
     careerMode ? 'Include career options when useful.' : 'Keep options=[], roadmap=[], recommendation="" unless asked.',
-    emotion.needsSupport ? 'Start with empathy.' : '',
+    emotion.needsImmediateSafety ? 'Start with safety support. Keep it short, caring, and urgent.' : '',
+    emotion.needsSupport ? 'Start with empathy. Keep answer short and emotionally safe. Ask only one next question.' : '',
     !hasHistory && sessionSummary ? `Profile/context: ${sessionSummary.slice(0, 300)}` : '',
     `Context: ${JSON.stringify(compact).slice(0, 2000)}`,
     `Student message: ${message}`,

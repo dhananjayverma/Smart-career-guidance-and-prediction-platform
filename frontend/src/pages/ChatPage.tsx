@@ -12,8 +12,17 @@ import {
   ShieldCheck,
   Target,
   TrendingUp,
+  Trash2,
+  RefreshCw,
 } from 'lucide-react';
-import { getChatSession, getQuickQuestions, resolveChatSource, saveCareerToSession, sendChatMessageStream } from '../lib/api';
+import {
+  clearChatSessionMessages,
+  getChatSession,
+  getQuickQuestions,
+  resolveChatSource,
+  saveCareerToSession,
+  sendChatMessageStream,
+} from '../lib/api';
 import type { ChatResponse, RoadmapPhase, SessionSnapshot } from '../lib/api';
 
 interface Message {
@@ -71,6 +80,109 @@ function sessionToMessages(sessionMessages: SessionSnapshot['messages']): Messag
     source: msg.role === 'assistant' ? 'NextStep AI' : undefined,
   }));
 }
+
+function renderInlineFormatting(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index} className="font-black text-slate-950">{part.slice(2, -2)}</strong>;
+    }
+    return <span key={index}>{part}</span>;
+  });
+}
+
+function renderFormattedMessage(content: string, isUser: boolean) {
+  if (isUser) {
+    return <div className="whitespace-pre-wrap text-sm leading-relaxed">{content}</div>;
+  }
+
+  const lines = content.split('\n').map((line) => line.trim()).filter(Boolean);
+  const blocks: JSX.Element[] = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index];
+    const careerMatch = line.match(/^(\d+)\.\s+\*\*(.+?)\*\*$/) || line.match(/^(\d+)\.\s+(.+)$/);
+
+    if (careerMatch) {
+      const number = careerMatch[1];
+      const title = careerMatch[2].replace(/\*\*/g, '');
+      const details: string[] = [];
+      index += 1;
+
+      while (index < lines.length && !/^\d+\.\s+/.test(lines[index])) {
+        details.push(lines[index]);
+        index += 1;
+      }
+
+      const pros = details.find((item) => /^-\s*Pros:/i.test(item));
+      const cons = details.find((item) => /^-\s*Cons:/i.test(item));
+      const other = details.filter((item) => !/^-\s*(Pros|Cons):/i.test(item));
+
+      blocks.push(
+        <div key={`career-${number}-${title}`} className="rounded-2xl border border-teal-100 bg-white p-3 shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="grid h-7 w-7 place-items-center rounded-xl bg-slate-950 text-xs font-black text-white">{number}</span>
+            <h4 className="font-black text-slate-950">{title}</h4>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {pros && (
+              <div className="rounded-xl bg-teal-50 p-2.5">
+                <p className="text-[10px] font-black uppercase text-teal-700">Pros</p>
+                <p className="mt-1 text-xs leading-5 text-slate-700">{pros.replace(/^-\s*Pros:\s*/i, '')}</p>
+              </div>
+            )}
+            {cons && (
+              <div className="rounded-xl bg-rose-50 p-2.5">
+                <p className="text-[10px] font-black uppercase text-rose-700">Cons</p>
+                <p className="mt-1 text-xs leading-5 text-slate-700">{cons.replace(/^-\s*Cons:\s*/i, '')}</p>
+              </div>
+            )}
+          </div>
+          {other.length ? (
+            <div className="mt-2 space-y-1 text-xs leading-5 text-slate-600">
+              {other.map((item) => <p key={item}>{renderInlineFormatting(item.replace(/^-\s*/, ''))}</p>)}
+            </div>
+          ) : null}
+        </div>
+      );
+      continue;
+    }
+
+    if (/^-\s+/.test(line)) {
+      const bullets: string[] = [];
+      while (index < lines.length && /^-\s+/.test(lines[index])) {
+        bullets.push(lines[index].replace(/^-\s+/, ''));
+        index += 1;
+      }
+      blocks.push(
+        <ul key={`bullets-${index}`} className="space-y-2 rounded-2xl bg-slate-50 p-3">
+          {bullets.map((item) => (
+            <li key={item} className="flex gap-2 text-sm leading-5 text-slate-700">
+              <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-teal-500" />
+              <span>{renderInlineFormatting(item)}</span>
+            </li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    const isHeading = /^(career options|roadmap|next questions|aapke liye roadmap|aapke questions|options|recommendation)/i.test(line);
+    blocks.push(
+      <p
+        key={`line-${index}`}
+        className={isHeading ? 'text-sm font-black uppercase tracking-wide text-teal-700' : 'text-sm leading-6 text-slate-700'}
+      >
+        {renderInlineFormatting(line)}
+      </p>
+    );
+    index += 1;
+  }
+
+  return <div className="space-y-3">{blocks}</div>;
+}
+
 function getChatUserId() {
   const storageKey = 'nextstepai_chat_user_id';
   const existing = window.localStorage.getItem(storageKey);
@@ -81,6 +193,12 @@ function getChatUserId() {
   return created;
 }
 
+const AUTO_CLEAR_STORAGE_KEY = 'nextstepai_chat_auto_clear';
+
+function getAutoClearPreference() {
+  return window.localStorage.getItem(AUTO_CLEAR_STORAGE_KEY) === 'true';
+}
+
 export default function ChatPage({ userProfile }: { userProfile: UserProfile }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -88,8 +206,10 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
   const [quickQuestions, setQuickQuestions] = useState<string[]>([]);
   const [session, setSession] = useState<SessionSnapshot | null>(null);
   const [toast, setToast] = useState('');
+  const [autoClear, setAutoClear] = useState(getAutoClearPreference);
   const [chatUserId] = useState(getChatUserId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const autoClearCheckedRef = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -104,20 +224,27 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
       .then(setQuickQuestions)
       .catch((error) => console.warn('Quick questions unavailable:', error));
 
-    getChatSession(chatUserId)
-      .then((data) => {
-        setSession(data);
-        if (data.messages?.length) {
-          setMessages(sessionToMessages(data.messages));
-        } else {
-          setMessages([getWelcomeMessage(userProfile)]);
-        }
-      })
+    const shouldAutoClearNow = autoClear && !autoClearCheckedRef.current;
+    const loadSession = shouldAutoClearNow
+      ? clearChatSessionMessages(chatUserId)
+      : getChatSession(chatUserId);
+
+    autoClearCheckedRef.current = true;
+
+    loadSession.then((data) => {
+      setSession(data);
+      if (!shouldAutoClearNow && data.messages?.length) {
+        setMessages(sessionToMessages(data.messages));
+      } else {
+        setMessages([getWelcomeMessage(userProfile)]);
+      }
+      if (shouldAutoClearNow) setToast('Auto clear: fresh chat started');
+    })
       .catch((error) => {
         console.warn('Chat session unavailable:', error);
         setMessages([getWelcomeMessage(userProfile)]);
       });
-  }, [chatUserId]);
+  }, [autoClear, chatUserId, userProfile]);
 
   useEffect(() => {
     if (!toast) return;
@@ -229,6 +356,26 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
     }
   };
 
+  const clearChat = async () => {
+    try {
+      const nextSession = await clearChatSessionMessages(chatUserId);
+      setSession(nextSession);
+      setMessages([getWelcomeMessage(userProfile)]);
+      setInput('');
+      setToast('Chat cleared');
+    } catch (error) {
+      console.warn('Clear chat unavailable:', error);
+      setToast('Clear failed');
+    }
+  };
+
+  const toggleAutoClear = () => {
+    const next = !autoClear;
+    setAutoClear(next);
+    window.localStorage.setItem(AUTO_CLEAR_STORAGE_KEY, String(next));
+    setToast(next ? 'Auto clear enabled' : 'Auto clear disabled');
+  };
+
   return (
     <div className="mx-auto grid h-[calc(100vh-7rem)] max-w-[1500px] gap-4 overflow-hidden lg:grid-cols-[minmax(0,1fr)_340px]">
       {toast && (
@@ -252,7 +399,7 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="flex flex-wrap items-center justify-end gap-2 text-center">
             {quickQuestions.slice(0, 3).map((question, index) => (
               <button
                 key={question}
@@ -262,6 +409,26 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
                 {index + 1}
               </button>
             ))}
+            <button
+              onClick={toggleAutoClear}
+              className={`inline-flex items-center gap-1 rounded-2xl border px-3 py-2 text-xs font-bold transition ${
+                autoClear
+                  ? 'border-teal-200 bg-teal-200 text-slate-950'
+                  : 'border-white/10 bg-white/10 text-white hover:bg-white/15'
+              }`}
+              title="Auto clear chat on next visit"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Auto Clear
+            </button>
+            <button
+              onClick={clearChat}
+              className="inline-flex items-center gap-1 rounded-2xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white transition hover:bg-white/15"
+              title="Clear chat history"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Clear
+            </button>
           </div>
         </div>
       </div>
@@ -311,9 +478,7 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
                     : 'bg-slate-100 text-slate-800'
                 }`}
               >
-                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                  {message.content}
-                </div>
+                {renderFormattedMessage(message.content, message.role === 'user')}
 
                 {message.roadmap?.length ? (
                   <div className="mt-4 space-y-3">

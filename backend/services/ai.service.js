@@ -71,10 +71,12 @@ function createFallbackAnswer(input) {
     analysis,
     userProfile = {},
     fullRoadmap = null,
+    conversationState = {},
   } = input;
   const isEnglish = language === 'english';
   const userName = userProfile.name ? `${userProfile.name}, ` : '';
   const emotion = analysis?.emotion || {};
+  const learnedBranch = userProfile.preferredBranch ? ` (${userProfile.preferredBranch})` : '';
 
   if (intent === 'greeting') {
     return formatCareerResponse({
@@ -89,18 +91,45 @@ function createFallbackAnswer(input) {
     });
   }
 
+  if (conversationState?.needsMentorClarification && conversationState.localResponse) {
+    return formatCareerResponse({
+      message: conversationState.localResponse.message,
+      options: [],
+      roadmap: [],
+      recommendation: '',
+      nextQuestions: conversationState.localResponse.nextQuestions || [],
+      metadata: {
+        aiMode: 'conversation-state-engine',
+        provider: 'local',
+        conversationStage: conversationState.stage,
+        problem: conversationState.currentProblem,
+      },
+    });
+  }
+
   if (!isCareerIntent(intent)) {
     const supportive = intent === 'support' || emotion.needsSupport;
+    const safety = emotion.needsImmediateSafety;
     return formatCareerResponse({
-      message: supportive
+      message: safety
         ? (isEnglish
-          ? "I hear you. What you're feeling is valid. Tell me what's going on."
-          : 'Main samajh sakta hoon. Jo feel kar rahe ho valid hai. Batao kya ho raha hai?')
+          ? `${userName}I'm really glad you told me. Please do not stay alone right now. Call someone you trust immediately, and if you may hurt yourself, contact local emergency support now. Tell me only one thing: are you safe at this moment?`
+          : `${userName}achha ki tumne bataya. Abhi please akela mat raho. Kisi trusted person ko turant call karo, aur agar khud ko harm karne ka risk hai to local emergency help lo. Bas ek cheez batao: kya tum abhi safe ho?`)
+        : supportive
+        ? (isEnglish
+          ? `${userName}I hear you. It sounds heavy right now, and your feeling is valid. We can slow it down. What is troubling you most: career confusion, study pressure, family pressure, or something else?`
+          : `${userName}samajh raha hoon, abhi pressure heavy lag raha hoga. Pehle isko simple karte hain. Sabse zyada pareshaani kis cheez ki hai: career confusion${learnedBranch}, study pressure, family pressure, ya kuch aur?`)
         : (isEnglish ? `I can help with: "${message}".` : `Main help kar sakta hoon: "${message}".`),
       options: [],
       roadmap: [],
       recommendation: '',
-      nextQuestions: [],
+      nextQuestions: supportive && !safety
+        ? [
+            isEnglish ? 'Career confusion' : 'Career confusion',
+            isEnglish ? 'Study pressure' : 'Study pressure',
+            isEnglish ? 'Family pressure' : 'Family pressure',
+          ]
+        : [],
       metadata: { aiMode: 'local-engine', provider: 'local' },
     });
   }

@@ -1,5 +1,87 @@
 [
   {
+    "id": "stress-support",
+    "patterns": ["presan hu", "pareshan hu", "pareshaan hu", "tension me hu", "stress ho raha", "pressure hai", "dimag kharab", "ghabra raha"],
+    "message": "Samajh raha hoon, abhi pressure heavy lag raha hoga. Pehle isko simple karte hain.\n\nAbhi mujhe bas ek cheez batao: pareshaani career confusion ki hai, study pressure ki, family pressure ki, ya kisi aur cheez ki?\n\nMain ek-ek step me help karunga. Abhi long advice nahi, pehle problem clear karte hain.",
+    "recommendation": "Start with one honest sentence: sabse zyada tension kis baat ki hai?",
+    "nextQuestions": ["Career confusion hai", "Study pressure hai", "Family pressure hai"]
+  },
+  {
+    "id": "career-panic-reset",
+    "patterns": ["career me tension", "career se pareshan", "future ka dar", "galat career", "career pressure", "job nahi milegi"],
+    "message": "Career ka dar normal hai, especially jab options bahut zyada lagte hain. Isko 3 filters me todte hain:\n\n1. Interest: tum kis cheez me naturally curious ho?\n2. Reality: time, money, marks aur family situation kya allow karti hai?\n3. Market: us path me jobs/earning ka realistic chance kya hai?\n\nTum bas apni class/course aur 2 interests bata do. Main tumhe 2-3 practical paths dunga, fantasy nahi.",
+    "recommendation": "Career decision ko emotion ke peak par mat lo. Pehle facts collect karo.",
+    "nextQuestions": ["Main B.Tech CSE me hu", "12th ke baad confused hu", "Quick job options chahiye"]
+  },
+  {
+    "id": "btech-cse-field-options",
+    "patterns": ["btech cse ke baad", "b.tech cse ke baad", "cse ke baad kya", "computer science ke baad", "cse branch options"],
+    "message": "B.Tech CSE ke baad major field options:\n\n1. Frontend Developer — websites/apps ka UI\n2. Backend Developer — APIs, database, server logic\n3. Full Stack Developer — frontend + backend dono\n4. Mobile App Developer — Android/Flutter apps\n5. Data Analyst — SQL, Excel, dashboards\n6. Data Scientist / AI-ML — Python, ML models, statistics\n7. Cybersecurity Analyst — networks, web security, incident response\n8. Cloud/DevOps Engineer — AWS, Docker, CI/CD\n9. QA Automation Engineer — testing + automation tools\n10. Product Manager — tech + users + business decisions\n\nBest start: programming + Git + one project. Phir field choose karo.",
+    "recommendation": "CSE me pehle 2 months programming foundation, phir field selection. Direct AI/ML jump mat karo agar Python/basic maths weak hai.",
+    "nextQuestions": ["CSE me best field kaunsi?", "Frontend roadmap", "AI/ML roadmap"]
+  },
+  {
+    "id": "ai-after-cse",
+    "patterns": ["cse se ai", "btech cse ai", "ai engineer kaise", "ai ml after cse", "machine learning after cse"],
+    "message": "CSE se AI/ML path possible hai, but sequence important hai:\n\nPhase 1: Python + DSA basics\nPhase 2: Statistics, probability, linear algebra basics\nPhase 3: Pandas, NumPy, visualization\nPhase 4: ML algorithms with scikit-learn\nPhase 5: 3 projects: prediction, recommendation, NLP/computer vision\nPhase 6: Internship applications + GitHub portfolio\n\nAI field me certificate se zyada projects and maths clarity matter karti hai.",
+    "roadmap": [
+      { "title": "Python + Logic", "duration": "4 weeks", "tasks": ["Python basics", "Functions/OOP", "GitHub", "Mini scripts"] },
+      { "title": "Math + Data", "duration": "6 weeks", "tasks": ["Statistics", "Pandas", "NumPy", "SQL"] },
+      { "title": "ML Projects", "duration": "8 weeks", "tasks": ["Scikit-learn", "Model evaluation", "3 portfolio projects"] },
+      { "title": "Internship Ready", "duration": "4 weeks", "tasks": ["Resume", "Kaggle/GitHub", "Mock interviews"] }
+    ],
+    "recommendation": "AI/ML ke liye Python + statistics ko ignore mat karna.",
+    "nextQuestions": ["Math weak hai AI possible?", "AI project ideas", "Data analyst vs AI"]
+  },
+  {
+    "id": "frontend-from-cse",
+    "patterns": ["frontend after cse", "frontend developer roadmap", "frontend kaise banu", "web developer cse"],
+    "message": "Frontend Developer Roadmap:\n\n1. HTML, CSS, responsive layout\n2. JavaScript strong: DOM, arrays, objects, async/await\n3. React: components, state, hooks, router\n4. API integration + forms\n5. 3 projects: portfolio, dashboard, full API app\n6. Deploy on Vercel and add GitHub links\n\nFrontend me design sense + clean UI + API integration important hai.",
+    "roadmap": [
+      { "title": "Web Base", "duration": "3 weeks", "tasks": ["HTML", "CSS", "Responsive design"] },
+      { "title": "JavaScript", "duration": "4 weeks", "tasks": ["DOM", "ES6", "Async/await"] },
+      { "title": "React", "duration": "5 weeks", "tasks": ["Components", "Hooks", "Router", "APIs"] },
+      { "title": "Portfolio", "duration": "3 weeks", "tasks": ["3 projects", "Deploy", "Resume"] }
+    ],
+    "recommendation": "Frontend me daily UI practice karo. Sirf tutorials dekhne se skill nahi banti.",
+    "nextQuestions": ["React roadmap", "Frontend project ideas", "Frontend salary"]
+  },
+  {
+    "id": "backend-from-cse",
+    "patterns": ["backend after cse", "backend developer roadmap", "backend kaise banu", "server developer"],
+    "message": "Backend Developer Roadmap:\n\n1. One language: JavaScript/Node, Java, or Python\n2. HTTP, REST APIs, status codes\n3. Database: MongoDB or SQL\n4. Auth: JWT, sessions, roles\n5. Validation, error handling, file uploads\n6. Deploy API on Render/Railway\n7. Build 2 projects: job portal API, ecommerce API, chat API\n\nBackend me logic, database design, and debugging skill sabse important hai.",
+    "recommendation": "Node.js + Express + MongoDB ek fast beginner backend stack hai.",
+    "nextQuestions": ["Node roadmap", "Backend projects", "MongoDB vs SQL"]
+  },
+  {
+    "id": "resume-for-fresher-cse",
+    "patterns": ["cse resume", "fresher resume", "btech resume", "resume for cse", "resume project section"],
+    "message": "CSE Fresher Resume Structure:\n\n1. Header: name, phone, email, LinkedIn, GitHub\n2. Summary: 1 line with target role and skills\n3. Skills: only skills you can explain\n4. Projects: 2-3 strong projects with live/GitHub link\n5. Education: degree, college, year, CGPA if good\n6. Achievements/certifications if relevant\n\nProject format:\nBuilt [project] using [tech]. Added [feature]. Improved/solved [problem].\n\nAvoid: long objective, fake skills, too many certificates.",
+    "recommendation": "For freshers, projects section is more powerful than certificates.",
+    "nextQuestions": ["Resume template", "Project ideas", "LinkedIn tips"]
+  },
+  {
+    "id": "interview-after-cse",
+    "patterns": ["cse interview prep", "placement prep cse", "campus placement cse", "technical interview cse"],
+    "message": "CSE Placement Prep Plan:\n\nMonth 1: Resume + GitHub + 2 projects polish\nMonth 2: DSA basics — arrays, strings, hashing, recursion\nMonth 3: OOP, DBMS, OS, CN revision\nMonth 4: Mock interviews + HR answers + company research\n\nDaily routine:\n1 DSA problem + 30 min core subject + 30 min project explanation practice.",
+    "recommendation": "Project explanation practice karo. Interview me clarity marks se zyada impact karti hai.",
+    "nextQuestions": ["DSA plan", "HR questions", "Core subjects list"]
+  },
+  {
+    "id": "openai-free-learning-plan",
+    "patterns": ["openai dependency kam", "without openai", "local ai mentor", "ai ke bina", "offline mentor"],
+    "message": "OpenAI dependency kam karne ka practical plan:\n\n1. Top 50 templates banao for common questions\n2. Local emotion engine rakho for stress/support\n3. Career/roadmap data JSON/MongoDB me structured rakho\n4. User memory se personalization karo\n5. RAG knowledge base banao: careers, exams, colleges, skills\n6. AI sirf complex/free-form questions ke liye use karo\n\nGoal: 60-70% queries local/template se solve, baaki AI fallback.",
+    "recommendation": "Pehle templates + memory + RAG strong karo. Local LLM later add karna.",
+    "nextQuestions": ["Template list banao", "RAG kaise setup karein", "MongoDB memory plan"]
+  },
+  {
+    "id": "product-stability-checklist",
+    "patterns": ["production checklist", "saas product checklist", "stability layer", "product stable kaise", "mentor production"],
+    "message": "AI Mentor SaaS Stability Checklist:\n\n1. Every API has try/catch + safe fallback\n2. AI fail ho to local response\n3. JSON read/write corrupt ho to default memory\n4. Logs track: route, emotion, intent, provider\n5. Rate limiting for spam\n6. Crisis detection local-first\n7. Frontend error boundary\n8. Templates for common questions\n9. Tests for emotional, slang, empty, long prompts\n10. MongoDB migration plan for memory\n\nRule: product crash nahi hona chahiye.",
+    "recommendation": "Decision engine + logging + memory migration are the next production steps.",
+    "nextQuestions": ["Decision engine explain", "Logging add karo", "MongoDB plan"]
+  },
+  {
     "id": "react-roadmap",
     "patterns": ["react roadmap", "react ka roadmap", "learn react", "react sikho", "react developer"],
     "message": "React Developer Roadmap (3-6 months):\n\nPhase 1 — Foundations (2-3 weeks)\n• HTML, CSS, Flexbox, Grid\n• JavaScript ES6+: arrow functions, destructuring, async/await\n\nPhase 2 — React Core (4-5 weeks)\n• JSX, components, props, state\n• useState, useEffect, useRef\n• Lists, keys, conditional rendering\n• React Router for multi-page apps\n\nPhase 3 — Production Skills (4-6 weeks)\n• API integration with fetch/axios\n• Context API or Redux basics\n• Form handling and validation\n• Build 2-3 portfolio projects\n\nPhase 4 — Job Ready (2-3 weeks)\n• Git/GitHub, deploy on Vercel/Netlify\n• Resume + LinkedIn\n• Apply for internships and junior roles",

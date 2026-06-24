@@ -3,6 +3,9 @@ import {
   CheckCircle,
   XCircle,
   GitCompare,
+  Gauge,
+  TrendingUp,
+  Wallet,
 } from 'lucide-react';
 import { getCompareOptions } from '../lib/api';
 
@@ -50,22 +53,41 @@ export default function ComparePage() {
   };
 
   const selectedCompare = compareOptions.filter((item) => selectedItems.includes(item.id));
+  const bestJobRate = selectedCompare.reduce((best, item) => Math.max(best, item.stats.jobRate), 0);
+  const bestGrowth = selectedCompare.reduce((best, item) => Math.max(best, item.stats.growth), 0);
 
   return (
-    <div className="space-y-6">
-      <div className="page-hero">
-        <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-slate-950">
-            <GitCompare className="h-5 w-5" />
+    <div className="space-y-5">
+      <div className="page-hero p-6 sm:p-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white text-slate-950">
+              <GitCompare className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-teal-100">Decision Matrix</p>
+              <h1 className="mt-2 text-4xl font-black">Compare Career Options</h1>
+              <p className="mt-2 text-sm text-slate-300">Select up to four paths and compare cost, salary, difficulty, job rate, growth, pros, and tradeoffs.</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-extrabold">Compare Career Options</h1>
-            <p className="text-sm text-slate-300">Side-by-side decision view.</p>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-2xl bg-white/10 px-4 py-3">
+              <p className="text-2xl font-black">{selectedItems.length}</p>
+              <p className="text-[11px] font-bold text-teal-100">Selected</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 px-4 py-3">
+              <p className="text-2xl font-black">{bestJobRate}%</p>
+              <p className="text-[11px] font-bold text-teal-100">Best Jobs</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 px-4 py-3">
+              <p className="text-2xl font-black">{bestGrowth}%</p>
+              <p className="text-[11px] font-bold text-teal-100">Best Growth</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="surface p-4">
+      <div className="surface p-5">
         <p className="section-title mb-3">Select Options ({selectedItems.length}/4)</p>
         <div className="flex flex-wrap gap-2">
           {compareOptions.map((option) => (
@@ -82,25 +104,34 @@ export default function ComparePage() {
         {error && <p className="text-sm text-red-700 mt-3">{error}</p>}
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid gap-4 xl:grid-cols-2">
         {selectedCompare.map((item) => (
           <div key={item.id} className="surface overflow-hidden">
-            <div className="bg-slate-950 px-4 py-4 text-center text-white">
-              <h3 className="font-extrabold">{item.title}</h3>
+            <div className="bg-gradient-to-br from-slate-950 via-indigo-950 to-teal-900 p-5 text-white">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold text-teal-100">Career Path</p>
+                  <h3 className="mt-1 text-xl font-black">{item.title}</h3>
+                </div>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold">{item.stats.jobRate}% jobs</span>
+              </div>
             </div>
-            <div className="p-4">
-              <div className="grid grid-cols-2 gap-2 mb-4 text-center text-xs">
-                <div className="p-2 bg-slate-50 rounded">
-                  <p className="text-slate-500">Duration</p>
-                  <p className="font-bold text-slate-800">{item.stats.duration}</p>
+            <div className="p-5">
+              <div className="mb-5 grid gap-2 sm:grid-cols-3">
+                <div className="rounded-2xl bg-slate-50 p-3">
+                  <Gauge className="mb-2 h-4 w-4 text-slate-600" />
+                  <p className="text-[10px] font-black uppercase text-slate-500">Duration</p>
+                  <p className="mt-1 text-sm font-bold text-slate-900">{item.stats.duration}</p>
                 </div>
-                <div className="p-2 bg-slate-50 rounded">
-                  <p className="text-slate-500">Fees</p>
-                  <p className="font-bold text-slate-800">{item.stats.fees}</p>
+                <div className="rounded-2xl bg-indigo-50 p-3">
+                  <Wallet className="mb-2 h-4 w-4 text-indigo-700" />
+                  <p className="text-[10px] font-black uppercase text-indigo-700">Fees</p>
+                  <p className="mt-1 text-sm font-bold text-slate-900">{item.stats.fees}</p>
                 </div>
-                <div className="p-2 bg-slate-50 rounded col-span-2">
-                  <p className="text-slate-500">Salary</p>
-                  <p className="font-bold text-teal-700">{item.stats.salary}</p>
+                <div className="rounded-2xl bg-teal-50 p-3">
+                  <TrendingUp className="mb-2 h-4 w-4 text-teal-700" />
+                  <p className="text-[10px] font-black uppercase text-teal-700">Salary</p>
+                  <p className="mt-1 text-sm font-bold text-slate-900">{item.stats.salary}</p>
                 </div>
               </div>
 
@@ -134,17 +165,17 @@ export default function ComparePage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <div>
-                  <p className="text-xs font-medium text-emerald-700 flex items-center gap-1 mb-1">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl bg-teal-50 p-3">
+                  <p className="text-xs font-black text-emerald-700 flex items-center gap-1 mb-2">
                     <CheckCircle className="w-3 h-3" /> Pros
                   </p>
                   <ul className="space-y-1 text-xs text-slate-600">
                     {item.pros.map((pro, i) => <li key={i}>{pro}</li>)}
                   </ul>
                 </div>
-                <div>
-                  <p className="text-xs font-medium text-red-700 flex items-center gap-1 mb-1">
+                <div className="rounded-2xl bg-rose-50 p-3">
+                  <p className="text-xs font-black text-red-700 flex items-center gap-1 mb-2">
                     <XCircle className="w-3 h-3" /> Cons
                   </p>
                   <ul className="space-y-1 text-xs text-slate-600">

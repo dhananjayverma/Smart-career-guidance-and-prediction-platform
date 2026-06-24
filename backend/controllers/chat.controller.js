@@ -5,6 +5,8 @@ const { getCareerData, getCollegeData, getExamData } = require('../services/data
 const { detectLanguage } = require('../utils/languageDetector');
 const { cleanMessage, detectIntent, extractEducation } = require('../utils/promptBuilder');
 const { runMentorGraph } = require('../services/mentorGraph.service');
+const { buildLearningSummaryAsync, getMemory, learnFromPrompt } = require('../services/learning.service');
+const { buildConversationState } = require('../services/conversationState.service');
 
 const memorySessions = new Map();
 const memorySavedCareers = new Map();
@@ -61,6 +63,11 @@ async function getSessionSummary(userId, userProfile = {}) {
     parts.push(`Recent questions: ${userTopics.join(' | ')}`);
   }
 
+  const learningSummary = await buildLearningSummaryAsync(userId);
+  if (learningSummary) {
+    parts.push(`Learned memory: ${learningSummary}`);
+  }
+
   return parts.join('. ').slice(0, 400);
 }
 
@@ -88,7 +95,10 @@ async function saveSessionTurn(userId, userMessage, assistantMessage, metadata) 
   }
 
   const history = memorySessions.get(userId) || [];
-  history.push({ role: 'user', content: userMessage }, { role: 'assistant', content: assistantMessage });
+  history.push(
+    { role: 'user', content: userMessage, metadata },
+    { role: 'assistant', content: assistantMessage, metadata }
+  );
   memorySessions.set(userId, history.slice(-30));
 }
 
@@ -165,6 +175,37 @@ async function saveCareer(req, res, next) {
   }
 }
 
+async function clearSessionMessages(req, res, next) {
+  try {
+    const userId = req.params.userId || req.body.userId || 'guest';
+
+    if (!userId || userId === 'guest') {
+      return res.json({ success: true, data: buildSessionSnapshot() });
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      const session = await Session.findOneAndUpdate(
+        { userId },
+        { $set: { messages: [] }, $setOnInsert: { userId } },
+        { upsert: true, new: true }
+      ).lean();
+
+      return res.json({ success: true, data: buildSessionSnapshot(session || {}) });
+    }
+
+    memorySessions.set(userId, []);
+    return res.json({
+      success: true,
+      data: buildSessionSnapshot({
+        messages: [],
+        savedCareers: memorySavedCareers.get(userId) || [],
+      }),
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function buildChatContext(req) {
   const message = cleanMessage(req.body.message);
   const userId = req.body.userId || 'guest';
@@ -183,11 +224,15 @@ async function buildChatContext(req) {
   const examData = shouldUseCareerData ? getExamData(message) : [];
   const collegeData = shouldUseCareerData ? getCollegeData({ search: message }).slice(0, 2) : [];
   const conversationHistory = await getConversationHistory(userId, 5);
+  const learnedProfile = await getMemory(userId);
+  const learningSummary = await buildLearningSummaryAsync(userId);
   const userProfile = {
     name: req.body.profile?.name || '',
-    education: req.body.education || education,
-    interests: req.body.profile?.interests || req.body.interests || [],
+    education: req.body.education || learnedProfile.education || education,
+    interests: req.body.profile?.interests || req.body.interests || Object.keys(learnedProfile.interests || {}),
     skills: req.body.profile?.skills || [],
+    preferredBranch: learnedProfile.preferredBranch || '',
+    learningSummary,
   };
   const sessionSummary = await getSessionSummary(userId, userProfile);
   const analysis = await runMentorGraph({
@@ -195,6 +240,14 @@ async function buildChatContext(req) {
     intent,
     careerData,
     userProfile,
+  });
+  const conversationState = buildConversationState({
+    message,
+    intent,
+    analysis,
+    userProfile,
+    conversationHistory,
+    language,
   });
 
   return {
@@ -210,6 +263,7 @@ async function buildChatContext(req) {
     conversationHistory,
     userProfile,
     analysis,
+    conversationState,
     stream: Boolean(req.body.stream),
   };
 }
@@ -234,17 +288,27 @@ async function chat(req, res, next) {
       conversationHistory: context.conversationHistory,
       userProfile: context.userProfile,
       analysis: context.analysis,
+      conversationState: context.conversationState,
     });
 
+    const isClarifying = context.conversationState?.needsMentorClarification;
     const metadata = {
       language: context.language,
       intent: context.intent,
       education: context.education,
       emotion: context.analysis.emotion,
       confusion: context.analysis.confusion,
-      decision: context.analysis.decision,
+      decision: isClarifying ? null : context.analysis.decision,
       workflow: context.analysis.workflow,
+      conversationState: context.conversationState,
     };
+    await learnFromPrompt({
+      userId: context.userId,
+      message: context.message,
+      analysis: context.analysis,
+      intent: context.intent,
+      language: context.language,
+    });
     await saveSessionTurn(context.userId, context.message, answer.message, metadata);
 
     res.json({
@@ -290,6 +354,7 @@ async function chatStream(req, res, next) {
         conversationHistory: context.conversationHistory,
         userProfile: context.userProfile,
         analysis: context.analysis,
+        conversationState: context.conversationState,
       },
       {
         onDelta: (chunk) => {
@@ -297,16 +362,25 @@ async function chatStream(req, res, next) {
           res.write(`data: ${JSON.stringify({ type: 'delta', content: chunk })}\n\n`);
         },
         onDone: async (answer) => {
+          const isClarifying = context.conversationState?.needsMentorClarification;
           const metadata = {
             language: context.language,
             intent: context.intent,
             education: context.education,
             emotion: context.analysis.emotion,
             confusion: context.analysis.confusion,
-            decision: context.analysis.decision,
+            decision: isClarifying ? null : context.analysis.decision,
             workflow: context.analysis.workflow,
+            conversationState: context.conversationState,
           };
 
+          await learnFromPrompt({
+            userId: context.userId,
+            message: context.message,
+            analysis: context.analysis,
+            intent: context.intent,
+            language: context.language,
+          });
           await saveSessionTurn(context.userId, context.message, answer.message || fullMessage, metadata);
 
           res.write(`data: ${JSON.stringify({
@@ -334,4 +408,4 @@ async function chatStream(req, res, next) {
   }
 }
 
-module.exports = { chat, chatStream, getSession, saveCareer };
+module.exports = { chat, chatStream, clearSessionMessages, getSession, saveCareer };

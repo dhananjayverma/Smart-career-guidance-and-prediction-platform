@@ -1,11 +1,7 @@
 const { buildCacheKey, getCachedResponse, setCachedResponse } = require('./cache.service');
 const { scheduleTask } = require('./requestQueue.service');
 const { matchTemplate, buildTemplateResponse, getStaticResponse } = require('./templateEngine.service');
-
-function shouldUseCache(input) {
-  if (input.skipCache) return false;
-  return (input.conversationHistory || []).length === 0;
-}
+const { selectResponseRoute, shouldUseCache } = require('./decisionEngine.service');
 
 function tagResponse(response, pipeline, extra = {}) {
   return {
@@ -18,6 +14,26 @@ function tagResponse(response, pipeline, extra = {}) {
   };
 }
 
+function personalizeTemplateResponse(response, input = {}) {
+  const profile = input.userProfile || {};
+  const interests = Array.isArray(profile.interests) ? profile.interests.slice(0, 3) : [];
+  const contextBits = [
+    profile.preferredBranch ? `branch/course: ${profile.preferredBranch}` : '',
+    interests.length ? `interest: ${interests.join(', ')}` : '',
+  ].filter(Boolean);
+
+  if (!contextBits.length || !response?.message) return response;
+
+  return {
+    ...response,
+    message: `${response.message}\n\nTumhare context ke hisaab se (${contextBits.join(', ')}), pehla best step foundation strong karke ek practical project banana hai.`,
+    metadata: {
+      ...(response.metadata || {}),
+      personalized: true,
+    },
+  };
+}
+
 async function executeMentorRequest({ input, getAiResponse, buildFallback }) {
   const cacheKey = buildCacheKey({
     message: input.message,
@@ -25,20 +41,33 @@ async function executeMentorRequest({ input, getAiResponse, buildFallback }) {
     intent: input.intent,
   });
 
-  if (shouldUseCache(input)) {
-    const cached = getCachedResponse(cacheKey);
-    if (cached) {
-      return tagResponse(cached, 'cache', { cacheKey });
+  const cached = shouldUseCache(input) ? getCachedResponse(cacheKey) : null;
+  const template = matchTemplate({ message: input.message });
+  const route = selectResponseRoute(input, {
+    hasCache: Boolean(cached),
+    hasTemplate: Boolean(template),
+  });
+
+  if (route.useLocalFallback) {
+    const response = buildFallback(input);
+    if (response) {
+      const pipeline = route.route === 'conversation-state-local'
+        ? 'conversation-state-engine'
+        : 'local-emotion-engine';
+      return tagResponse(response, pipeline, { routeReason: route.reason });
     }
   }
 
-  const template = matchTemplate({ message: input.message });
-  if (template) {
-    const response = buildTemplateResponse(template, { language: input.language });
-    if (shouldUseCache(input)) {
+  if (route.route === 'cache' && cached) {
+    return tagResponse(cached, 'cache', { cacheKey, routeReason: route.reason });
+  }
+
+  if (route.route === 'template' && template) {
+    const response = personalizeTemplateResponse(buildTemplateResponse(template, { language: input.language }), input);
+    if (shouldUseCache(input) && !response.metadata?.personalized) {
       setCachedResponse(cacheKey, response);
     }
-    return tagResponse(response, 'template', { templateId: template.id });
+    return tagResponse(response, 'template', { templateId: template.id, routeReason: route.reason });
   }
 
   try {
@@ -76,22 +105,36 @@ async function executeMentorStream({ input, streamAiResponse, buildFallback, onD
     onDone(tagResponse(response, pipeline, extra));
   };
 
-  if (shouldUseCache(input)) {
-    const cached = getCachedResponse(cacheKey);
-    if (cached?.message) {
-      onDelta(cached.message);
-      return finish(cached, 'cache', { cacheKey });
+  const cached = shouldUseCache(input) ? getCachedResponse(cacheKey) : null;
+  const template = matchTemplate({ message: input.message });
+  const route = selectResponseRoute(input, {
+    hasCache: Boolean(cached),
+    hasTemplate: Boolean(template),
+  });
+
+  if (route.useLocalFallback) {
+    const response = buildFallback(input);
+    if (response) {
+      onDelta(response.message);
+      const pipeline = route.route === 'conversation-state-local'
+        ? 'conversation-state-engine'
+        : 'local-emotion-engine';
+      return finish(response, pipeline, { routeReason: route.reason });
     }
   }
 
-  const template = matchTemplate({ message: input.message });
-  if (template) {
-    const response = buildTemplateResponse(template, { language: input.language });
-    if (shouldUseCache(input)) {
+  if (route.route === 'cache' && cached?.message) {
+    onDelta(cached.message);
+    return finish(cached, 'cache', { cacheKey, routeReason: route.reason });
+  }
+
+  if (route.route === 'template' && template) {
+    const response = personalizeTemplateResponse(buildTemplateResponse(template, { language: input.language }), input);
+    if (shouldUseCache(input) && !response.metadata?.personalized) {
       setCachedResponse(cacheKey, response);
     }
     onDelta(response.message);
-    return finish(response, 'template', { templateId: template.id });
+    return finish(response, 'template', { templateId: template.id, routeReason: route.reason });
   }
 
   try {

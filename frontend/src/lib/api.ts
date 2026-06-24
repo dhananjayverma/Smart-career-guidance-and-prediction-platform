@@ -88,7 +88,7 @@ export interface ChatResponse {
         riskLevel: string;
         missingSkills: string[];
       }[];
-    };
+    } | null;
   };
 }
 
@@ -200,6 +200,12 @@ export function saveCareerToSession<T = SessionSnapshot>(
   return request<T>(`/api/chat/session/${encodeURIComponent(userId)}/saved-careers`, {
     method: 'POST',
     body: JSON.stringify(input),
+  });
+}
+
+export function clearChatSessionMessages<T = SessionSnapshot>(userId: string) {
+  return request<T>(`/api/chat/session/${encodeURIComponent(userId)}/messages`, {
+    method: 'DELETE',
   });
 }
 
