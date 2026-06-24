@@ -380,8 +380,8 @@ function buildMentorState({ message = '', detectedIntent = '', conversationHisto
   }
 
   const known = {
-    ...profileKnown,
     ...previousKnown,
+    ...profileKnown,
     ...currentKnown,
   };
   const mergedEntities = mergeEntities(previousEntities, entities);
