@@ -2,6 +2,7 @@ const careers = require('../data/careers.json');
 const colleges = require('../data/colleges.json');
 const exams = require('../data/exams.json');
 const materials = require('../data/materials.json');
+const mentorKnowledge = require('../data/mentorKnowledge.json');
 
 class HashEmbeddings {
   constructor(dimensions = 128) {
@@ -82,7 +83,16 @@ function buildDocuments() {
     metadata: { type: 'resource', id: resource.id, title: resource.title },
   }));
 
-  return [...careerDocs, ...collegeDocs, ...examDocs, ...materialDocs];
+  const knowledgeDocs = mentorKnowledge.map((item) => ({
+    pageContent: [
+      `Knowledge: ${item.title}`,
+      `Tags: ${(item.tags || []).join(', ')}`,
+      item.content,
+    ].join('\n'),
+    metadata: { type: 'mentor_knowledge', id: item.id, title: item.title },
+  }));
+
+  return [...careerDocs, ...collegeDocs, ...examDocs, ...materialDocs, ...knowledgeDocs];
 }
 
 async function getVectorStore() {

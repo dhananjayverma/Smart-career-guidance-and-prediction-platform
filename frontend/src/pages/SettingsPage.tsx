@@ -9,9 +9,9 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 import type { ElementType } from 'react';
-import { getSettings } from '../lib/api';
+import { getSettings, clearUserMemory } from '../lib/api';
 
-type SettingsSection = 'profile' | 'language' | 'notifications';
+type SettingsSection = 'profile' | 'language' | 'notifications' | 'privacy';
 
 interface SettingsData {
   tabs: { id: SettingsSection; label: string; icon: string }[];
@@ -33,6 +33,8 @@ export default function SettingsPage() {
   const [language, setLanguage] = useState('hinglish');
   const [activeSection, setActiveSection] = useState<SettingsSection>('profile');
   const [settings, setSettings] = useState<SettingsData | null>(null);
+  const [toast, setToast] = useState('');
+  const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
     getSettings<SettingsData>()
@@ -40,8 +42,38 @@ export default function SettingsPage() {
       .catch((error) => console.warn('Settings API unavailable:', error));
   }, []);
 
+  useEffect(() => {
+    if (!toast) return;
+    const timeout = window.setTimeout(() => setToast(''), 2200);
+    return () => window.clearTimeout(timeout);
+  }, [toast]);
+
+  const handleClearMemory = async () => {
+    if (isClearing) return;
+    if (!window.confirm("Are you sure you want to clear all personalization data learned by the AI mentor? This cannot be undone.")) {
+      return;
+    }
+    
+    setIsClearing(true);
+    try {
+      const userId = window.localStorage.getItem('nextstepai_chat_user_id') || 'guest';
+      await clearUserMemory(userId);
+      setToast('Personalization memory cleared');
+    } catch (error) {
+      console.warn('Failed to clear memory:', error);
+      setToast('Failed to clear memory');
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className="fixed right-5 top-20 z-50 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-bold text-white shadow-2xl">
+          {toast}
+        </div>
+      )}
       <div className="page-hero">
         <div className="flex items-center gap-3">
           <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-slate-950">
@@ -167,6 +199,33 @@ export default function SettingsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Privacy & Memory Section */}
+      {activeSection === 'privacy' && (
+        <div className="surface overflow-hidden">
+          <div className="border-b border-slate-200 bg-slate-50 px-4 py-3">
+            <p className="section-title">Mentor Memory & Privacy</p>
+          </div>
+          <div className="p-4 space-y-4">
+            <p className="text-sm text-slate-600">
+              The AI Career Mentor learns from your messages, interests, education level, and emotions to provide personalized guidance.
+            </p>
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+              <h3 className="text-sm font-extrabold text-red-950">Reset AI Memory</h3>
+              <p className="mt-1 text-xs text-red-700">
+                This will clear all personalization data (interests, emotional patterns, language preference, and preferences) that the career mentor has learned from you. Your chat history will not be deleted.
+              </p>
+              <button
+                onClick={handleClearMemory}
+                disabled={isClearing}
+                className="mt-3 rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700 disabled:opacity-50 transition"
+              >
+                {isClearing ? 'Clearing...' : 'Clear Learned Memory'}
+              </button>
+            </div>
           </div>
         </div>
       )}

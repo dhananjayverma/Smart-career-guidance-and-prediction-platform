@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Math & Python for AI",
+    "duration": "Month 1-2",
+    "tasks": [
+      "Linear Algebra & Calculus basics",
+      "Advanced Python & PyTorch",
+      "Data Processing & NumPy/Pandas",
+      "Implement basic neural network from scratch"
+    ]
+  },
+  {
+    "title": "Classical ML & Deep Learning",
+    "duration": "Month 3-4",
+    "tasks": [
+      "Supervised & Unsupervised learning",
+      "CNNs & RNNs architectures",
+      "Model training & Hyperparameter tuning",
+      "Complete 2 Kaggle ML projects"
+    ]
+  },
+  {
+    "title": "LLMs & Generative AI",
+    "duration": "Month 5-6",
+    "tasks": [
+      "Transformers & Attention mechanism",
+      "Fine-tuning LLMs & Prompt Engineering",
+      "Vector databases & RAG pipeline integration",
+      "Deploy an AI application to cloud (AWS/GCP)"
+    ]
+  }
+]

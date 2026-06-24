@@ -8,6 +8,13 @@ const server = createServer(app);
 async function start() {
   await connectDb();
 
+  try {
+    const { backfillJsonToMongo } = require('./services/learning.service');
+    await backfillJsonToMongo();
+  } catch (error) {
+    console.error('Failed to run backfill on startup:', error);
+  }
+
   server.listen(env.port, () => {
     console.log(`Career Mentor AI backend running on http://localhost:${env.port}`);
   });

@@ -1,64 +1,147 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-24T06:13:21.423Z",
+  "updatedAt": "2026-06-24T11:01:55.517Z",
   "users": {
     "user-cb3b8b19-437b-4bbb-acd7-a198ba16cf99": {
       "userId": "user-cb3b8b19-437b-4bbb-acd7-a198ba16cf99",
       "version": 2,
-      "promptCount": 12,
+      "promptCount": 62,
       "interests": {},
       "branches": {
         "B.Tech CSE": {
+          "count": 2,
+          "weight": 1,
+          "lastUsed": "2026-06-24T08:46:13.400Z",
+          "source": "explicit"
+        },
+        "B.Tech IT": {
           "count": 1,
           "weight": 0.77,
-          "lastUsed": "2026-06-24T05:53:57.214Z",
+          "lastUsed": "2026-06-24T09:29:07.618Z",
+          "source": "explicit"
+        },
+        "BCA": {
+          "count": 3,
+          "weight": 1,
+          "lastUsed": "2026-06-24T10:47:40.260Z",
           "source": "explicit"
         }
       },
+      "professions": {
+        "software developer": {
+          "count": 2,
+          "weight": 1,
+          "lastUsed": "2026-06-24T08:56:33.838Z",
+          "source": "explicit"
+        },
+        "student": {
+          "count": 10,
+          "weight": 1,
+          "lastUsed": "2026-06-24T11:01:55.262Z",
+          "source": "explicit"
+        }
+      },
+      "problems": {
+        "career_confusion": {
+          "count": 24,
+          "weight": 1,
+          "lastUsed": "2026-06-24T11:01:55.262Z",
+          "source": "problem"
+        }
+      },
       "emotions": {
-        "stressed": 2
+        "stressed": {
+          "count": 2,
+          "weight": 1,
+          "lastUsed": "2026-06-24T09:52:06.998Z",
+          "source": "emotional"
+        },
+        "curious": {
+          "count": 5,
+          "weight": 1,
+          "lastUsed": "2026-06-24T10:28:25.737Z",
+          "source": "emotional"
+        },
+        "confused": {
+          "count": 8,
+          "weight": 1,
+          "lastUsed": "2026-06-24T11:01:55.262Z",
+          "source": "emotional"
+        }
       },
       "intents": {
         "greeting": {
-          "count": 1,
-          "weight": 0.59,
-          "lastUsed": "2026-06-24T05:52:25.467Z",
+          "count": 10,
+          "weight": 1,
+          "lastUsed": "2026-06-24T10:46:37.553Z",
           "source": "behavioral"
         },
-        "support": 2,
-        "general_guidance": {
-          "count": 5,
+        "support": {
+          "count": 2,
           "weight": 1,
-          "lastUsed": "2026-06-24T06:13:21.413Z",
+          "lastUsed": "2026-06-24T09:52:06.998Z",
+          "source": "behavioral"
+        },
+        "general_guidance": {
+          "count": 24,
+          "weight": 1,
+          "lastUsed": "2026-06-24T11:01:55.262Z",
           "source": "behavioral"
         },
         "career_confusion": {
+          "count": 18,
+          "weight": 1,
+          "lastUsed": "2026-06-24T11:00:21.912Z",
+          "source": "behavioral"
+        },
+        "roadmap": {
           "count": 1,
           "weight": 0.59,
-          "lastUsed": "2026-06-24T05:53:57.214Z",
+          "lastUsed": "2026-06-24T09:02:14.974Z",
+          "source": "behavioral"
+        },
+        "exam": {
+          "count": 1,
+          "weight": 0.59,
+          "lastUsed": "2026-06-24T09:56:17.364Z",
+          "source": "behavioral"
+        },
+        "government_job": {
+          "count": 1,
+          "weight": 0.59,
+          "lastUsed": "2026-06-24T10:07:56.613Z",
           "source": "behavioral"
         }
       },
       "languages": {
         "hinglish": {
-          "count": 7,
+          "count": 57,
           "weight": 1,
-          "lastUsed": "2026-06-24T06:13:21.413Z",
+          "lastUsed": "2026-06-24T11:01:55.262Z",
           "source": "behavioral"
         }
       },
+      "feedback": {},
       "recentNeeds": [
         "main thora presan hu",
+        "thora presan hu",
         "presan hu yr"
       ],
-      "preferences": {},
+      "preferences": {
+        "education": "10th",
+        "careerStage": "student",
+        "askedQuestions": [
+          "interest"
+        ]
+      },
       "meta": {
         "lastIntent": "general_guidance",
-        "lastEmotion": "neutral"
+        "lastEmotion": "confused",
+        "source": "mentor-memory-service"
       },
-      "updatedAt": "2026-06-24T06:13:21.413Z",
-      "education": "",
-      "preferredBranch": "B.Tech CSE"
+      "updatedAt": "2026-06-24T11:01:55.262Z",
+      "education": "10th",
+      "preferredBranch": "BCA"
     }
   },
   "globalPatterns": {

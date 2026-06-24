@@ -68,9 +68,11 @@ async function postChatCompletion({
       body: JSON.stringify({
         model,
         messages,
-        temperature: 0.5,
+        temperature: 0.7,
         max_tokens: maxTokens,
         stream,
+        frequency_penalty: 0.2,
+        presence_penalty: 0.1,
         ...(stream ? {} : { response_format: { type: 'json_object' } }),
       }),
     });

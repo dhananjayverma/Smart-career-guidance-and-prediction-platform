@@ -1,12 +1,12 @@
 const { analyzeEmotion, detectConfusion } = require('./emotion.service');
 const { buildCareerDecision } = require('./decision.service');
-const { isCareerIntent } = require('../utils/promptBuilder');
+const { allowsCareerDecision } = require('../utils/promptBuilder');
 
 function runLocalMentorGraph({ message, intent, careerData, userProfile = {} }) {
   const emotion = analyzeEmotion(message);
   const confusion = detectConfusion(message);
-  const careerMode = isCareerIntent(intent);
-  const decision = careerMode
+  const decisionMode = allowsCareerDecision(intent);
+  const decision = decisionMode
     ? buildCareerDecision(careerData, {
         emotion,
         confusion,
@@ -26,7 +26,7 @@ function runLocalMentorGraph({ message, intent, careerData, userProfile = {} }) 
         ? 'Greet warmly, introduce yourself, ask what they need help with today.'
         : intent === 'roadmap'
           ? 'Provide a COMPLETE phase-by-phase roadmap with durations and specific tasks. Be thorough.'
-          : careerMode
+          : decisionMode
             ? 'Listen to their exact question first. Give a direct answer, then options with honest pros/cons.'
             : 'Answer naturally like ChatGPT. Match their tone. Be helpful and conversational.',
   };
@@ -44,7 +44,7 @@ async function runLangGraphMentor(input) {
       emotion: null,
       confusion: null,
       decision: null,
-      careerMode: null,
+      decisionMode: null,
       coachHint: null,
       workflow: null,
       nodes: null,
@@ -62,11 +62,11 @@ async function runLangGraphMentor(input) {
       nodes: [...(state.nodes || []), 'confusion'],
     }))
     .addNode('careerDecision', async (state) => {
-      const careerMode = isCareerIntent(state.intent);
+      const decisionMode = allowsCareerDecision(state.intent);
 
       return {
-        careerMode,
-        decision: careerMode
+        decisionMode,
+        decision: decisionMode
           ? buildCareerDecision(state.careerData || [], {
               emotion: state.emotion,
               confusion: state.confusion,
@@ -83,7 +83,7 @@ async function runLangGraphMentor(input) {
           ? 'Greet warmly, introduce yourself, ask what they need help with today.'
           : state.intent === 'roadmap'
             ? 'Provide a COMPLETE phase-by-phase roadmap with durations and specific tasks. Be thorough.'
-            : state.careerMode
+            : state.decisionMode
               ? 'Listen to their exact question first. Give a direct answer, then options with honest pros/cons.'
               : 'Answer naturally like ChatGPT. Match their tone. Be helpful and conversational.',
       nodes: [...(state.nodes || []), 'responseCoach'],

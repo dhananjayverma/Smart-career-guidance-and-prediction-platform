@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const careers = require('../data/careers.json');
 
 const baseRoadmaps = {
@@ -246,10 +248,46 @@ function getGenericMilestones(career) {
   ];
 }
 
-function createRoadmap(careerName = 'Software Developer') {
+function getRoadmapFromFile(careerName, experienceYears = 0) {
+  const isExperienced = experienceYears >= 2;
+  const folder = isExperienced ? 'experienced' : 'beginner';
+  
+  // Map career names to filename keys
+  const fileMap = {
+    'software developer': 'software_developer',
+    'software engineer': 'software_developer',
+    'ai engineer': 'ai_engineer',
+    'data scientist': 'ai_engineer',
+    'ai/ml': 'ai_engineer',
+    'devops engineer': 'devops',
+    'devops': 'devops',
+    'cybersecurity': 'cybersecurity',
+    'cybersecurity engineer': 'cybersecurity',
+    'data engineer': 'data_engineer',
+    'data engineering': 'data_engineer'
+  };
+  
+  const key = fileMap[careerName.toLowerCase()];
+  if (!key) return null;
+  
+  try {
+    const filePath = path.join(__dirname, `../data/roadmaps/${folder}/${key}.json`);
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    }
+  } catch (error) {
+    console.error(`Failed to load roadmap file: ${error.message}`);
+  }
+  return null;
+}
+
+function createRoadmap(careerName = 'Software Developer', experienceYears = 0) {
   const matched = allCareers.find((career) => career.title.toLowerCase() === careerName.toLowerCase());
   const title = matched?.title || careerName;
-  const milestones = baseRoadmaps[title] || (matched ? getGenericMilestones(matched) : [
+  
+  // Try loading from split files first
+  const fileMilestones = getRoadmapFromFile(title, experienceYears);
+  const milestones = fileMilestones || baseRoadmaps[title] || (matched ? getGenericMilestones(matched) : [
     { title: 'Explore', duration: 'Month 1', tasks: ['Understand role', 'Talk to 2 seniors', 'List required skills', 'Choose learning resources'] },
     { title: 'Build Skills', duration: 'Month 2-4', tasks: ['Study daily', 'Complete projects', 'Take feedback', 'Track progress weekly'] },
     { title: 'Apply', duration: 'Month 5-6', tasks: ['Prepare resume', 'Practice interviews', 'Apply consistently', 'Improve from feedback'] },

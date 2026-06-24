@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Programming Foundation",
+    "duration": "Month 1-2",
+    "tasks": [
+      "Pick JavaScript or Python",
+      "Learn Git/GitHub",
+      "Build 2 small projects",
+      "Solve 50 beginner problems"
+    ]
+  },
+  {
+    "title": "Web + Database Skills",
+    "duration": "Month 3-4",
+    "tasks": [
+      "HTML/CSS/React basics",
+      "Node.js or Django basics",
+      "SQL fundamentals",
+      "Deploy one full-stack project"
+    ]
+  },
+  {
+    "title": "Job Readiness",
+    "duration": "Month 5-6",
+    "tasks": [
+      "DSA practice 5 days/week",
+      "Resume + LinkedIn",
+      "Mock interviews",
+      "Apply to internships and junior roles"
+    ]
+  }
+]

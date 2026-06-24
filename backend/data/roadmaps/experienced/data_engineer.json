@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Advanced SQL & Programming",
+    "duration": "Month 1-2",
+    "tasks": [
+      "Complex window functions & optimization in SQL",
+      "Advanced Python / Scala",
+      "Data modeling (Star & Snowflake schema)",
+      "Setup PostgreSQL database"
+    ]
+  },
+  {
+    "title": "Data Pipelines & ETL",
+    "duration": "Month 3-4",
+    "tasks": [
+      "Apache Airflow orchestration",
+      "Apache Spark for batch/stream processing",
+      "Docker for data services",
+      "Build a robust ETL pipeline from public API"
+    ]
+  },
+  {
+    "title": "Data Warehousing & Cloud",
+    "duration": "Month 5-6",
+    "tasks": [
+      "Snowflake or AWS Redshift integration",
+      "NoSQL databases (MongoDB/Cassandra)",
+      "Data Lake architecture (Delta Lake/Parquet)",
+      "Deploy data pipeline to AWS (S3, EMR, Athena)"
+    ]
+  }
+]

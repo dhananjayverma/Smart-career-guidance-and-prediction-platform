@@ -21,6 +21,11 @@ interface SimulationScenario {
   outcomes: { year: number; title: string; salary: string; status: string; description: string }[];
   risk: string;
   investment: string;
+  year1Salary?: string;
+  year3Salary?: string;
+  requiredSkills?: string[];
+  dailyRoutine?: string[];
+  competitionLevel?: string;
 }
 
 const iconMap: Record<string, ElementType> = {
@@ -73,6 +78,7 @@ export default function SimulationPage() {
   const visibleOutcomes = selectedSimulation?.outcomes.filter((_, index) => !isAnimating || index < currentYear) || [];
   const finalOutcome = selectedSimulation?.outcomes[selectedSimulation.outcomes.length - 1];
   const growthYears = selectedSimulation?.outcomes.filter((outcome) => outcome.status === 'growth').length || 0;
+  const competitionScore = selectedSimulation?.competitionLevel === 'High' ? 86 : selectedSimulation?.competitionLevel === 'Medium' ? 62 : 42;
 
   return (
     <div className="space-y-5">
@@ -193,6 +199,74 @@ export default function SimulationPage() {
                   </div>
                 </div>
               )}
+
+              <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+                <div className="surface overflow-hidden">
+                  <div className="border-b border-slate-200 bg-gradient-to-r from-white to-teal-50 px-5 py-4">
+                    <p className="text-xs font-black uppercase text-teal-700">Agar tum {selectedSimulation.title} bante ho</p>
+                    <h2 className="mt-1 text-2xl font-black text-slate-950">Real Career Simulation</h2>
+                  </div>
+                  <div className="grid gap-3 p-5 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-teal-50 p-4">
+                      <p className="text-[10px] font-black uppercase text-teal-700">Year 1 Salary</p>
+                      <p className="mt-1 text-2xl font-black text-slate-950">{selectedSimulation.year1Salary || selectedSimulation.outcomes[0]?.salary}</p>
+                    </div>
+                    <div className="rounded-2xl bg-indigo-50 p-4">
+                      <p className="text-[10px] font-black uppercase text-indigo-700">Year 3 Salary</p>
+                      <p className="mt-1 text-2xl font-black text-slate-950">{selectedSimulation.year3Salary || selectedSimulation.outcomes[2]?.salary}</p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 p-4 sm:col-span-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-black uppercase text-slate-500">Competition Level</p>
+                        <p className="text-sm font-black text-slate-950">{selectedSimulation.competitionLevel || selectedSimulation.risk}</p>
+                      </div>
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-white">
+                        <div className="h-full rounded-full bg-gradient-to-r from-teal-500 to-rose-500" style={{ width: `${competitionScore}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="gradient-card">
+                  <p className="text-sm font-black text-teal-100">Salary Path</p>
+                  <div className="mt-4 space-y-3">
+                    {selectedSimulation.outcomes.slice(0, 3).map((outcome) => (
+                      <div key={outcome.year} className="flex items-center justify-between rounded-2xl bg-white/10 p-3">
+                        <div>
+                          <p className="text-xs font-bold text-slate-300">Year {outcome.year}</p>
+                          <p className="font-black text-white">{outcome.title}</p>
+                        </div>
+                        <p className="text-sm font-black text-teal-100">{outcome.salary}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 xl:grid-cols-2">
+                <div className="surface p-5">
+                  <p className="section-title">Required Skills</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {(selectedSimulation.requiredSkills || ['Communication', 'Projects', 'Interview prep', 'Domain basics']).map((skill) => (
+                      <span key={skill} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="surface p-5">
+                  <p className="section-title">Daily Routine</p>
+                  <div className="mt-3 space-y-2">
+                    {(selectedSimulation.dailyRoutine || selectedSimulation.outcomes.slice(0, 4).map((item) => item.description)).map((item, index) => (
+                      <div key={item} className="flex gap-3 rounded-2xl bg-slate-50 p-3">
+                        <span className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-xl bg-slate-950 text-xs font-black text-white">{index + 1}</span>
+                        <p className="text-sm font-semibold leading-5 text-slate-700">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
               <div className="surface p-5">
                 <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

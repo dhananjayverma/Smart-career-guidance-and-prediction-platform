@@ -3,10 +3,19 @@ const Session = require('../models/session.model');
 const { generateCareerAdvice, generateCareerAdviceStream } = require('../services/ai.service');
 const { getCareerData, getCollegeData, getExamData } = require('../services/data.service');
 const { detectLanguage } = require('../utils/languageDetector');
-const { cleanMessage, detectIntent, extractEducation } = require('../utils/promptBuilder');
+const { allowsCareerDecision, cleanMessage, detectIntent, extractEducation } = require('../utils/promptBuilder');
 const { runMentorGraph } = require('../services/mentorGraph.service');
-const { buildLearningSummaryAsync, getMemory, learnFromPrompt } = require('../services/learning.service');
+const {
+  buildLearningSummaryAsync,
+  getMemory,
+  learnFromFeedback,
+  learnFromPrompt,
+  clearMemory,
+} = require('../services/learning.service');
 const { buildConversationState } = require('../services/conversationState.service');
+const { buildUnderstanding } = require('../services/understanding.service');
+const { selectBehaviorMode } = require('../services/behaviorEngine.service');
+const { buildMentorState } = require('../services/gapEngine.service');
 
 const memorySessions = new Map();
 const memorySavedCareers = new Map();
@@ -88,6 +97,7 @@ async function saveSessionTurn(userId, userMessage, assistantMessage, metadata) 
             $slice: -30,
           },
         },
+        $addToSet: { 'preferences.askedQuestions': { $each: metadata?.mentorState?.askedQuestions || [] } }
       },
       { upsert: true }
     );
@@ -206,6 +216,36 @@ async function clearSessionMessages(req, res, next) {
   }
 }
 
+async function saveFeedback(req, res, next) {
+  try {
+    const userId = req.params.userId || req.body.userId || 'guest';
+    const rating = req.body.rating;
+
+    if (!['up', 'down'].includes(rating)) {
+      return res.status(400).json({ success: false, message: 'rating must be up or down' });
+    }
+
+    const memory = await learnFromFeedback(userId, {
+      rating,
+      intent: req.body.intent,
+      problem: req.body.problem,
+      pattern: req.body.pattern,
+      behaviorMode: req.body.behaviorMode,
+      messageId: req.body.messageId,
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        rating,
+        learned: Boolean(memory?.userId),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function buildChatContext(req) {
   const message = cleanMessage(req.body.message);
   const userId = req.body.userId || 'guest';
@@ -215,14 +255,8 @@ async function buildChatContext(req) {
   }
 
   const language = req.body.language || detectLanguage(message);
-  const intent = detectIntent(message);
+  const detectedIntent = detectIntent(message);
   const education = req.body.education || extractEducation(message);
-  const careerLikeIntents = ['career_confusion', 'exam', 'roadmap', 'college'];
-  const shouldUseCareerData = careerLikeIntents.includes(intent);
-  const interest = req.body.interest || message;
-  const careerData = shouldUseCareerData ? getCareerData({ education, interest }) : [];
-  const examData = shouldUseCareerData ? getExamData(message) : [];
-  const collegeData = shouldUseCareerData ? getCollegeData({ search: message }).slice(0, 2) : [];
   const conversationHistory = await getConversationHistory(userId, 5);
   const learnedProfile = await getMemory(userId);
   const learningSummary = await buildLearningSummaryAsync(userId);
@@ -233,7 +267,25 @@ async function buildChatContext(req) {
     skills: req.body.profile?.skills || [],
     preferredBranch: learnedProfile.preferredBranch || '',
     learningSummary,
+    experienceYears: learnedProfile.preferences?.experienceYears || 0,
+    currentRole: learnedProfile.preferences?.currentRole || '',
+    careerStage: learnedProfile.preferences?.careerStage || 'beginner',
+    askedQuestions: learnedProfile.preferences?.askedQuestions || [],
   };
+  const mentorState = buildMentorState({
+    message,
+    detectedIntent,
+    conversationHistory,
+    userProfile,
+    language,
+  });
+  const intent = mentorState.intent;
+  const careerLikeIntents = ['career_confusion', 'exam', 'government_job', 'roadmap', 'college'];
+  const shouldUseCareerData = careerLikeIntents.includes(intent);
+  const interest = req.body.interest || message;
+  const careerData = shouldUseCareerData ? getCareerData({ education, interest }) : [];
+  const examData = shouldUseCareerData ? getExamData(message) : [];
+  const collegeData = shouldUseCareerData ? getCollegeData({ search: message }).slice(0, 2) : [];
   const sessionSummary = await getSessionSummary(userId, userProfile);
   const analysis = await runMentorGraph({
     message,
@@ -248,6 +300,31 @@ async function buildChatContext(req) {
     userProfile,
     conversationHistory,
     language,
+  });
+  if (mentorState.shouldAsk && mentorState.localResponse) {
+    conversationState.stage = 'clarification';
+    conversationState.needsMentorClarification = true;
+    conversationState.localResponse = mentorState.localResponse;
+    conversationState.known = mentorState.known;
+    conversationState.missing = mentorState.missing;
+    conversationState.askedQuestions = mentorState.askedQuestions;
+    conversationState.nextBestQuestion = mentorState.criticalUnknown;
+    conversationState.reasoning = mentorState.reasoning;
+    conversationState.responsePlan = mentorState.responsePlan;
+  }
+  const understanding = buildUnderstanding({
+    message,
+    intent,
+    analysis,
+    conversationState,
+    userProfile,
+  });
+  const behavior = selectBehaviorMode({
+    message,
+    intent,
+    understanding,
+    conversationState,
+    analysis,
   });
 
   return {
@@ -264,6 +341,9 @@ async function buildChatContext(req) {
     userProfile,
     analysis,
     conversationState,
+    understanding,
+    behavior,
+    mentorState,
     stream: Boolean(req.body.stream),
   };
 }
@@ -274,6 +354,13 @@ async function chat(req, res, next) {
     if (context.error) {
       return res.status(400).json({ success: false, message: context.error });
     }
+
+    console.log("USER:", context.message);
+    console.log("EXTRACTED:", context.mentorState?.entities);
+    console.log("MEMORY:", context.userProfile);
+    console.log("KNOWN:", context.mentorState?.known);
+    console.log("MISSING:", context.mentorState?.missing);
+    console.log("NEXT QUESTION:", context.mentorState?.nextBestQuestion);
 
     const answer = await generateCareerAdvice({
       message: context.message,
@@ -289,18 +376,32 @@ async function chat(req, res, next) {
       userProfile: context.userProfile,
       analysis: context.analysis,
       conversationState: context.conversationState,
+      understanding: context.understanding,
+      behavior: context.behavior,
+      mentorState: context.mentorState,
     });
 
     const isClarifying = context.conversationState?.needsMentorClarification;
+    const allowDecisionCard = allowsCareerDecision(context.intent);
     const metadata = {
       language: context.language,
       intent: context.intent,
+      queryType: context.mentorState?.queryType || 'general',
       education: context.education,
       emotion: context.analysis.emotion,
       confusion: context.analysis.confusion,
-      decision: isClarifying ? null : context.analysis.decision,
+      decision: !isClarifying && allowDecisionCard ? context.analysis.decision : null,
+      ui: {
+        decisionCard: !isClarifying && allowDecisionCard,
+        careerCard: allowDecisionCard,
+        skillGap: allowDecisionCard,
+        roadmapCard: context.intent === 'roadmap',
+      },
       workflow: context.analysis.workflow,
       conversationState: context.conversationState,
+      understanding: context.understanding,
+      behavior: context.behavior,
+      mentorState: context.mentorState,
     };
     await learnFromPrompt({
       userId: context.userId,
@@ -308,6 +409,10 @@ async function chat(req, res, next) {
       analysis: context.analysis,
       intent: context.intent,
       language: context.language,
+      understanding: context.understanding,
+      conversationState: context.conversationState,
+      behavior: context.behavior,
+      mentorState: context.mentorState,
     });
     await saveSessionTurn(context.userId, context.message, answer.message, metadata);
 
@@ -333,6 +438,13 @@ async function chatStream(req, res, next) {
       return res.status(400).json({ success: false, message: context.error });
     }
 
+    console.log("USER:", context.message);
+    console.log("EXTRACTED:", context.mentorState?.entities);
+    console.log("MEMORY:", context.userProfile);
+    console.log("KNOWN:", context.mentorState?.known);
+    console.log("MISSING:", context.mentorState?.missing);
+    console.log("NEXT QUESTION:", context.mentorState?.nextBestQuestion);
+
     res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache, no-transform');
     res.setHeader('Connection', 'keep-alive');
@@ -355,6 +467,9 @@ async function chatStream(req, res, next) {
         userProfile: context.userProfile,
         analysis: context.analysis,
         conversationState: context.conversationState,
+        understanding: context.understanding,
+        behavior: context.behavior,
+        mentorState: context.mentorState,
       },
       {
         onDelta: (chunk) => {
@@ -363,15 +478,26 @@ async function chatStream(req, res, next) {
         },
         onDone: async (answer) => {
           const isClarifying = context.conversationState?.needsMentorClarification;
+          const allowDecisionCard = allowsCareerDecision(context.intent);
           const metadata = {
             language: context.language,
             intent: context.intent,
+            queryType: context.mentorState?.queryType || 'general',
             education: context.education,
             emotion: context.analysis.emotion,
             confusion: context.analysis.confusion,
-            decision: isClarifying ? null : context.analysis.decision,
+            decision: !isClarifying && allowDecisionCard ? context.analysis.decision : null,
+            ui: {
+              decisionCard: !isClarifying && allowDecisionCard,
+              careerCard: allowDecisionCard,
+              skillGap: allowDecisionCard,
+              roadmapCard: context.intent === 'roadmap',
+            },
             workflow: context.analysis.workflow,
             conversationState: context.conversationState,
+            understanding: context.understanding,
+            behavior: context.behavior,
+            mentorState: context.mentorState,
           };
 
           await learnFromPrompt({
@@ -380,6 +506,10 @@ async function chatStream(req, res, next) {
             analysis: context.analysis,
             intent: context.intent,
             language: context.language,
+            understanding: context.understanding,
+            conversationState: context.conversationState,
+            behavior: context.behavior,
+            mentorState: context.mentorState,
           });
           await saveSessionTurn(context.userId, context.message, answer.message || fullMessage, metadata);
 
@@ -408,4 +538,19 @@ async function chatStream(req, res, next) {
   }
 }
 
-module.exports = { chat, chatStream, clearSessionMessages, getSession, saveCareer };
+async function clearUserMemory(req, res, next) {
+  try {
+    const userId = req.params.userId || req.body.userId || 'guest';
+
+    if (!userId || userId === 'guest') {
+      return res.json({ success: true, message: 'Guest memory is not tracked.' });
+    }
+
+    await clearMemory(userId);
+    return res.json({ success: true, message: 'Learned memory has been cleared successfully.' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { chat, chatStream, clearSessionMessages, getSession, saveCareer, clearUserMemory, saveFeedback };

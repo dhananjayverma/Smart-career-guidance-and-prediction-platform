@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Networking & Linux Security",
+    "duration": "Month 1-2",
+    "tasks": [
+      "TCP/IP protocol deep dive",
+      "Linux/Windows system administration & hardening",
+      "Wireshark traffic analysis",
+      "Learn bash/python for security scripting"
+    ]
+  },
+  {
+    "title": "Vulnerability Assessment & Pentesting",
+    "duration": "Month 3-4",
+    "tasks": [
+      "OWASP Top 10 vulnerabilities",
+      "Nmap network scanning & Metasploit basics",
+      "Burp Suite web pentesting",
+      "Setup Active Directory lab & compromise it"
+    ]
+  },
+  {
+    "title": "Security Operations & Incident Response",
+    "duration": "Month 5-6",
+    "tasks": [
+      "SIEM tools (Splunk/ELK stack)",
+      "Log analysis & threat hunting",
+      "SOC analyst operations",
+      "Prepare for CompTIA Security+ or CEH exam"
+    ]
+  }
+]

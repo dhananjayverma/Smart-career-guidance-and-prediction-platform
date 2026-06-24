@@ -5,13 +5,17 @@
     "type": "IIT",
     "location": "New Delhi",
     "state": "Delhi",
-    "ranking": 1,
+    "ranking": 2,
     "placement": 98,
-    "avgPackage": "Rs 16 LPA",
-    "highestPackage": "Rs 2 Crore",
-    "fees": "Rs 4.5 Lakhs/year",
+    "avgPackage": "Rs 18.5 LPA",
+    "highestPackage": "Rs 2.4 Crore",
+    "fees": "Rs 2.2 Lakhs/year",
     "rating": 4.9,
-    "courses": ["B.Tech", "M.Tech", "MBA"]
+    "courses": ["B.Tech CSE", "B.Tech ECE", "M.Tech"],
+    "reviews": [
+      { "user": "Aman S.", "rating": 5, "comment": "Outstanding research labs, competitive coding culture is unmatched." },
+      { "user": "Kriti M.", "rating": 4.8, "comment": "Great placements, but academic workload is highly intense." }
+    ]
   },
   {
     "id": "iit-bombay",
@@ -19,13 +23,287 @@
     "type": "IIT",
     "location": "Mumbai",
     "state": "Maharashtra",
-    "ranking": 2,
+    "ranking": 3,
     "placement": 97,
-    "avgPackage": "Rs 18 LPA",
-    "highestPackage": "Rs 1.8 Crore",
-    "fees": "Rs 4.2 Lakhs/year",
+    "avgPackage": "Rs 21.8 LPA",
+    "highestPackage": "Rs 3.1 Crore",
+    "fees": "Rs 2.1 Lakhs/year",
     "rating": 4.9,
-    "courses": ["B.Tech", "M.Tech", "PhD"]
+    "courses": ["B.Tech CSE", "B.Tech Mech", "PhD"],
+    "reviews": [
+      { "user": "Rohan D.", "rating": 5, "comment": "Campus life at Powai is magical. Top companies recruit directly." },
+      { "user": "Tanvi P.", "rating": 4.9, "comment": "Unbelievable coding atmosphere, Mood Indigo is a huge plus." }
+    ]
+  },
+  {
+    "id": "iit-madras",
+    "name": "IIT Madras",
+    "type": "IIT",
+    "location": "Chennai",
+    "state": "Tamil Nadu",
+    "ranking": 1,
+    "placement": 96,
+    "avgPackage": "Rs 20.2 LPA",
+    "highestPackage": "Rs 1.9 Crore",
+    "fees": "Rs 2.3 Lakhs/year",
+    "rating": 4.9,
+    "courses": ["B.Tech CSE", "B.Tech Aerospace", "M.Tech"],
+    "reviews": [
+      { "user": "Vijay K.", "rating": 5, "comment": "Best research park in India. Extremely active student project clubs." },
+      { "user": "Deepika S.", "rating": 4.7, "comment": "Professors are world-renowned, lush green forest campus is beautiful." }
+    ]
+  },
+  {
+    "id": "iit-kanpur",
+    "name": "IIT Kanpur",
+    "type": "IIT",
+    "location": "Kanpur",
+    "state": "Uttar Pradesh",
+    "ranking": 4,
+    "placement": 95,
+    "avgPackage": "Rs 19.1 LPA",
+    "highestPackage": "Rs 2.1 Crore",
+    "fees": "Rs 2.15 Lakhs/year",
+    "rating": 4.8,
+    "courses": ["B.Tech CSE", "B.Tech Aerospace", "M.Sc Math"],
+    "reviews": [
+      { "user": "Yash V.", "rating": 5, "comment": "Strong focus on theoretical computer science, airstrip inside campus." },
+      { "user": "Neha G.", "rating": 4.6, "comment": "Placements are top tier, though the city location can feel a bit remote." }
+    ]
+  },
+  {
+    "id": "iit-kharagpur",
+    "name": "IIT Kharagpur",
+    "type": "IIT",
+    "location": "Kharagpur",
+    "state": "West Bengal",
+    "ranking": 6,
+    "placement": 94,
+    "avgPackage": "Rs 17.5 LPA",
+    "highestPackage": "Rs 2.4 Crore",
+    "fees": "Rs 2.2 Lakhs/year",
+    "rating": 4.8,
+    "courses": ["B.Tech CSE", "Integrated M.Tech", "MBA"],
+    "reviews": [
+      { "user": "Debashis B.", "rating": 5, "comment": "Huge campus with incredible network. Hall culture is strong." },
+      { "user": "Priya R.", "rating": 4.7, "comment": "Alumni network is legendary, plenty of startup opportunities." }
+    ]
+  },
+  {
+    "id": "iit-roorkee",
+    "name": "IIT Roorkee",
+    "type": "IIT",
+    "location": "Roorkee",
+    "state": "Uttarakhand",
+    "ranking": 5,
+    "placement": 93,
+    "avgPackage": "Rs 16.8 LPA",
+    "highestPackage": "Rs 1.8 Crore",
+    "fees": "Rs 2.22 Lakhs/year",
+    "rating": 4.8,
+    "courses": ["B.Tech CSE", "B.Tech Civil", "M.Tech"],
+    "reviews": [
+      { "user": "Aniket S.", "rating": 5, "comment": "Roorkee is historic, campus facilities and sports are top notch." },
+      { "user": "Simran K.", "rating": 4.7, "comment": "Amazing coding groups like SDSLabs, placements are brilliant." }
+    ]
+  },
+  {
+    "id": "iit-guwahati",
+    "name": "IIT Guwahati",
+    "type": "IIT",
+    "location": "Guwahati",
+    "state": "Assam",
+    "ranking": 7,
+    "placement": 92,
+    "avgPackage": "Rs 15.6 LPA",
+    "highestPackage": "Rs 1.2 Crore",
+    "fees": "Rs 2.2 Lakhs/year",
+    "rating": 4.8,
+    "courses": ["B.Tech CSE", "B.Tech Biotech", "M.Des"],
+    "reviews": [
+      { "user": "Jyoti D.", "rating": 5, "comment": "Most scenic campus in India next to Brahmaputra. Excellent placement rate." },
+      { "user": "Abhijit N.", "rating": 4.6, "comment": "Very active robotics club, research facilities are super modern." }
+    ]
+  },
+  {
+    "id": "iit-hyderabad",
+    "name": "IIT Hyderabad",
+    "type": "IIT",
+    "location": "Hyderabad",
+    "state": "Telangana",
+    "ranking": 8,
+    "placement": 91,
+    "avgPackage": "Rs 16.2 LPA",
+    "highestPackage": "Rs 1.4 Crore",
+    "fees": "Rs 2.4 Lakhs/year",
+    "rating": 4.7,
+    "courses": ["B.Tech CSE", "B.Tech Smart Mobility", "M.Tech"],
+    "reviews": [
+      { "user": "Sameer V.", "rating": 4.9, "comment": "Great Japanese collaboration, brilliant labs for AI and chip design." },
+      { "user": "Preeti A.", "rating": 4.6, "comment": "Close proximity to Hyderabad tech hub helps in getting internships." }
+    ]
+  },
+  {
+    "id": "iit-indore",
+    "name": "IIT Indore",
+    "type": "IIT",
+    "location": "Indore",
+    "state": "Madhya Pradesh",
+    "ranking": 14,
+    "placement": 89,
+    "avgPackage": "Rs 14.5 LPA",
+    "highestPackage": "Rs 90 LPA",
+    "fees": "Rs 2.3 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.Tech CSE", "B.Tech Metallurgy", "M.Tech"],
+    "reviews": [
+      { "user": "Rahul J.", "rating": 4.7, "comment": "Super clean campus, very clean hostel facilities and strong coding culture." },
+      { "user": "Meera C.", "rating": 4.5, "comment": "Excellent research culture. Placements are growing rapidly every year." }
+    ]
+  },
+  {
+    "id": "iit-bhu",
+    "name": "IIT BHU Varanasi",
+    "type": "IIT",
+    "location": "Varanasi",
+    "state": "Uttar Pradesh",
+    "ranking": 15,
+    "placement": 90,
+    "avgPackage": "Rs 15.2 LPA",
+    "highestPackage": "Rs 1.6 Crore",
+    "fees": "Rs 2.25 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.Tech CSE", "B.Tech Ceramic", "M.Tech"],
+    "reviews": [
+      { "user": "Ujjwal M.", "rating": 4.8, "comment": "Rich history, Banaras vibe is amazing, placement office is active." },
+      { "user": "Swati D.", "rating": 4.5, "comment": "Incredible peer group, coding culture is very strong here." }
+    ]
+  },
+  {
+    "id": "bits-pilani",
+    "name": "BITS Pilani",
+    "type": "Private",
+    "location": "Pilani",
+    "state": "Rajasthan",
+    "ranking": 25,
+    "placement": 95,
+    "avgPackage": "Rs 18.2 LPA",
+    "highestPackage": "Rs 85 LPA",
+    "fees": "Rs 5.2 Lakhs/year",
+    "rating": 4.8,
+    "courses": ["B.E. CSE", "B.E. Electrical", "M.Sc Physics"],
+    "reviews": [
+      { "user": "Karthik R.", "rating": 5, "comment": "No attendance policy is amazing. Best startup ecosystem in India." },
+      { "user": "Ananya S.", "rating": 4.7, "comment": "Fees are very high, but placement ROI and campus freedom make up for it." }
+    ]
+  },
+  {
+    "id": "bits-goa",
+    "name": "BITS Pilani Goa Campus",
+    "type": "Private",
+    "location": "Zuarinagar",
+    "state": "Goa",
+    "ranking": 28,
+    "placement": 93,
+    "avgPackage": "Rs 16.5 LPA",
+    "highestPackage": "Rs 65 LPA",
+    "fees": "Rs 5.2 Lakhs/year",
+    "rating": 4.8,
+    "courses": ["B.E. CSE", "B.E. Electronics", "M.Sc Chemistry"],
+    "reviews": [
+      { "user": "Nikhil T.", "rating": 4.9, "comment": "Campus is literally like a resort. Excellent peer group and coding labs." },
+      { "user": "Riya V.", "rating": 4.7, "comment": "Strict grading, but placements are combined with Pilani which is great." }
+    ]
+  },
+  {
+    "id": "bits-hyderabad",
+    "name": "BITS Pilani Hyderabad Campus",
+    "type": "Private",
+    "location": "Hyderabad",
+    "state": "Telangana",
+    "ranking": 30,
+    "placement": 92,
+    "avgPackage": "Rs 15.8 LPA",
+    "highestPackage": "Rs 60 LPA",
+    "fees": "Rs 5.2 Lakhs/year",
+    "rating": 4.7,
+    "courses": ["B.E. CSE", "B.E. Civil", "MBA"],
+    "reviews": [
+      { "user": "Abhishek C.", "rating": 4.8, "comment": "Modern infrastructure, great coding groups, clean green campus." },
+      { "user": "Sneha L.", "rating": 4.6, "comment": "Awesome placements, plenty of core electronics and IT opportunities." }
+    ]
+  },
+  {
+    "id": "iiit-hyderabad",
+    "name": "IIIT Hyderabad",
+    "type": "IIIT",
+    "location": "Hyderabad",
+    "state": "Telangana",
+    "ranking": 55,
+    "placement": 98,
+    "avgPackage": "Rs 26.0 LPA",
+    "highestPackage": "Rs 1.02 Crore",
+    "fees": "Rs 3.6 Lakhs/year",
+    "rating": 4.9,
+    "courses": ["B.Tech CSE", "B.Tech ECE", "MS by Research"],
+    "reviews": [
+      { "user": "Divyansh S.", "rating": 5, "comment": "Highest average package in India. Coding standards here are godly." },
+      { "user": "Malini P.", "rating": 4.8, "comment": "No useless subjects, start coding from day 1, highly research oriented." }
+    ]
+  },
+  {
+    "id": "iiit-bangalore",
+    "name": "IIIT Bangalore",
+    "type": "IIIT",
+    "location": "Bengaluru",
+    "state": "Karnataka",
+    "ranking": 74,
+    "placement": 97,
+    "avgPackage": "Rs 24.5 LPA",
+    "highestPackage": "Rs 78 LPA",
+    "fees": "Rs 3.8 Lakhs/year",
+    "rating": 4.7,
+    "courses": ["Integrated M.Tech CSE", "M.Tech CSE"],
+    "reviews": [
+      { "user": "Hari N.", "rating": 4.8, "comment": "Located in Electronic City. Industry links are excellent. Placements are top notch." },
+      { "user": "Shreya G.", "rating": 4.6, "comment": "Rigorous academic schedule, but direct access to IT ecosystem is unbeatable." }
+    ]
+  },
+  {
+    "id": "iiit-delhi",
+    "name": "IIIT Delhi",
+    "type": "IIIT",
+    "location": "New Delhi",
+    "state": "Delhi",
+    "ranking": 75,
+    "placement": 91,
+    "avgPackage": "Rs 16.5 LPA",
+    "highestPackage": "Rs 59 LPA",
+    "fees": "Rs 4.0 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.Tech CSE", "B.Tech CSAM", "M.Tech"],
+    "reviews": [
+      { "user": "Rishabh A.", "rating": 4.7, "comment": "Campus design is beautiful, research labs are very modern and open 24/7." },
+      { "user": "Kavya J.", "rating": 4.5, "comment": "Highly competitive, coding community is extremely active." }
+    ]
+  },
+  {
+    "id": "iiit-allahabad",
+    "name": "IIIT Allahabad",
+    "type": "IIIT",
+    "location": "Allahabad",
+    "state": "Uttar Pradesh",
+    "ranking": 89,
+    "placement": 93,
+    "avgPackage": "Rs 19.8 LPA",
+    "highestPackage": "Rs 1.2 Crore",
+    "fees": "Rs 2.8 Lakhs/year",
+    "rating": 4.7,
+    "courses": ["B.Tech IT", "B.Tech ECE", "M.Tech"],
+    "reviews": [
+      { "user": "Sarthak T.", "rating": 4.9, "comment": "Coding hub of north India. Consistent placements in Google, Amazon." },
+      { "user": "Apurva S.", "rating": 4.6, "comment": "Hostels are very spacious, great peer group for competitive programming." }
+    ]
   },
   {
     "id": "nit-trichy",
@@ -34,40 +312,124 @@
     "location": "Tiruchirappalli",
     "state": "Tamil Nadu",
     "ranking": 9,
-    "placement": 92,
-    "avgPackage": "Rs 12 LPA",
-    "highestPackage": "Rs 45 LPA",
-    "fees": "Rs 2.5 Lakhs/year",
-    "rating": 4.6,
-    "courses": ["B.Tech", "M.Tech", "MBA"]
-  },
-  {
-    "id": "bits-pilani",
-    "name": "BITS Pilani",
-    "type": "Private",
-    "location": "Pilani",
-    "state": "Rajasthan",
-    "ranking": 5,
-    "placement": 95,
-    "avgPackage": "Rs 15 LPA",
-    "highestPackage": "Rs 60 LPA",
-    "fees": "Rs 5 Lakhs/year",
+    "placement": 93,
+    "avgPackage": "Rs 13.5 LPA",
+    "highestPackage": "Rs 75 LPA",
+    "fees": "Rs 1.8 Lakhs/year",
     "rating": 4.7,
-    "courses": ["B.E", "M.E", "MBA"]
+    "courses": ["B.Tech CSE", "B.Tech Mechanical", "MCA"],
+    "reviews": [
+      { "user": "Pranav M.", "rating": 4.9, "comment": "Best NIT in India. Huge campus, amazing clubs, Pragyan is great." },
+      { "user": "Keerthana R.", "rating": 4.6, "comment": "Great labs, placements are as good as top IITs, though campus is hot." }
+    ]
   },
   {
-    "id": "iiit-hyderabad",
-    "name": "IIIT Hyderabad",
-    "type": "IIIT",
-    "location": "Hyderabad",
+    "id": "nit-surathkal",
+    "name": "NIT Surathkal",
+    "type": "NIT",
+    "location": "Surathkal",
+    "state": "Karnataka",
+    "ranking": 12,
+    "placement": 92,
+    "avgPackage": "Rs 12.8 LPA",
+    "highestPackage": "Rs 54 LPA",
+    "fees": "Rs 1.85 Lakhs/year",
+    "rating": 4.7,
+    "courses": ["B.Tech CSE", "B.Tech Mining", "M.Tech"],
+    "reviews": [
+      { "user": "Srinivas K.", "rating": 4.9, "comment": "We have a private beach! Brilliant academic culture and coding groups." },
+      { "user": "Akshatha B.", "rating": 4.6, "comment": "Top software and core engineering placements, highly peaceful vibe." }
+    ]
+  },
+  {
+    "id": "nit-warangal",
+    "name": "NIT Warangal",
+    "type": "NIT",
+    "location": "Warangal",
     "state": "Telangana",
-    "ranking": 11,
-    "placement": 96,
-    "avgPackage": "Rs 18 LPA",
-    "highestPackage": "Rs 55 LPA",
-    "fees": "Rs 3.5 Lakhs/year",
+    "ranking": 21,
+    "placement": 91,
+    "avgPackage": "Rs 12.5 LPA",
+    "highestPackage": "Rs 88 LPA",
+    "fees": "Rs 1.9 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.Tech CSE", "B.Tech Chemical", "M.Tech"],
+    "reviews": [
+      { "user": "Kiran S.", "rating": 4.8, "comment": "Very active student clubs, coding environment is top class." },
+      { "user": "Shanthi V.", "rating": 4.5, "comment": "Outstanding placements, campus is very clean and hostels are good." }
+    ]
+  },
+  {
+    "id": "nit-rourkela",
+    "name": "NIT Rourkela",
+    "type": "NIT",
+    "location": "Rourkela",
+    "state": "Odisha",
+    "ranking": 16,
+    "placement": 88,
+    "avgPackage": "Rs 11.2 LPA",
+    "highestPackage": "Rs 46 LPA",
+    "fees": "Rs 1.75 Lakhs/year",
     "rating": 4.5,
-    "courses": ["B.Tech CSE", "M.Tech"]
+    "courses": ["B.Tech CSE", "B.Tech Ceramic", "Int. M.Sc"],
+    "reviews": [
+      { "user": "Subhasis M.", "rating": 4.7, "comment": "Massive campus, top-tier research labs and huge sports complex." },
+      { "user": "Priyanka S.", "rating": 4.4, "comment": "Great placements, but climate can be harsh during summers." }
+    ]
+  },
+  {
+    "id": "vnit-nagpur",
+    "name": "VNIT Nagpur",
+    "type": "NIT",
+    "location": "Nagpur",
+    "state": "Maharashtra",
+    "ranking": 32,
+    "placement": 85,
+    "avgPackage": "Rs 9.8 LPA",
+    "highestPackage": "Rs 40 LPA",
+    "fees": "Rs 1.95 Lakhs/year",
+    "rating": 4.4,
+    "courses": ["B.Tech CSE", "B.Tech Civil", "M.Tech"],
+    "reviews": [
+      { "user": "Amol G.", "rating": 4.6, "comment": "Located in the heart of Nagpur. Very peaceful green campus, helpful seniors." },
+      { "user": "Sonal W.", "rating": 4.3, "comment": "Placements are very good for CSE/ECE. Academics are highly strict." }
+    ]
+  },
+  {
+    "id": "mnnit-allahabad",
+    "name": "MNNIT Allahabad",
+    "type": "NIT",
+    "location": "Prayagraj",
+    "state": "Uttar Pradesh",
+    "ranking": 40,
+    "placement": 89,
+    "avgPackage": "Rs 11.8 LPA",
+    "highestPackage": "Rs 1.18 Crore",
+    "fees": "Rs 1.9 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.Tech CSE", "B.Tech ECE", "MCA"],
+    "reviews": [
+      { "user": "Alok P.", "rating": 4.8, "comment": "Coding environment is just next to IIIT Allahabad. placements are legendary." },
+      { "user": "Shweta T.", "rating": 4.4, "comment": "Outstanding coding culture, though campus hostels need renovation." }
+    ]
+  },
+  {
+    "id": "manit-bhopal",
+    "name": "MANIT Bhopal",
+    "type": "NIT",
+    "location": "Bhopal",
+    "state": "Madhya Pradesh",
+    "ranking": 80,
+    "placement": 82,
+    "avgPackage": "Rs 9.2 LPA",
+    "highestPackage": "Rs 42 LPA",
+    "fees": "Rs 1.8 Lakhs/year",
+    "rating": 4.3,
+    "courses": ["B.Tech CSE", "B.Tech Chemical", "MBA"],
+    "reviews": [
+      { "user": "Sourabh S.", "rating": 4.5, "comment": "Huge campus with great forest vibe, sports facilities are amazing." },
+      { "user": "Divya N.", "rating": 4.2, "comment": "Very active student bodies, placements in tech roles are solid." }
+    ]
   },
   {
     "id": "dtu",
@@ -75,13 +437,467 @@
     "type": "State Govt",
     "location": "New Delhi",
     "state": "Delhi",
-    "ranking": 25,
+    "ranking": 29,
+    "placement": 88,
+    "avgPackage": "Rs 12.2 LPA",
+    "highestPackage": "Rs 1.09 Crore",
+    "fees": "Rs 2.0 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.Tech CSE", "B.Tech ECE", "MBA"],
+    "reviews": [
+      { "user": "Harsh B.", "rating": 4.8, "comment": "Huge campus. Super relaxed attendance policy. Great startup culture." },
+      { "user": "Pooja V.", "rating": 4.5, "comment": "Placements are top tier, brand value is extremely high in Delhi NCR." }
+    ]
+  },
+  {
+    "id": "nsut",
+    "name": "Netaji Subhas University of Technology",
+    "type": "State Govt",
+    "location": "New Delhi",
+    "state": "Delhi",
+    "ranking": 60,
+    "placement": 86,
+    "avgPackage": "Rs 11.5 LPA",
+    "highestPackage": "Rs 64 LPA",
+    "fees": "Rs 2.0 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.Tech CSE", "B.Tech MAC", "M.Tech"],
+    "reviews": [
+      { "user": "Ayush T.", "rating": 4.6, "comment": "Very clean campus, located in Dwarka. Placement cell is very active." },
+      { "user": "Snehal S.", "rating": 4.4, "comment": "Great tech companies visit for internships, good coding environment." }
+    ]
+  },
+  {
+    "id": "coep",
+    "name": "COEP Technological University",
+    "type": "State Govt",
+    "location": "Pune",
+    "state": "Maharashtra",
+    "ranking": 73,
+    "placement": 84,
+    "avgPackage": "Rs 8.9 LPA",
+    "highestPackage": "Rs 38 LPA",
+    "fees": "Rs 1.25 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.Tech Mech", "B.Tech CSE", "M.Tech"],
+    "reviews": [
+      { "user": "Ranjeet P.", "rating": 4.7, "comment": "One of the oldest colleges in India. Strong legacy, top Pune placements." },
+      { "user": "Aditi S.", "rating": 4.4, "comment": "Campus has great riverside vibe, alumni support is outstanding." }
+    ]
+  },
+  {
+    "id": "vjti",
+    "name": "Veermata Jijabai Technological Institute",
+    "type": "State Govt",
+    "location": "Mumbai",
+    "state": "Maharashtra",
+    "ranking": 82,
     "placement": 85,
-    "avgPackage": "Rs 8 LPA",
-    "highestPackage": "Rs 35 LPA",
-    "fees": "Rs 1.5 Lakhs/year",
+    "avgPackage": "Rs 9.2 LPA",
+    "highestPackage": "Rs 44 LPA",
+    "fees": "Rs 85,000/year",
+    "rating": 4.5,
+    "courses": ["B.Tech CSE", "B.Tech Production", "MCA"],
+    "reviews": [
+      { "user": "Manoj K.", "rating": 4.7, "comment": "VJTI is a brand in Mumbai. Low fees and extremely high package ratio." },
+      { "user": "Sneha F.", "rating": 4.3, "comment": "Located in Matunga, very active coding groups, top corporate links." }
+    ]
+  },
+  {
+    "id": "jadavpur-university",
+    "name": "Jadavpur University",
+    "type": "State Govt",
+    "location": "Kolkata",
+    "state": "West Bengal",
+    "ranking": 10,
+    "placement": 92,
+    "avgPackage": "Rs 11.5 LPA",
+    "highestPackage": "Rs 85 LPA",
+    "fees": "Rs 2,400/year",
+    "rating": 4.7,
+    "courses": ["B.Tech CSE", "B.Tech Chemical", "M.A."],
+    "reviews": [
+      { "user": "Siddharth S.", "rating": 5, "comment": "Fees are literally zero. Placements are massive. ROI is infinite." },
+      { "user": "Mimi C.", "rating": 4.5, "comment": "Best student politics and freedom, extremely bright minds here." }
+    ]
+  },
+  {
+    "id": "anna-university",
+    "name": "College of Engineering Guindy",
+    "type": "State Govt",
+    "location": "Chennai",
+    "state": "Tamil Nadu",
+    "ranking": 13,
+    "placement": 87,
+    "avgPackage": "Rs 8.8 LPA",
+    "highestPackage": "Rs 36 LPA",
+    "fees": "Rs 55,000/year",
+    "rating": 4.4,
+    "courses": ["B.Tech ECE", "B.Tech IT", "M.Tech"],
+    "reviews": [
+      { "user": "Raghavan N.", "rating": 4.6, "comment": "Historic campus in Chennai. Highly respected degree, solid placements." },
+      { "user": "Divya B.", "rating": 4.3, "comment": "Academics are very traditional, but placement opportunities are great." }
+    ]
+  },
+  {
+    "id": "vit-vellore",
+    "name": "VIT Vellore",
+    "type": "Private",
+    "location": "Vellore",
+    "state": "Tamil Nadu",
+    "ranking": 11,
+    "placement": 88,
+    "avgPackage": "Rs 8.2 LPA",
+    "highestPackage": "Rs 75 LPA",
+    "fees": "Rs 1.9 Lakhs/year",
+    "rating": 4.3,
+    "courses": ["B.Tech CSE", "B.Tech Biotech", "MCA"],
+    "reviews": [
+      { "user": "Vivek M.", "rating": 4.5, "comment": "Massive campus infrastructure, outstanding coding hackathons (VIT Hack)." },
+      { "user": "Anjali G.", "rating": 4.1, "comment": "Crowded batch size, but top placement companies visit in large numbers." }
+    ]
+  },
+  {
+    "id": "srm-chennai",
+    "name": "SRM Institute of Science and Technology",
+    "type": "Private",
+    "location": "Chennai",
+    "state": "Tamil Nadu",
+    "ranking": 36,
+    "placement": 82,
+    "avgPackage": "Rs 7.5 LPA",
+    "highestPackage": "Rs 44 LPA",
+    "fees": "Rs 2.5 Lakhs/year",
     "rating": 4.2,
-    "courses": ["B.Tech", "MBA", "M.Tech"]
+    "courses": ["B.Tech CSE", "B.Tech Mech", "MBA"],
+    "reviews": [
+      { "user": "Harish P.", "rating": 4.4, "comment": "Very active campus life, clean hostels, high placement opportunities." },
+      { "user": "Shalini M.", "rating": 4.0, "comment": "Highly commercialized, but tech ecosystem is solid." }
+    ]
+  },
+  {
+    "id": "manipal-mit",
+    "name": "Manipal Institute of Technology",
+    "type": "Private",
+    "location": "Manipal",
+    "state": "Karnataka",
+    "ranking": 61,
+    "placement": 86,
+    "avgPackage": "Rs 10.5 LPA",
+    "highestPackage": "Rs 54 LPA",
+    "fees": "Rs 3.35 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.Tech CSE", "B.Tech Aeronautical", "M.Tech"],
+    "reviews": [
+      { "user": "Varun T.", "rating": 4.8, "comment": "Unbelievable student life, library is open 24/7, outstanding labs." },
+      { "user": "Rhea S.", "rating": 4.4, "comment": "Expensive fees, but placement quality is far superior to other private colleges." }
+    ]
+  },
+  {
+    "id": "rvce-bengaluru",
+    "name": "RV College of Engineering",
+    "type": "Private",
+    "location": "Bengaluru",
+    "state": "Karnataka",
+    "ranking": 85,
+    "placement": 91,
+    "avgPackage": "Rs 11.2 LPA",
+    "highestPackage": "Rs 53 LPA",
+    "fees": "Rs 2.4 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.E. CSE", "B.E. Mech", "MCA"],
+    "reviews": [
+      { "user": "Siddharth K.", "rating": 4.8, "comment": "Top choice in COMEDK. Placements are equal to NITs due to Bangalore location." },
+      { "user": "Meghana P.", "rating": 4.4, "comment": "Very strict attendance and academic schedule, but placements are a surety." }
+    ]
+  },
+  {
+    "id": "pes-bengaluru",
+    "name": "PES University",
+    "type": "Private",
+    "location": "Bengaluru",
+    "state": "Karnataka",
+    "ranking": 90,
+    "placement": 87,
+    "avgPackage": "Rs 9.5 LPA",
+    "highestPackage": "Rs 48 LPA",
+    "fees": "Rs 3.6 Lakhs/year",
+    "rating": 4.4,
+    "courses": ["B.Tech CSE", "B.Tech ECE", "MBA"],
+    "reviews": [
+      { "user": "Lokesh A.", "rating": 4.5, "comment": "Very focused on placements. Continuous assessments keep you busy." },
+      { "user": "Shruti R.", "rating": 4.2, "comment": "Great location, good industrial interface, coding environment is strong." }
+    ]
+  },
+  {
+    "id": "bmsce-bengaluru",
+    "name": "BMS College of Engineering",
+    "type": "Private",
+    "location": "Bengaluru",
+    "state": "Karnataka",
+    "ranking": 83,
+    "placement": 88,
+    "avgPackage": "Rs 8.8 LPA",
+    "highestPackage": "Rs 45 LPA",
+    "fees": "Rs 2.3 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.E. CSE", "B.E. Biotech", "MCA"],
+    "reviews": [
+      { "user": "Nitin R.", "rating": 4.6, "comment": "Located in central Bangalore. Beautiful campus with rich heritage." },
+      { "user": "Pooja D.", "rating": 4.3, "comment": "Hostel food is average, but academic faculty and placement cell are strong." }
+    ]
+  },
+  {
+    "id": "thapar-patiala",
+    "name": "Thapar Institute of Eng. & Tech.",
+    "type": "Private",
+    "location": "Patiala",
+    "state": "Punjab",
+    "ranking": 34,
+    "placement": 89,
+    "avgPackage": "Rs 10.2 LPA",
+    "highestPackage": "Rs 40 LPA",
+    "fees": "Rs 4.0 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.Tech CSE", "B.Tech Chemical", "M.Tech"],
+    "reviews": [
+      { "user": "Jaspreet S.", "rating": 4.8, "comment": "State of the art campus infrastructure. Hostel feels like 3-star hotel." },
+      { "user": "Simran J.", "rating": 4.4, "comment": "High fees, but placement network is exceptionally strong." }
+    ]
+  },
+  {
+    "id": "pec-chandigarh",
+    "name": "Punjab Engineering College",
+    "type": "State Govt",
+    "location": "Chandigarh",
+    "state": "Chandigarh",
+    "ranking": 87,
+    "placement": 84,
+    "avgPackage": "Rs 9.5 LPA",
+    "highestPackage": "Rs 42 LPA",
+    "fees": "Rs 1.6 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.Tech CSE", "B.Tech Aerospace", "M.Tech"],
+    "reviews": [
+      { "user": "Gurinder S.", "rating": 4.7, "comment": "Chandigarh city life is amazing. Alumni network includes Kalpana Chawla." },
+      { "user": "Naveen P.", "rating": 4.3, "comment": "Academics are moderate, coding culture is very active." }
+    ]
+  },
+  {
+    "id": "psg-coimbatore",
+    "name": "PSG College of Technology",
+    "type": "Private",
+    "location": "Coimbatore",
+    "state": "Tamil Nadu",
+    "ranking": 63,
+    "placement": 89,
+    "avgPackage": "Rs 8.5 LPA",
+    "highestPackage": "Rs 38 LPA",
+    "fees": "Rs 1.5 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.Tech Mech", "B.Tech CSE", "MCA"],
+    "reviews": [
+      { "user": "Santhosh M.", "rating": 4.7, "comment": "Strong industry connects in textile and mechanical engineering. Placement is great." },
+      { "user": "Aishwarya T.", "rating": 4.3, "comment": "Traditional style administration, but coding club is very active." }
+    ]
+  },
+  {
+    "id": "amrita-coimbatore",
+    "name": "Amrita Vishwa Vidyapeetham",
+    "type": "Private",
+    "location": "Coimbatore",
+    "state": "Tamil Nadu",
+    "ranking": 19,
+    "placement": 86,
+    "avgPackage": "Rs 7.8 LPA",
+    "highestPackage": "Rs 32 LPA",
+    "fees": "Rs 2.2 Lakhs/year",
+    "rating": 4.4,
+    "courses": ["B.Tech CSE", "M.Tech", "MBA"],
+    "reviews": [
+      { "user": "Karthika S.", "rating": 4.5, "comment": "Extremely green and spiritual campus, strict rules but good placements." },
+      { "user": "Rahul U.", "rating": 4.2, "comment": "Coding environment is decent, focus on moral values is high." }
+    ]
+  },
+  {
+    "id": "kiit-bhubaneswar",
+    "name": "KIIT University",
+    "type": "Private",
+    "location": "Bhubaneswar",
+    "state": "Odisha",
+    "ranking": 39,
+    "placement": 85,
+    "avgPackage": "Rs 6.8 LPA",
+    "highestPackage": "Rs 30 LPA",
+    "fees": "Rs 3.5 Lakhs/year",
+    "rating": 4.3,
+    "courses": ["B.Tech CSE", "B.Tech Civil", "MCA"],
+    "reviews": [
+      { "user": "Subrat P.", "rating": 4.5, "comment": "Incredible infrastructure. Massive indoor stadiums, active placement office." },
+      { "user": "Supriya K.", "rating": 4.1, "comment": "Placement numbers are high, but competition is fierce due to huge intake." }
+    ]
+  },
+  {
+    "id": "snu-noida",
+    "name": "Shiv Nadar University",
+    "type": "Private",
+    "location": "Greater Noida",
+    "state": "Uttar Pradesh",
+    "ranking": 95,
+    "placement": 82,
+    "avgPackage": "Rs 9.2 LPA",
+    "highestPackage": "Rs 33 LPA",
+    "fees": "Rs 3.5 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.Tech CSE", "B.Tech Mech", "B.Sc Chemistry"],
+    "reviews": [
+      { "user": "Mihir G.", "rating": 4.7, "comment": "Excellent research-focused university. Outstanding campus infrastructure." },
+      { "user": "Shikha P.", "rating": 4.3, "comment": "Located in NCR. Very good coding opportunities and startup funding." }
+    ]
+  },
+  {
+    "id": "ashoka-university",
+    "name": "Ashoka University",
+    "type": "Private",
+    "location": "Sonepat",
+    "state": "Haryana",
+    "ranking": 88,
+    "placement": 80,
+    "avgPackage": "Rs 10.5 LPA",
+    "highestPackage": "Rs 35 LPA",
+    "fees": "Rs 7.5 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.Sc Computer Science", "B.A. Economics", "Liberal Arts"],
+    "reviews": [
+      { "user": "Kabir S.", "rating": 4.8, "comment": "Best liberal arts college in India. Dynamic faculty and global exposure." },
+      { "user": "Tara R.", "rating": 4.4, "comment": "Extremely expensive fees, but excellent faculty and campus networking." }
+    ]
+  },
+  {
+    "id": "flame-university",
+    "name": "Flame University",
+    "type": "Private",
+    "location": "Pune",
+    "state": "Maharashtra",
+    "ranking": 105,
+    "placement": 78,
+    "avgPackage": "Rs 7.8 LPA",
+    "highestPackage": "Rs 24 LPA",
+    "fees": "Rs 6.8 Lakhs/year",
+    "rating": 4.4,
+    "courses": ["B.A. Design", "BBA", "MBA"],
+    "reviews": [
+      { "user": "Rohan M.", "rating": 4.5, "comment": "Liberal education model. Very beautiful golf course campus." },
+      { "user": "Ayesha J.", "rating": 4.2, "comment": "Placement team is good, very small class size allows direct mentoring." }
+    ]
+  },
+  {
+    "id": "christ-university",
+    "name": "Christ University",
+    "type": "Private",
+    "location": "Bengaluru",
+    "state": "Karnataka",
+    "ranking": 60,
+    "placement": 82,
+    "avgPackage": "Rs 6.5 LPA",
+    "highestPackage": "Rs 22 LPA",
+    "fees": "Rs 1.8 Lakhs/year",
+    "rating": 4.3,
+    "courses": ["BCA", "BBA", "MBA"],
+    "reviews": [
+      { "user": "Joel D.", "rating": 4.4, "comment": "Extremely strict discipline and dress code. But placements are excellent." },
+      { "user": "Renuka R.", "rating": 4.1, "comment": "Bangalore location gives immense industrial exposure." }
+    ]
+  },
+  {
+    "id": "symbiosis-pune",
+    "name": "Symbiosis Institute of Technology",
+    "type": "Private",
+    "location": "Pune",
+    "state": "Maharashtra",
+    "ranking": 98,
+    "placement": 83,
+    "avgPackage": "Rs 7.8 LPA",
+    "highestPackage": "Rs 30 LPA",
+    "fees": "Rs 2.8 Lakhs/year",
+    "rating": 4.4,
+    "courses": ["B.Tech CSE", "B.Tech Civil", "M.Tech"],
+    "reviews": [
+      { "user": "Sanket B.", "rating": 4.6, "comment": "Lavale hilltop campus is gorgeous. Very good industrial connection." },
+      { "user": "Shruti S.", "rating": 4.2, "comment": "Nice student vibe, active coding groups, and helpful faculty." }
+    ]
+  },
+  {
+    "id": "shoolini-solan",
+    "name": "Shoolini University",
+    "type": "Private",
+    "location": "Solan",
+    "state": "Himachal Pradesh",
+    "ranking": 101,
+    "placement": 76,
+    "avgPackage": "Rs 5.2 LPA",
+    "highestPackage": "Rs 18 LPA",
+    "fees": "Rs 1.5 Lakhs/year",
+    "rating": 4.3,
+    "courses": ["B.Tech CSE", "B.Pharma", "MBA"],
+    "reviews": [
+      { "user": "Himanshu S.", "rating": 4.5, "comment": "Lush green Himalayan campus. Focus on research and patent filings." },
+      { "user": "Nisha C.", "rating": 4.1, "comment": "Peaceful atmosphere, helpful faculty, average placements." }
+    ]
+  },
+  {
+    "id": "lpu-jalandhar",
+    "name": "Lovely Professional University",
+    "type": "Private",
+    "location": "Jalandhar",
+    "state": "Punjab",
+    "ranking": 47,
+    "placement": 79,
+    "avgPackage": "Rs 6.0 LPA",
+    "highestPackage": "Rs 64 LPA",
+    "fees": "Rs 1.2 Lakhs/year",
+    "rating": 4.2,
+    "courses": ["B.Tech CSE", "B.Sc Agriculture", "MBA"],
+    "reviews": [
+      { "user": "Sukhvinder S.", "rating": 4.4, "comment": "Massive campus size. Outstanding hostel structures and shopping mall." },
+      { "user": "Priya P.", "rating": 3.9, "comment": "Crowded batch size, but massive brand names visit for mass recruitment." }
+    ]
+  },
+  {
+    "id": "amity-noida",
+    "name": "Amity University Noida",
+    "type": "Private",
+    "location": "Noida",
+    "state": "Uttar Pradesh",
+    "ranking": 35,
+    "placement": 80,
+    "avgPackage": "Rs 6.5 LPA",
+    "highestPackage": "Rs 45 LPA",
+    "fees": "Rs 2.5 Lakhs/year",
+    "rating": 4.2,
+    "courses": ["B.Tech CSE", "B.Des", "MBA"],
+    "reviews": [
+      { "user": "Rohan G.", "rating": 4.3, "comment": "Excellent infrastructure, very active sports tournaments and student clubs." },
+      { "user": "Anamika K.", "rating": 3.9, "comment": "Placements are decent for CS branch, campus rules are strict." }
+    ]
+  },
+  {
+    "id": "chandigarh-university",
+    "name": "Chandigarh University",
+    "type": "Private",
+    "location": "Mohali",
+    "state": "Punjab",
+    "ranking": 27,
+    "placement": 81,
+    "avgPackage": "Rs 6.8 LPA",
+    "highestPackage": "Rs 52 LPA",
+    "fees": "Rs 1.6 Lakhs/year",
+    "rating": 4.3,
+    "courses": ["B.Tech CSE", "B.Pharma", "MCA"],
+    "reviews": [
+      { "user": "Jatinder S.", "rating": 4.5, "comment": "Great university facilities, placements are growing strongly every year." },
+      { "user": "Simran G.", "rating": 4.0, "comment": "Huge intake size, but placement cell works hard to bring IT brands." }
+    ]
   },
   {
     "id": "government-polytechnic-mumbai",
@@ -89,12 +905,178 @@
     "type": "State Govt",
     "location": "Mumbai",
     "state": "Maharashtra",
-    "ranking": 42,
+    "ranking": 115,
     "placement": 72,
     "avgPackage": "Rs 3.2 LPA",
     "highestPackage": "Rs 9 LPA",
     "fees": "Rs 12,000/year",
     "rating": 4.0,
-    "courses": ["Diploma IT", "Diploma Mechanical", "Diploma Civil"]
+    "courses": ["Diploma IT", "Diploma Mechanical", "Diploma Civil"],
+    "reviews": [
+      { "user": "Vijay M.", "rating": 4.2, "comment": "Best polytechnic college in Mumbai. Extremely pocket-friendly fees." },
+      { "user": "Swati S.", "rating": 3.8, "comment": "Hostel facilities are average, but teaching is highly practical." }
+    ]
+  },
+  {
+    "id": "government-polytechnic-pune",
+    "name": "Government Polytechnic Pune",
+    "type": "State Govt",
+    "location": "Pune",
+    "state": "Maharashtra",
+    "ranking": 120,
+    "placement": 74,
+    "avgPackage": "Rs 3.5 LPA",
+    "highestPackage": "Rs 8.5 LPA",
+    "fees": "Rs 12,000/year",
+    "rating": 4.1,
+    "courses": ["Diploma IT", "Diploma Electrical", "Diploma Mech"],
+    "reviews": [
+      { "user": "Rahul S.", "rating": 4.3, "comment": "Highly practical labs. Very famous across Pune industries for hiring." },
+      { "user": "Pranjal P.", "rating": 3.9, "comment": "Very low fees. Excellent step before taking lateral entry B.Tech." }
+    ]
+  },
+  {
+    "id": "dseu-delhi",
+    "name": "Delhi Skill and Entrepreneurship University",
+    "type": "State Govt",
+    "location": "New Delhi",
+    "state": "Delhi",
+    "ranking": 110,
+    "placement": 76,
+    "avgPackage": "Rs 4.0 LPA",
+    "highestPackage": "Rs 10 LPA",
+    "fees": "Rs 25,000/year",
+    "rating": 4.1,
+    "courses": ["Diploma IT", "B.A. Digital Media", "BMS"],
+    "reviews": [
+      { "user": "Sunny A.", "rating": 4.2, "comment": "New university model focused on skills. Industry labs are modern." },
+      { "user": "Meera S.", "rating": 3.9, "comment": "Very good focus on entrepreneurship, placements are growing." }
+    ]
+  },
+  {
+    "id": "nirma-ahmedabad",
+    "name": "Nirma University",
+    "type": "Private",
+    "location": "Ahmedabad",
+    "state": "Gujarat",
+    "ranking": 80,
+    "placement": 85,
+    "avgPackage": "Rs 8.2 LPA",
+    "highestPackage": "Rs 30 LPA",
+    "fees": "Rs 2.2 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.Tech CSE", "B.Tech ECE", "MBA"],
+    "reviews": [
+      { "user": "Pranav J.", "rating": 4.6, "comment": "Beautiful green campus, top placement ratios in Gujarat region." },
+      { "user": "Hiral Patel", "rating": 4.3, "comment": "Strong alumni support, strict attendance is a bit demanding." }
+    ]
+  },
+  {
+    "id": "daiict-gandhinagar",
+    "name": "DA-IICT Gandhinagar",
+    "type": "Private",
+    "location": "Gandhinagar",
+    "state": "Gujarat",
+    "ranking": 91,
+    "placement": 92,
+    "avgPackage": "Rs 13.2 LPA",
+    "highestPackage": "Rs 45 LPA",
+    "fees": "Rs 2.0 Lakhs/year",
+    "rating": 4.7,
+    "courses": ["B.Tech ICT", "M.Tech ICT"],
+    "reviews": [
+      { "user": "Jay K.", "rating": 4.8, "comment": "Top class tech campus, best coding ecosystem in Gandhinagar/Ahmedabad." },
+      { "user": "Drashti R.", "rating": 4.5, "comment": "Placements are massive for tech companies, very rigorous exams." }
+    ]
+  },
+  {
+    "id": "jamia-millia-delhi",
+    "name": "Jamia Millia Islamia",
+    "type": "State Govt",
+    "location": "New Delhi",
+    "state": "Delhi",
+    "ranking": 3,
+    "placement": 80,
+    "avgPackage": "Rs 8.9 LPA",
+    "highestPackage": "Rs 25 LPA",
+    "fees": "Rs 15,000/year",
+    "rating": 4.4,
+    "courses": ["B.Tech CSE", "B.Tech Civil", "MBA"],
+    "reviews": [
+      { "user": "Faisal K.", "rating": 4.6, "comment": "Outstanding brand value and very low fees. Placements are solid." },
+      { "user": "Zara A.", "rating": 4.2, "comment": "Great university life, central Delhi location, nice peer group." }
+    ]
+  },
+  {
+    "id": "amu-aligarh",
+    "name": "Aligarh Muslim University",
+    "type": "State Govt",
+    "location": "Aligarh",
+    "state": "Uttar Pradesh",
+    "ranking": 9,
+    "placement": 78,
+    "avgPackage": "Rs 6.5 LPA",
+    "highestPackage": "Rs 21 LPA",
+    "fees": "Rs 20,000/year",
+    "rating": 4.3,
+    "courses": ["B.Tech CSE", "B.Tech Electrical", "MCA"],
+    "reviews": [
+      { "user": "Tariq S.", "rating": 4.5, "comment": "Huge residential campus, historic campus structures, strong alumni base." },
+      { "user": "Shazia P.", "rating": 4.1, "comment": "Very cheap fees, placement cell is active for CS/IT departments." }
+    ]
+  },
+  {
+    "id": "msrit-bengaluru",
+    "name": "MS Ramaiah Institute of Technology",
+    "type": "Private",
+    "location": "Bengaluru",
+    "state": "Karnataka",
+    "ranking": 78,
+    "placement": 88,
+    "avgPackage": "Rs 8.5 LPA",
+    "highestPackage": "Rs 46 LPA",
+    "fees": "Rs 2.35 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.E. CSE", "B.E. Mech", "MCA"],
+    "reviews": [
+      { "user": "Abhinay S.", "rating": 4.6, "comment": "One of the best engineering colleges in Karnataka. Placement in IT companies is massive." },
+      { "user": "Rashmi J.", "rating": 4.3, "comment": "Great labs, friendly faculty, and located in the heart of Bengaluru." }
+    ]
+  },
+  {
+    "id": "nit-kurukshetra",
+    "name": "NIT Kurukshetra",
+    "type": "NIT",
+    "location": "Kurukshetra",
+    "state": "Haryana",
+    "ranking": 40,
+    "placement": 89,
+    "avgPackage": "Rs 11.5 LPA",
+    "highestPackage": "Rs 44 LPA",
+    "fees": "Rs 1.8 Lakhs/year",
+    "rating": 4.5,
+    "courses": ["B.Tech CSE", "B.Tech Production", "M.Tech"],
+    "reviews": [
+      { "user": "Harshal D.", "rating": 4.7, "comment": "Very strong coding culture. Excellent placements in tech startups." },
+      { "user": "Nancy P.", "rating": 4.3, "comment": "Hostels are okay, but sports and placement cell are outstanding." }
+    ]
+  },
+  {
+    "id": "nit-calicut",
+    "name": "NIT Calicut",
+    "type": "NIT",
+    "location": "Kozhikode",
+    "state": "Kerala",
+    "ranking": 23,
+    "placement": 90,
+    "avgPackage": "Rs 12.1 LPA",
+    "highestPackage": "Rs 67 LPA",
+    "fees": "Rs 1.85 Lakhs/year",
+    "rating": 4.6,
+    "courses": ["B.Tech CSE", "B.Tech EEE", "M.C.A."],
+    "reviews": [
+      { "user": "Jayan V.", "rating": 4.8, "comment": "Lush green campus. Calicut climate is beautiful. Outstanding tech placements." },
+      { "user": "Remya S.", "rating": 4.4, "comment": "Highly supportive teachers, excellent labs and research facilities." }
+    ]
   }
 ]

@@ -41,6 +41,11 @@ const PROBLEMS = {
     words: ['job nahi mil', 'job search', 'interview nahi', 'placement nahi', 'apply kiya', 'resume reject'],
     requiredSignals: ['role', 'applications', 'skills'],
   },
+  government_job: {
+    label: 'government_job',
+    words: ['gov job', 'govt job', 'government job', 'sarkari naukri', 'sarkari job', 'ssc', 'upsc', 'railway', 'banking job'],
+    requiredSignals: ['education', 'target_exam'],
+  },
 };
 
 function latestConversationState(history = []) {
@@ -92,6 +97,14 @@ function detectProblem(message = '', intent = '') {
     };
   }
 
+  if (intent === 'government_job') {
+    return {
+      key: 'government_job',
+      label: PROBLEMS.government_job.label,
+      requiredSignals: PROBLEMS.government_job.requiredSignals,
+    };
+  }
+
   if (isCareerGoalMessage(message)) {
     return {
       key: 'career_confusion',
@@ -129,16 +142,18 @@ function detectAnswerSignals(message = '', problemKey = '') {
   if (/\b\d+(\.\d+)?\s*(year|yr|years|saal|mahine|month|months)\b/.test(text) || /\bfresher\b/.test(text)) {
     signals.add('experience');
   }
-  if (/\b\d+(\.\d+)?\s*(k|lpa|lakh|lakhs|lac|lacs|ctc|rs|₹)\b/.test(text) || /salary|package|ctc/.test(text)) {
+  if (/\b\d+(\.\d+)?\s*(k|lpa|lakh|lakhs|lac|lacs|ctc|rs|₹)\b/.test(text)) {
     signals.add('salary');
   }
   if (/switch|apply|interview|resume|naukri|linkedin|job portal|try kiya|try nahi/.test(text)) {
     signals.add('switch');
   }
-  if (/10th|12th|graduate|graduation|btech|bca|college|school|class|engineering|engineer|computer science|cse|degree/.test(text)) {
+  if (/10th|\b10\b|dasvi|matric|12th|\b12\b|barahvi|intermediate|graduate|graduation|degree|college|school|class/.test(text)) {
     signals.add('education');
   }
-  if (target || /interest|pasand|like|coding|design|marketing|business|teaching|medical|commerce|science|developer|full stack|frontend|backend|software|cyber|security|sequeity|hacking/.test(text)) {
+  // Clean 'computer science' and 'cse' from interest detection because they represent general education, not target options/interests.
+  const cleanInterestText = text.replace(/computer science/g, '').replace(/\bcse\b/g, '');
+  if (target || /interest|pasand|like|coding|design|marketing|business|teaching|medical|commerce|science|developer|full stack|frontend|backend|software|cyber|security|sequeity|hacking/.test(cleanInterestText)) {
     signals.add('interest');
   }
   if (/family|money|time|location|city|english|weak|problem|constraint|issue/.test(text)) {
@@ -146,6 +161,9 @@ function detectAnswerSignals(message = '', problemKey = '') {
   }
   if (/jee|neet|exam|board|semester|test/.test(text)) {
     signals.add('exam');
+  }
+  if (/ssc|upsc|banking|bank|railway|police|state psc|psc/.test(text)) {
+    signals.add('target_exam');
   }
   if (/month|week|din|date|deadline|attempt|next year|is saal/.test(text)) {
     signals.add('timeline');
@@ -191,6 +209,18 @@ function chooseStage({ previousState, problem, signals }) {
 function buildClarifyingResponse(state, language = 'hinglish') {
   const isEnglish = language === 'english';
   const problem = state.problemKey;
+
+  if (state.currentRole && state.experienceYears >= 2 && problem === 'career_confusion') {
+    return isEnglish
+      ? {
+          message: `Bilkul ho sakta hai. Switch karna common hai after ${state.experienceYears} years of experience, but it depends on your goal.\n\nTo give you a human-like direction, tell me:\n1. What is your current tech stack?\n2. Are you switching for higher salary or interest/AI-related shift?\n3. Which field are you interested in: AI/ML, Cyber Security, Cloud/DevOps, Product Management, Data Engineering, or Blockchain?`,
+          nextQuestions: ['AI/ML switch', 'Cloud/DevOps switch', 'Salary growth switch'],
+        }
+      : {
+          message: `Bilkul ho sakta hai.\n\n${state.experienceYears} years experience ke baad switch karna common hai, lekin direction depend karti hai tumhara goal kya hai.\n\nCurrent stack kya hai?\n- MERN / Full Stack\n- Mobile Development\n- Java Backend\n- .NET\n- Other\n\nAur switch kis reason se karna chahte ho?\n- Higher salary\n- Better work-life balance\n- AI interest\n- Market demand\n- Remote jobs`,
+          nextQuestions: ['AI interest', 'Higher salary', 'Better WLB'],
+        };
+  }
 
   if (problem === 'salary') {
     return isEnglish
@@ -286,8 +316,35 @@ function buildConversationState({ message, intent, analysis = {}, userProfile = 
     requiredSignals: previousState.requiredSignals || PROBLEMS[previousState.problemKey]?.requiredSignals || [],
   } : null);
   const currentSignals = detectedProblem ? detectAnswerSignals(message, detectedProblem.key) : [];
-  const knownSignals = mergeSignals(previousState?.knownSignals, currentSignals);
-  const stage = chooseStage({ previousState, problem: detectedProblem, signals: knownSignals });
+  
+  // Initialize known signals from user profile permanent memory
+  const profileSignals = [];
+  if (userProfile.education && userProfile.education !== 'unknown') {
+    profileSignals.push('education');
+  }
+  if (userProfile.interests && userProfile.interests.length > 0) {
+    profileSignals.push('interest');
+  }
+  if (userProfile.currentRole && userProfile.currentRole !== '') {
+    profileSignals.push('role');
+  }
+  if (userProfile.experienceYears && userProfile.experienceYears > 0) {
+    profileSignals.push('experience');
+  }
+
+  const knownSignals = mergeSignals(
+    mergeSignals(previousState?.knownSignals, profileSignals),
+    currentSignals
+  );
+  
+  let stage = chooseStage({ previousState, problem: detectedProblem, signals: knownSignals });
+  
+  // experienced clarification override: if the user is experienced but has no clear target career, force clarification stage.
+  const isExperiencedUser = (userProfile.currentRole && userProfile.experienceYears >= 2);
+  if (isExperiencedUser && !target && detectedProblem?.key === 'career_confusion') {
+    stage = 'clarification';
+  }
+
   const emotion = analysis?.emotion || {};
   const needsMentorClarification = Boolean(
     detectedProblem
@@ -308,10 +365,12 @@ function buildConversationState({ message, intent, analysis = {}, userProfile = 
     requiredSignals: detectedProblem?.requiredSignals || previousState?.requiredSignals || [],
     needsMentorClarification,
     tone: emotion.needsSupport || emotion.mood === 'frustrated' ? 'understanding + practical' : 'warm + practical',
+    experienceYears: userProfile.experienceYears || 0,
+    currentRole: userProfile.currentRole || '',
   };
 
   if (needsMentorClarification) {
-    state.localResponse = stage === 'problem_understanding' || !knownSignals.length
+    state.localResponse = (stage === 'problem_understanding' || !knownSignals.length) || (isExperiencedUser && !target)
       ? buildClarifyingResponse(state, language)
       : buildDeeperResponse(state, language);
   }
@@ -323,5 +382,6 @@ module.exports = {
   STAGES,
   PROBLEMS,
   buildConversationState,
+  detectCareerTarget,
   detectProblem,
 };

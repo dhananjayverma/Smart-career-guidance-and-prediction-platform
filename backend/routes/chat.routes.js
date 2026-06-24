@@ -4,7 +4,9 @@ const {
   chatStream,
   clearSessionMessages,
   getSession,
+  saveFeedback,
   saveCareer,
+  clearUserMemory,
 } = require('../controllers/chat.controller');
 
 const router = express.Router();
@@ -14,5 +16,7 @@ router.post('/stream', chatStream);
 router.get('/session/:userId', getSession);
 router.delete('/session/:userId/messages', clearSessionMessages);
 router.post('/session/:userId/saved-careers', saveCareer);
+router.post('/session/:userId/feedback', saveFeedback);
+router.delete('/session/:userId/memory', clearUserMemory);
 
 module.exports = router;

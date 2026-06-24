@@ -11,7 +11,12 @@ async function getRoadmapTemplatesController(_req, res, next) {
 async function createRoadmapController(req, res, next) {
   try {
     const career = req.body.career || req.query.career || 'Software Developer';
-    res.json({ success: true, data: createRoadmap(career) });
+    const userId = req.body.userId || req.query.userId || 'guest';
+    const { getMemory } = require('../services/learning.service');
+    const learnedProfile = await getMemory(userId);
+    const experienceYears = learnedProfile.preferences?.experienceYears || 0;
+
+    res.json({ success: true, data: createRoadmap(career, experienceYears) });
   } catch (error) {
     next(error);
   }

@@ -385,9 +385,9 @@
   {
     "id": "government-job",
     "patterns": ["sarkari naukri", "government job", "govt job", "stable job"],
-    "message": "Government Job Paths in India:\n\nAfter 12th: Railway, SSC CHSL, state police (varies)\nAfter Graduation: SSC CGL, Banking, UPSC, State PSC\n\nPros: Stability, pension benefits, respect\nCons: High competition, long preparation, slower growth\n\nPick exam based on your education level and available study time.",
-    "recommendation": "Choose one exam and commit 12 months — jumping between UPSC/SSC/Bank splits your focus.",
-    "nextQuestions": ["Easiest govt exam?", "12th pass options?", "Sarkari job prep time?"]
+    "message": "Samajh gaya. Government job ke liye prepare karna chahte ho.\n\nBas ye batao:\n1. 12th pass ho ya graduate?\n2. Kis type ki govt job me interest hai?\n\n- UPSC\n- SSC\n- Banking\n- Railway\n- Police\n- State PSC\n\nPhir main tumhare level ke hisaab se exact preparation strategy bataunga.",
+    "recommendation": "",
+    "nextQuestions": ["12th pass options", "Graduate govt jobs", "SSC vs Banking vs Railway"]
   },
   {
     "id": "study-abroad",

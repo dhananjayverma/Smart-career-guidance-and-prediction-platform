@@ -49,17 +49,17 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       <div className="page-hero p-6 sm:p-8 lg:p-10">
         <div className="grid gap-8 lg:grid-cols-[1fr_460px] lg:items-center">
           <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold text-teal-100">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/20 px-3 py-1 text-xs font-bold text-teal-100">
               <Sparkles className="h-3.5 w-3.5" />
               {hero?.badge}
             </div>
             <h1 className="max-w-3xl text-4xl font-black leading-tight sm:text-6xl">{hero?.title}</h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-teal-50">
               {hero?.subtitle}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               {highlights.map((item) => (
-                <span key={item.label} title={item.desc} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white">
+                <span key={item.label} title={item.desc} className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/20 px-3 py-2 text-xs font-bold text-white">
                   <CheckCircle className="h-3.5 w-3.5 text-teal-200" />
                   {item.label}
                 </span>
@@ -67,41 +67,45 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             </div>
           </div>
 
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/10 p-3 shadow-2xl shadow-black/20 backdrop-blur">
+          <div className="rounded-[1.75rem] border border-white bg-white/30 p-3.5 shadow-xl shadow-indigo-950/5 backdrop-blur-md">
             <div className="mb-3 grid grid-cols-3 gap-2">
               {quickActions.slice(0, 3).map((action) => (
-                <button key={action.id} onClick={() => onNavigate(action.id)} className="rounded-2xl bg-white/10 p-3 text-left transition hover:bg-white/15">
-                  <Sparkles className="mb-3 h-5 w-5 text-teal-200" />
-                  <p className="text-xs font-bold text-white">{action.label}</p>
-                  <p className="text-[11px] text-slate-300">{action.desc}</p>
+                <button
+                  key={action.id}
+                  onClick={() => onNavigate(action.id)}
+                  className="rounded-2xl bg-white/90 p-3 text-left transition hover:bg-white text-slate-800 border border-slate-200/50 shadow-xs hover:-translate-y-0.5 duration-200"
+                >
+                  <Sparkles className="mb-3 h-5 w-5 text-teal-600" />
+                  <p className="text-xs font-black text-slate-900">{action.label}</p>
+                  <p className="text-[10px] font-bold text-slate-500 leading-4 mt-0.5">{action.desc}</p>
                 </button>
               ))}
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-2">
+            <div className="rounded-2xl border border-slate-200 bg-white/95 p-2 shadow-sm">
               <div className="flex gap-2">
               <input
                 type="text"
                 value={mainInput}
                 onChange={(e) => setMainInput(e.target.value)}
                 placeholder={hero?.placeholder || ''}
-                className="min-w-0 flex-1 rounded-xl border-0 bg-white px-4 py-3 text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                className="min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400"
               />
               <button
                 onClick={() => onNavigate('chat')}
-                className="inline-flex items-center gap-2 rounded-xl bg-teal-400 px-4 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-teal-300"
+                className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-extrabold text-white transition hover:bg-slate-800"
               >
                 <MessageSquare className="h-4 w-4" />
                 {hero?.buttonLabel}
               </button>
               </div>
             </div>
-            <div className="mt-3 rounded-2xl bg-gradient-to-r from-teal-400/20 to-indigo-400/20 p-4">
-              <p className="text-xs font-bold uppercase text-teal-100">{homeData?.sectionLabels.guidedFlow}</p>
+            <div className="mt-3 rounded-2xl bg-gradient-to-r from-teal-50 to-indigo-50 border border-slate-200/60 p-4 shadow-2xs">
+              <p className="text-[10px] font-black uppercase tracking-wider text-teal-800">{homeData?.sectionLabels.guidedFlow}</p>
               <div className="mt-3 grid gap-2">
                 {steps.map((step) => (
-                  <div key={step.step} className="rounded-xl bg-white/10 px-3 py-2">
-                    <p className="text-xs font-bold text-white">{step.title}</p>
-                    <p className="text-[11px] text-slate-300">{step.desc}</p>
+                  <div key={step.step} className="rounded-xl bg-white/90 border border-slate-100 px-3 py-2.5 shadow-2xs">
+                    <p className="text-xs font-black text-slate-900">{step.title}</p>
+                    <p className="text-[10px] font-bold text-slate-500 mt-0.5 leading-4">{step.desc}</p>
                   </div>
                 ))}
               </div>
@@ -138,12 +142,12 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         </div>
         </div>
         {cta && <div className="gradient-card">
-          <p className="text-sm font-extrabold text-teal-100">{cta.eyebrow}</p>
-          <h2 className="mt-2 text-2xl font-black">{cta.title}</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-300">{cta.desc}</p>
+          <p className="text-sm font-extrabold text-teal-700">{cta.eyebrow}</p>
+          <h2 className="mt-2 text-2xl font-black text-slate-900">{cta.title}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600 font-medium">{cta.desc}</p>
           <button
             onClick={() => onNavigate(cta.target)}
-            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-extrabold text-slate-950"
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-slate-950 px-4 py-2 text-sm font-extrabold text-white hover:bg-slate-800 transition shadow-sm animate-pulse"
           >
             {cta.buttonLabel} <ArrowRight className="h-4 w-4" />
           </button>

@@ -2,7 +2,8 @@
   "tabs": [
     { "id": "profile", "label": "Profile", "icon": "User" },
     { "id": "language", "label": "Language", "icon": "Globe" },
-    { "id": "notifications", "label": "Notifications", "icon": "Bell" }
+    { "id": "notifications", "label": "Notifications", "icon": "Bell" },
+    { "id": "privacy", "label": "Privacy & Memory", "icon": "Shield" }
   ],
   "educationLevels": [
     "10th Pass",

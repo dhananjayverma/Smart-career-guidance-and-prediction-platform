@@ -20,9 +20,12 @@ const mentorMemorySchema = new mongoose.Schema(
     preferences: mongoose.Schema.Types.Mixed,
     interests: { type: Map, of: signalSchema, default: {} },
     branches: { type: Map, of: signalSchema, default: {} },
+    professions: { type: Map, of: signalSchema, default: {} },
+    problems: { type: Map, of: signalSchema, default: {} },
     emotions: { type: Map, of: signalSchema, default: {} },
     intents: { type: Map, of: signalSchema, default: {} },
     languages: { type: Map, of: signalSchema, default: {} },
+    feedback: { type: Map, of: signalSchema, default: {} },
     recentNeeds: { type: [String], default: [] },
     meta: {
       lastIntent: String,

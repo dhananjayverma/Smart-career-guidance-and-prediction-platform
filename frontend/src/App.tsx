@@ -68,28 +68,28 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-slate-950 text-white">
-      <div className="loader-grid" />
-      <div className="loader-glow loader-glow-one" />
-      <div className="loader-glow loader-glow-two" />
+    <div className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-[#f6f8fa] text-slate-950">
+      <div className="loader-grid opacity-25" />
+      <div className="loader-glow loader-glow-one opacity-30" />
+      <div className="loader-glow loader-glow-two opacity-30" />
 
       <div className="relative z-10 w-full max-w-md px-6 text-center">
-        <div className="mx-auto mb-7 grid h-24 w-24 place-items-center rounded-[2rem] border border-white/10 bg-white/10 shadow-2xl shadow-teal-500/20 backdrop-blur-xl">
+        <div className="mx-auto mb-7 grid h-24 w-24 place-items-center rounded-[2rem] border border-slate-200 bg-white shadow-lg backdrop-blur-xl">
           <div className="loader-orbit">
-            <Sparkles className="h-10 w-10 text-teal-200" />
+            <Sparkles className="h-10 w-10 text-teal-600" />
           </div>
         </div>
 
-        <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.32em] text-teal-200">Launching</p>
-        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">{productName}</h1>
-        <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-slate-300">
+        <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.32em] text-teal-600">Launching</p>
+        <h1 className="text-4xl font-black tracking-tight sm:text-5xl text-slate-900">{productName}</h1>
+        <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-slate-500 font-medium">
           Preparing your career intelligence workspace.
         </p>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/10 p-2 backdrop-blur-xl">
-          <div className="h-3 overflow-hidden rounded-full bg-slate-900">
+        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+          <div className="h-3 overflow-hidden rounded-full bg-slate-100">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-teal-300 via-white to-indigo-300 transition-all duration-200"
+              className="h-full rounded-full bg-gradient-to-r from-teal-400 via-indigo-500 to-purple-500 transition-all duration-200"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -97,7 +97,7 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
 
         <div className="mt-4 flex items-center justify-center gap-3 text-xs font-bold text-slate-400">
           <span>{progress}%</span>
-          <span className="h-1 w-1 rounded-full bg-slate-600" />
+          <span className="h-1 w-1 rounded-full bg-slate-300" />
           <span>Building your next step</span>
         </div>
       </div>
@@ -191,7 +191,7 @@ function App() {
             onClick={() => handleNavigate(item.id)}
             className={`nav-item ${selected ? 'nav-item-active' : ''}`}
           >
-            <span className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-xl bg-white/5">
+            <span className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-xl bg-slate-100">
               <Icon className="h-4 w-4" />
             </span>
             <span className="truncate">{item.label}</span>
@@ -202,27 +202,27 @@ function App() {
   );
 
   const sidebar = (
-    <aside className="flex h-full w-72 flex-col overflow-hidden border-r border-white/10 bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950 px-4 py-5 text-white shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+    <aside className="flex h-full w-72 flex-col overflow-hidden border-r border-slate-200 bg-white/95 px-4 py-5 text-slate-800 shadow-sm backdrop-blur-xl">
       <div className="mb-6 flex items-center justify-between">
         <button
           onClick={() => handleNavigate('dashboard')}
           className="flex min-w-0 items-center gap-3 text-left"
           aria-label="Open dashboard"
         >
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-slate-950 shadow-lg shadow-teal-400/20">
-            <Sparkles className="h-5 w-5" />
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-slate-950 text-white shadow-lg shadow-indigo-950/20">
+            <Sparkles className="h-5 w-5 text-teal-300" />
           </span>
           <span className="min-w-0">
-            <span className="block text-base font-extrabold text-white">{productName}</span>
-            <span className="block text-xs font-medium text-teal-100/80">Career intelligence</span>
+            <span className="block text-base font-extrabold text-slate-900">{productName}</span>
+            <span className="block text-xs font-semibold text-teal-700">Career intelligence</span>
           </span>
         </button>
         <button
           onClick={() => setSidebarOpen(false)}
-          className="icon-button lg:hidden"
+          className="icon-button lg:hidden bg-slate-100 hover:bg-slate-200 border-slate-200"
           aria-label="Close menu"
         >
-          <X className="h-5 w-5" />
+          <X className="h-5 w-5 text-slate-700" />
         </button>
       </div>
 
@@ -230,7 +230,7 @@ function App() {
         {renderNavGroup(groupedNav.primary)}
         {groupedNav.secondary.length > 0 && (
           <div>
-            <p className="px-3 pb-2 text-[11px] font-bold uppercase text-teal-100/50">Tools</p>
+            <p className="px-3 pb-2 text-[11px] font-black uppercase text-slate-400">Tools</p>
             {renderNavGroup(groupedNav.secondary)}
           </div>
         )}
@@ -240,7 +240,7 @@ function App() {
         onClick={() => handleNavigate('settings')}
         className={`nav-item mt-4 ${activePage === 'settings' ? 'nav-item-active' : ''}`}
       >
-        <span className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-xl bg-white/5">
+        <span className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700">
           <Settings className="h-4 w-4" />
         </span>
         <span className="truncate">Settings</span>
@@ -253,12 +253,20 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-50 to-teal-50 text-slate-950">
-      <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(120deg,rgba(20,184,166,0.16),transparent_34%,rgba(99,102,241,0.16)),repeating-linear-gradient(90deg,rgba(15,23,42,0.035)_0_1px,transparent_1px_96px)]" />
+    <div className="flex h-screen w-screen overflow-hidden bg-[#F8FAFC] text-slate-950">
+      {/* Subtle blur highlights in the corners for a premium feel */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-[30%] -left-[10%] h-[70%] w-[50%] rounded-full bg-indigo-200/25 blur-[120px]" />
+        <div className="absolute -bottom-[20%] -right-[5%] h-[60%] w-[40%] rounded-full bg-teal-100/30 blur-[100px]" />
+      </div>
 
-      <div className="relative min-h-screen">
-        <div className="fixed inset-y-0 left-0 z-40 hidden lg:block">{sidebar}</div>
+      <div className="relative flex h-full w-full min-w-0 flex-1 overflow-hidden">
+        {/* Desktop Sidebar */}
+        <div className="hidden lg:block h-full flex-shrink-0 z-20">
+          {sidebar}
+        </div>
 
+        {/* Mobile Sidebar */}
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />
         )}
@@ -270,9 +278,10 @@ function App() {
           {sidebar}
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col lg:pl-72">
-          <header className="sticky top-0 z-30 border-b border-white/60 bg-white/75 shadow-sm shadow-slate-900/[0.03] backdrop-blur-xl">
-            <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        {/* Main Work Area */}
+        <div className="flex min-w-0 flex-1 flex-col h-full overflow-hidden">
+          <header className="h-16 flex-shrink-0 border-b border-white/60 bg-white/75 shadow-sm shadow-slate-900/[0.03] backdrop-blur-xl flex items-center">
+            <div className="flex w-full items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
               <div className="flex min-w-0 items-center gap-3">
                 <button
                   onClick={() => setSidebarOpen(true)}
@@ -297,7 +306,7 @@ function App() {
           </header>
 
           {navError && (
-            <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900 sm:px-6 lg:px-8">
+            <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900 sm:px-6 lg:px-8 flex-shrink-0">
               <div className="flex items-center justify-between gap-3">
                 <span>{navError}</span>
                 <button onClick={loadNavigation} className="font-bold underline underline-offset-2">
@@ -307,8 +316,10 @@ function App() {
             </div>
           )}
 
-          <main className="mx-auto w-full max-w-[1500px] flex-1 px-4 py-7 sm:px-6 lg:px-10">
-            {renderPage()}
+          <main className="flex-1 overflow-y-auto px-4 py-7 sm:px-6 lg:px-10">
+            <div className="mx-auto w-full max-w-[1500px]">
+              {renderPage()}
+            </div>
           </main>
         </div>
       </div>

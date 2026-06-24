@@ -1,0 +1,32 @@
+[
+  {
+    "id": "mern_salary_growth",
+    "title": "MERN Developer Salary Growth",
+    "tags": ["mern", "full stack", "salary", "switch", "career_growth"],
+    "content": "For a MERN/full-stack developer with 2-4 years experience in India, salary growth usually improves by combining stronger projects, deployment experience, system design basics, TypeScript/Next.js, testing, cloud basics, and interview preparation. Practical plan: update resume with measurable project impact, add one production-grade project, prepare JavaScript/React/Node interview topics, apply to 8-12 targeted roles weekly, and negotiate after offers."
+  },
+  {
+    "id": "cybersecurity_entry_path",
+    "title": "Cybersecurity Entry Path",
+    "tags": ["cybersecurity", "security", "ethical hacking", "soc", "career_switch"],
+    "content": "Cybersecurity entry path depends on current level. For beginners: learn networking, Linux, web basics, security fundamentals, OWASP Top 10, and basic labs. For developers: move toward application security, secure coding, API security, threat modeling, and bug bounty labs. Good starter roles include SOC analyst, security analyst, application security intern, and junior penetration tester."
+  },
+  {
+    "id": "ai_switch_for_developers",
+    "title": "AI Career Switch For Developers",
+    "tags": ["ai", "machine learning", "career_switch", "developer", "roadmap"],
+    "content": "A developer switching to AI should not start with heavy theory only. Best path: Python basics, data handling with pandas, machine learning fundamentals, model evaluation, APIs around AI models, embeddings/RAG, and one deployable AI project. For MERN developers, AI app development and RAG products are a practical bridge."
+  },
+  {
+    "id": "dsa_interview_plan",
+    "title": "DSA Interview Plan",
+    "tags": ["dsa", "interview", "software", "coding"],
+    "content": "A focused DSA plan for job switching: arrays/strings, hashing, two pointers, sliding window, stack/queue, recursion, trees, graphs basics, dynamic programming basics, and timed mock interviews. Practice 4-5 problems daily for 8-10 weeks and revise patterns instead of random questions."
+  },
+  {
+    "id": "career_mentor_clarification_rule",
+    "title": "Mentor Clarification Rule",
+    "tags": ["mentor", "ask", "behavior", "conversation"],
+    "content": "When a user shares a problem for the first time, the mentor should not immediately give a roadmap. First validate the feeling, identify the missing context, ask one to three useful questions, then provide guidance after enough context is known."
+  }
+]

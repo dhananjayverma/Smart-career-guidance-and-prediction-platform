@@ -14,6 +14,10 @@ import {
   TrendingUp,
   Trash2,
   RefreshCw,
+  ThumbsDown,
+  ThumbsUp,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import {
   clearChatSessionMessages,
@@ -21,9 +25,16 @@ import {
   getQuickQuestions,
   resolveChatSource,
   saveCareerToSession,
+  sendChatFeedback,
   sendChatMessageStream,
 } from '../lib/api';
 import type { ChatResponse, RoadmapPhase, SessionSnapshot } from '../lib/api';
+import {
+  RadarChart,
+  SkillGapGraph,
+  SalaryTimeline,
+  GrowthMeter
+} from '../components/CareerCharts';
 
 interface Message {
   id: string;
@@ -36,6 +47,8 @@ interface Message {
   source?: string;
   decision?: ChatResponse['metadata']['decision'];
   nextQuestions?: string[];
+  metadata?: ChatResponse['metadata'];
+  feedback?: 'up' | 'down';
 }
 
 interface Option {
@@ -78,6 +91,7 @@ function sessionToMessages(sessionMessages: SessionSnapshot['messages']): Messag
     content: msg.content,
     timestamp: msg.createdAt ? new Date(msg.createdAt) : new Date(),
     source: msg.role === 'assistant' ? 'NextStep AI' : undefined,
+    metadata: msg.metadata as ChatResponse['metadata'] | undefined,
   }));
 }
 
@@ -199,6 +213,12 @@ function getAutoClearPreference() {
   return window.localStorage.getItem(AUTO_CLEAR_STORAGE_KEY) === 'true';
 }
 
+function shouldShowDecisionCard(metadata?: ChatResponse['metadata']) {
+  if (metadata?.ui?.decisionCard === false) return false;
+  if (metadata?.ui?.decisionCard === true) return Boolean(metadata.decision?.bestPath);
+  return ['career_confusion'].includes(metadata?.intent || '') && Boolean(metadata?.decision?.bestPath);
+}
+
 export default function ChatPage({ userProfile }: { userProfile: UserProfile }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -207,9 +227,13 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
   const [session, setSession] = useState<SessionSnapshot | null>(null);
   const [toast, setToast] = useState('');
   const [autoClear, setAutoClear] = useState(getAutoClearPreference);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState('');
   const [chatUserId] = useState(getChatUserId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const autoClearCheckedRef = useRef(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -218,6 +242,56 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const rec = new SpeechRecognition();
+      rec.continuous = false;
+      rec.interimResults = false;
+      rec.lang = userProfile.language === 'english' ? 'en-IN' : 'hi-IN';
+
+      rec.onstart = () => {
+        setIsListening(true);
+        setToast('Listening... Bolna shuru kijiye');
+      };
+
+      rec.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          setToast(`Captured: "${transcript}"`);
+          handleSend(transcript);
+        }
+      };
+
+      rec.onerror = (e: any) => {
+        console.error('Speech recognition error:', e);
+        setIsListening(false);
+        setToast('Voice input error. Try again.');
+      };
+
+      rec.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = rec;
+    }
+  }, [userProfile.language]);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      setToast('Voice input not supported in this browser');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      window.speechSynthesis?.cancel();
+      setSpeakingMessageId('');
+      recognitionRef.current.start();
+    }
+  };
 
   useEffect(() => {
     getQuickQuestions<string[]>()
@@ -252,10 +326,46 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
     return () => window.clearTimeout(timeout);
   }, [toast]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  useEffect(() => () => {
+    window.speechSynthesis?.cancel();
+  }, []);
 
-    const outgoing = input.trim();
+  useEffect(() => {
+    const prefetch = window.localStorage.getItem('chat_input_prefetch');
+    if (prefetch) {
+      window.localStorage.removeItem('chat_input_prefetch');
+      setInput(prefetch);
+    }
+  }, []);
+
+  const speakMessage = (message: Message) => {
+    if (!('speechSynthesis' in window)) {
+      setToast('Voice not supported in this browser');
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    if (speakingMessageId === message.id) {
+      setSpeakingMessageId('');
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(message.content.replace(/\*\*/g, ''));
+    utterance.lang = userProfile.language === 'english' ? 'en-IN' : 'hi-IN';
+    utterance.rate = 0.96;
+    utterance.pitch = 1;
+    utterance.onend = () => setSpeakingMessageId('');
+    utterance.onerror = () => setSpeakingMessageId('');
+    setSpeakingMessageId(message.id);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleSend = async (customText?: string) => {
+    const textToSend = customText !== undefined ? customText : input;
+    if (!textToSend.trim()) return;
+
+    const outgoing = textToSend.trim();
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -320,8 +430,9 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
         })),
         roadmap: apiResponse.roadmap?.length ? apiResponse.roadmap : undefined,
         source,
-        decision: apiResponse.metadata?.decision,
+        decision: shouldShowDecisionCard(apiResponse.metadata) ? apiResponse.metadata?.decision : null,
         nextQuestions: apiResponse.nextQuestions,
+        metadata: apiResponse.metadata,
       };
 
       if (!assistantMessage.content && streamedPreview) {
@@ -329,6 +440,9 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
       }
 
       setMessages((prev) => [...prev.filter((msg) => msg.id !== assistantId), assistantMessage]);
+      if (voiceEnabled && assistantMessage.content) {
+        window.setTimeout(() => speakMessage(assistantMessage), 150);
+      }
       getChatSession(chatUserId).then(setSession).catch(() => undefined);
     } catch (error) {
       const assistantMessage: Message = {
@@ -353,6 +467,30 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
     } catch (error) {
       console.warn('Save career unavailable:', error);
       setToast('Save failed');
+    }
+  };
+
+  const sendFeedback = async (message: Message, rating: 'up' | 'down') => {
+    setMessages((prev) => prev.map((item) => (
+      item.id === message.id ? { ...item, feedback: rating } : item
+    )));
+
+    try {
+      await sendChatFeedback(chatUserId, {
+        messageId: message.id,
+        rating,
+        intent: message.metadata?.intent,
+        problem: message.metadata?.understanding?.problem || message.metadata?.conversationState?.currentProblem,
+        behaviorMode: message.metadata?.behavior?.mode,
+        pattern: [
+          message.metadata?.intent,
+          message.metadata?.understanding?.problem || message.metadata?.conversationState?.currentProblem,
+        ].filter(Boolean).join(':'),
+      });
+      setToast(rating === 'up' ? 'Feedback saved' : 'Feedback noted');
+    } catch (error) {
+      console.warn('Feedback unavailable:', error);
+      setToast('Feedback failed');
     }
   };
 
@@ -410,6 +548,26 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
               </button>
             ))}
             <button
+              onClick={() => {
+                const next = !voiceEnabled;
+                setVoiceEnabled(next);
+                if (!next) {
+                  window.speechSynthesis?.cancel();
+                  setSpeakingMessageId('');
+                }
+                setToast(next ? 'Voice mentor enabled' : 'Voice mentor disabled');
+              }}
+              className={`inline-flex items-center gap-1 rounded-2xl border px-3 py-2 text-xs font-bold transition ${
+                voiceEnabled
+                  ? 'border-teal-200 bg-teal-200 text-slate-950'
+                  : 'border-white/10 bg-white/10 text-white hover:bg-white/15'
+              }`}
+              title="Toggle voice mentor"
+            >
+              <Volume2 className="h-3.5 w-3.5" />
+              Voice
+            </button>
+            <button
               onClick={toggleAutoClear}
               className={`inline-flex items-center gap-1 rounded-2xl border px-3 py-2 text-xs font-bold transition ${
                 autoClear
@@ -460,22 +618,24 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
               className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
               <div
-                className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${
-                  message.role === 'assistant' ? 'bg-slate-950' : 'bg-slate-100'
+                className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-xs border transition ${
+                  message.role === 'assistant'
+                    ? 'bg-slate-950 border-teal-500/20 text-white shadow-teal-500/10'
+                    : 'bg-white border-slate-200 text-slate-700 shadow-slate-200/10'
                 }`}
               >
                 {message.role === 'assistant' ? (
-                  <Bot className="w-4 h-4 text-white" />
+                  <Bot className="w-4.5 h-4.5 text-teal-300 animate-pulse" />
                 ) : (
-                  <User className="w-4 h-4 text-slate-700" />
+                  <User className="w-4.5 h-4.5 text-slate-600" />
                 )}
               </div>
 
               <div
-                className={`max-w-[86%] rounded-lg px-4 py-3 ${
+                className={`max-w-[84%] px-4 py-3 ${
                   message.role === 'user'
-                    ? 'bg-slate-950 text-white'
-                    : 'bg-slate-100 text-slate-800'
+                    ? 'bg-gradient-to-br from-slate-900 to-indigo-950 text-white shadow-md shadow-indigo-950/15 rounded-2xl rounded-tr-xs border border-indigo-950/20'
+                    : 'bg-white text-slate-800 border border-slate-200/70 shadow-sm shadow-slate-100/50 rounded-2xl rounded-tl-xs'
                 }`}
               >
                 {renderFormattedMessage(message.content, message.role === 'user')}
@@ -537,7 +697,7 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
                   </div>
                 )}
 
-                {message.decision?.bestPath && (
+                {shouldShowDecisionCard(message.metadata) && message.decision?.bestPath && (
                   <div className="mt-3 rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-3 text-slate-900">
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -567,6 +727,25 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
                         <p className="font-black">{message.decision.bestPath.roadmapPreview.length} phases</p>
                       </div>
                     </div>
+
+                    {/* Premium Career Match Charts */}
+                    <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
+                      <RadarChart
+                        growth={message.decision.bestPath.growth || 'Medium'}
+                        skills={message.decision.bestPath.skills || []}
+                        difficulty={message.decision.bestPath.difficulty || 'Medium'}
+                        roadmapDuration={message.decision.bestPath.roadmapDuration}
+                        salary={message.decision.bestPath.salary || 'Rs 3-8 LPA'}
+                      />
+                      <SkillGapGraph skills={message.decision.bestPath.skills || []} />
+                      <div className="sm:col-span-2">
+                        <SalaryTimeline salary={message.decision.bestPath.salary || 'Rs 3-8 LPA'} />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <GrowthMeter growth={message.decision.bestPath.growth || 'Medium'} />
+                      </div>
+                    </div>
+
                     <div className="mt-4 flex flex-wrap gap-2">
                       <button
                         onClick={() => saveCareer(message.decision!.bestPath!.title, message.decision!.bestPath as unknown as Record<string, unknown>)}
@@ -598,6 +777,41 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   {message.role === 'assistant' && message.source ? ` - ${message.source}` : ''}
                 </p>
+
+                {message.role === 'assistant' && message.id !== 'welcome' ? (
+                  <div className="mt-2 flex items-center gap-1">
+                    <button
+                      onClick={() => speakMessage(message)}
+                      className={`grid h-7 w-7 place-items-center rounded-lg bg-white text-slate-600 transition hover:text-indigo-700 ${
+                        speakingMessageId === message.id ? 'text-indigo-700 ring-1 ring-indigo-200' : ''
+                      }`}
+                      aria-label={speakingMessageId === message.id ? 'Stop voice' : 'Speak response'}
+                      title={speakingMessageId === message.id ? 'Stop voice' : 'Speak response'}
+                    >
+                      {speakingMessageId === message.id ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+                    </button>
+                    <button
+                      onClick={() => sendFeedback(message, 'up')}
+                      className={`grid h-7 w-7 place-items-center rounded-lg bg-white text-slate-600 transition hover:text-teal-700 ${
+                        message.feedback === 'up' ? 'text-teal-700 ring-1 ring-teal-200' : ''
+                      }`}
+                      aria-label="Good response"
+                      title="Good response"
+                    >
+                      <ThumbsUp className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => sendFeedback(message, 'down')}
+                      className={`grid h-7 w-7 place-items-center rounded-lg bg-white text-slate-600 transition hover:text-rose-700 ${
+                        message.feedback === 'down' ? 'text-rose-700 ring-1 ring-rose-200' : ''
+                      }`}
+                      aria-label="Poor response"
+                      title="Poor response"
+                    >
+                      <ThumbsDown className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </div>
           ))}
@@ -625,8 +839,17 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
 
       <div className="surface p-2.5">
         <div className="flex gap-2">
-          <button className="icon-button" aria-label="Voice input">
-            <Mic className="w-5 h-5" />
+          <button
+            onClick={toggleListening}
+            className={`grid h-11 w-11 place-items-center rounded-xl transition ${
+              isListening
+                ? 'bg-rose-600 text-white animate-pulse shadow-lg shadow-rose-600/30 hover:bg-rose-700'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+            aria-label="Voice input"
+            title="Start voice input"
+          >
+            <Mic className={`w-5 h-5 ${isListening ? 'animate-bounce' : ''}`} />
           </button>
           <input
             type="text"
@@ -637,7 +860,7 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
             className="input-field flex-1"
           />
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={!input.trim() || isTyping}
             className="grid h-11 w-11 place-items-center rounded-xl bg-slate-950 text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Send message"
@@ -663,32 +886,32 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
         </div>
         <div className="gradient-card p-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-extrabold text-teal-100">Quick Questions</p>
-            <TrendingUp className="h-4 w-4 text-teal-100" />
+            <p className="text-sm font-extrabold text-teal-700">Quick Questions</p>
+            <TrendingUp className="h-4 w-4 text-teal-650" />
           </div>
           <div className="mt-3 space-y-2">
             {quickQuestions.map((question) => (
               <button
                 key={question}
                 onClick={() => setInput(question)}
-                className="w-full rounded-2xl border border-white/10 bg-white/10 p-2.5 text-left text-xs font-bold text-white transition hover:bg-white/15"
+                className="w-full rounded-2xl border border-slate-200 bg-white p-2.5 text-left text-xs font-bold text-slate-800 transition hover:bg-slate-50 shadow-2xs hover:-translate-y-0.5 duration-200"
               >
                 {question}
               </button>
             ))}
           </div>
         </div>
-        <div className="surface min-h-0 overflow-hidden p-3">
+        <div className="surface min-h-0 overflow-hidden p-3 bg-white">
           <p className="section-title">Saved Careers</p>
           <div className="mt-3 space-y-2 overflow-hidden">
             {session?.savedCareers.length ? (
               session.savedCareers.slice(-4).map((career) => (
-                <div key={`${career.title}-${career.savedAt}`} className="rounded-2xl bg-white/80 p-2.5 text-sm font-bold text-slate-800">
+                <div key={`${career.title}-${career.savedAt}`} className="rounded-2xl bg-slate-50 border border-slate-150 p-2.5 text-xs font-black text-slate-800 shadow-2xs">
                   {career.title}
                 </div>
               ))
             ) : (
-              <div className="rounded-2xl bg-gradient-to-br from-teal-50 to-indigo-50 p-3 text-sm font-bold text-slate-700">
+              <div className="rounded-2xl bg-slate-50 border border-slate-100 p-3 text-xs font-bold text-slate-500">
                 Saved career cards will appear here.
               </div>
             )}

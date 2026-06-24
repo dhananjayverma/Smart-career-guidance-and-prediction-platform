@@ -15,6 +15,8 @@ function tagResponse(response, pipeline, extra = {}) {
 }
 
 function personalizeTemplateResponse(response, input = {}) {
+  if (!['career_confusion', 'roadmap'].includes(input.intent)) return response;
+
   const profile = input.userProfile || {};
   const interests = Array.isArray(profile.interests) ? profile.interests.slice(0, 3) : [];
   const contextBits = [

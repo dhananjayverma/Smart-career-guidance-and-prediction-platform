@@ -44,8 +44,30 @@ function isMongoReady() {
 }
 
 function toPlainSignals(signals = {}) {
-  if (signals instanceof Map) return Object.fromEntries(signals.entries());
-  return signals || {};
+  let plain = {};
+  if (signals instanceof Map) {
+    plain = Object.fromEntries(signals.entries());
+  } else {
+    plain = signals || {};
+  }
+  
+  // Unescape dot placeholder keys from MongoDB
+  const unescaped = {};
+  for (const [key, val] of Object.entries(plain)) {
+    const unescapedKey = key.replace(/__dot__/g, '.');
+    unescaped[unescapedKey] = val;
+  }
+  return unescaped;
+}
+
+function toMongoMap(signals = {}) {
+  const plain = toPlainSignals(signals);
+  const escaped = {};
+  for (const [key, val] of Object.entries(plain)) {
+    const escapedKey = key.replace(/\./g, '__dot__');
+    escaped[escapedKey] = val;
+  }
+  return new Map(Object.entries(escaped));
 }
 
 function serializeMemory(memory = {}) {
@@ -58,9 +80,12 @@ function serializeMemory(memory = {}) {
     preferences: memory.preferences || {},
     interests: toPlainSignals(memory.interests),
     branches: toPlainSignals(memory.branches),
+    professions: toPlainSignals(memory.professions),
+    problems: toPlainSignals(memory.problems),
     emotions: toPlainSignals(memory.emotions),
     intents: toPlainSignals(memory.intents),
     languages: toPlainSignals(memory.languages),
+    feedback: toPlainSignals(memory.feedback),
     recentNeeds: memory.recentNeeds || [],
     meta: memory.meta || {},
     updatedAt: memory.updatedAt || new Date().toISOString(),
@@ -74,9 +99,12 @@ function createEmptyUser(userId) {
     promptCount: 0,
     interests: {},
     branches: {},
+    professions: {},
+    problems: {},
     emotions: {},
     intents: {},
     languages: {},
+    feedback: {},
     recentNeeds: [],
     preferences: {},
     meta: {},
@@ -145,17 +173,98 @@ function extractBranch(text) {
   return '';
 }
 
-function extractSignals({ message = '', analysis = {}, intent = '', language = '' }) {
+function extractExperience(message = '') {
+  const text = message.toLowerCase();
+  const experiencePatterns = [
+    /(\d+(\.\d+)?)\s*(year|years|yr|yrs)/i,
+    /(\d+(\.\d+)?)\s*(saal)/i,
+    /(\d+(\.\d+)?)\s*(exp|experience)/i
+  ];
+  for (const pattern of experiencePatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      const val = parseFloat(match[1]);
+      if (!isNaN(val)) return val;
+    }
+  }
+  return 0;
+}
+
+function extractCurrentRole(message = '') {
+  const text = message.toLowerCase();
+  const roles = [
+    'software engineer',
+    'software developer',
+    'devops engineer',
+    'backend developer',
+    'frontend developer',
+    'full stack developer',
+    'sde',
+    'qa engineer',
+    'data scientist',
+    'data analyst'
+  ];
+  for (const role of roles) {
+    if (text.includes(role)) {
+      return role.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+  }
+  return '';
+}
+
+function extractProfession(text) {
+  const directMatch = text.match(/\b(?:main|mai|me|i am|i'm)\s+(?:ek\s+|a\s+|an\s+)?([a-z0-9 .+#-]{2,40}?\s+(?:dev|developer|engineer|designer|analyst|student|professional))\b/);
+  if (/\bmern\b|full stack|fullstack/.test(text)) return 'MERN/full-stack developer';
+  if (/frontend|react developer|ui developer/.test(text)) return 'frontend developer';
+  if (/backend|node developer|api developer/.test(text)) return 'backend developer';
+  if (/software engineer|software developer/.test(text)) return 'software developer';
+  if (/data analyst|data scientist|machine learning engineer|ml engineer/.test(text)) return 'data/AI professional';
+  if (/student|college|btech|bca|12th|10th/.test(text)) return 'student';
+  if (directMatch) return directMatch[1].trim();
+  return '';
+}
+
+function extractProblemSignal({ text = '', understanding = {}, conversationState = {} }) {
+  if (understanding.problem) return understanding.problem;
+  if (conversationState.currentProblem) return conversationState.currentProblem;
+  if (/salary|ctc|package|underpaid|increment|hike/.test(text) && /low|kam|nahi|stuck|problem|frustrat/.test(text)) {
+    return 'low_salary';
+  }
+  if (/job nahi|resume reject|interview nahi|apply/.test(text)) return 'job_search';
+  if (/stress|pressure|tension|pareshan|frustrat/.test(text)) return 'stress_support';
+  return '';
+}
+
+function extractSignals({
+  message = '',
+  analysis = {},
+  intent = '',
+  language = '',
+  understanding = {},
+  conversationState = {},
+}) {
   const text = normalizeEmotionText(message);
   const signals = [];
   const education = extractEducation(message);
   const branch = extractBranch(text);
+  const profession = extractProfession(text);
+  const problem = extractProblemSignal({
+    text,
+    understanding,
+    conversationState,
+  });
 
   if (education && education !== 'unknown') {
     signals.push({ type: 'explicit', bucket: 'preferences', key: 'education', value: education, strength: 0.9 });
   }
   if (branch) {
     signals.push({ type: 'explicit', bucket: 'branches', key: branch, value: branch, strength: 0.95 });
+  }
+  if (profession) {
+    signals.push({ type: 'explicit', bucket: 'professions', key: profession, value: profession, strength: 0.9 });
+  }
+  if (problem) {
+    signals.push({ type: 'problem', bucket: 'problems', key: problem, value: problem, strength: 0.82 });
   }
 
   extractInterests(text).forEach((interest) => {
@@ -177,9 +286,16 @@ function extractSignals({ message = '', analysis = {}, intent = '', language = '
   return { text, education, branch, signals };
 }
 
-function mergeMemory(memory, { message = '', analysis = {}, intent = '', language = '' }) {
+function mergeMemory(memory, { message = '', analysis = {}, intent = '', language = '', understanding = {}, conversationState = {}, mentorState = {} }) {
   const next = { ...createEmptyUser(memory.userId), ...serializeMemory(memory) };
-  const { text, education, branch, signals } = extractSignals({ message, analysis, intent, language });
+  const { text, education, branch, signals } = extractSignals({
+    message,
+    analysis,
+    intent,
+    language,
+    understanding,
+    conversationState,
+  });
 
   next.promptCount += 1;
   next.updatedAt = new Date().toISOString();
@@ -191,6 +307,34 @@ function mergeMemory(memory, { message = '', analysis = {}, intent = '', languag
 
   if (education && education !== 'unknown') next.education = education;
   if (branch) next.preferredBranch = branch;
+
+  const expYears = extractExperience(message);
+  const role = extractCurrentRole(message);
+
+  if (!next.preferences) next.preferences = {};
+  
+  // Merge askedQuestions
+  if (Array.isArray(mentorState?.askedQuestions)) {
+    const asked = new Set(next.preferences.askedQuestions || []);
+    mentorState.askedQuestions.forEach((q) => asked.add(q));
+    next.preferences.askedQuestions = Array.from(asked);
+  }
+
+  if (expYears > 0) {
+    next.preferences.experienceYears = expYears;
+  }
+  if (role) {
+    next.preferences.currentRole = role;
+  }
+
+  // Career stage detection
+  if (next.preferences.experienceYears >= 2) {
+    next.preferences.careerStage = 'experienced';
+  } else if (next.education && next.education !== 'unknown') {
+    next.preferences.careerStage = 'student';
+  } else if (next.preferences.experienceYears > 0) {
+    next.preferences.careerStage = 'beginner';
+  }
 
   signals.forEach((signal) => {
     if (signal.bucket === 'preferences') {
@@ -252,11 +396,14 @@ async function updateMemory(userId = 'guest', signals = {}) {
             education: merged.education,
             preferredBranch: merged.preferredBranch,
             preferences: merged.preferences,
-            interests: merged.interests,
-            branches: merged.branches,
-            emotions: merged.emotions,
-            intents: merged.intents,
-            languages: merged.languages,
+            interests: toMongoMap(merged.interests),
+            branches: toMongoMap(merged.branches),
+            professions: merged.professions,
+            problems: merged.problems,
+            emotions: toMongoMap(merged.emotions),
+            intents: toMongoMap(merged.intents),
+            languages: toMongoMap(merged.languages),
+            feedback: merged.feedback,
             recentNeeds: merged.recentNeeds,
             meta: merged.meta,
           },
@@ -286,6 +433,12 @@ function buildSummaryFromMemory(memory = {}) {
   const interests = topKeys(memory.interests);
   if (interests.length) parts.push(`Repeated interests: ${interests.join(', ')}`);
 
+  const professions = topKeys(memory.professions, 2);
+  if (professions.length) parts.push(`Profession/profile: ${professions.join(', ')}`);
+
+  const problems = topKeys(memory.problems, 3);
+  if (problems.length) parts.push(`Repeated problems: ${problems.join(', ')}`);
+
   const emotions = topKeys(memory.emotions, 3);
   if (emotions.length) parts.push(`Emotional pattern: ${emotions.join(', ')}`);
 
@@ -312,6 +465,155 @@ async function learnFromPrompt(input = {}) {
   return updateMemory(input.userId, input);
 }
 
+async function learnFromFeedback(userId = 'guest', feedback = {}) {
+  if (!userId || userId === 'guest') return {};
+
+  const existing = await getMemory(userId);
+  const next = { ...createEmptyUser(userId), ...existing, userId };
+  const rating = feedback.rating === 'down' ? 'thumbs_down' : 'thumbs_up';
+  addSignal(next, 'feedback', rating, {
+    strength: rating === 'thumbs_up' ? 0.75 : 0.85,
+    source: 'explicit',
+  });
+
+  if (feedback.intent) {
+    addSignal(next, 'intents', feedback.intent, {
+      strength: rating === 'thumbs_up' ? 0.45 : 0.35,
+      source: 'feedback',
+    });
+  }
+
+  if (feedback.problem) {
+    addSignal(next, 'problems', feedback.problem, {
+      strength: rating === 'thumbs_up' ? 0.55 : 0.35,
+      source: 'feedback',
+    });
+  }
+
+  next.meta = {
+    ...(next.meta || {}),
+    lastFeedback: rating,
+    lastFeedbackAt: new Date().toISOString(),
+  };
+
+  if (isMongoReady()) {
+    try {
+      await MentorMemory.findOneAndUpdate(
+        { userId },
+        {
+          $set: {
+            version: next.version,
+            promptCount: next.promptCount,
+            education: next.education,
+            preferredBranch: next.preferredBranch,
+            preferences: next.preferences,
+            interests: next.interests,
+            branches: next.branches,
+            professions: next.professions,
+            problems: next.problems,
+            emotions: next.emotions,
+            intents: next.intents,
+            languages: next.languages,
+            feedback: next.feedback,
+            recentNeeds: next.recentNeeds,
+            meta: next.meta,
+          },
+        },
+        { upsert: true, new: true }
+      );
+    } catch (error) {
+      console.warn(`Mentor feedback Mongo write failed: ${error.message}`);
+    }
+  }
+
+  const fileMemory = readMemoryFile();
+  fileMemory.globalPatterns = {
+    emotionPhrases: {},
+    careerTerms: {},
+    commonQuestions: {},
+    ...(fileMemory.globalPatterns || {}),
+  };
+  fileMemory.users[userId] = next;
+  const patternKey = feedback.pattern || feedback.intent || feedback.problem || 'general';
+  fileMemory.globalPatterns.commonQuestions[patternKey] = {
+    count: (fileMemory.globalPatterns.commonQuestions[patternKey]?.count || 0) + 1,
+    lastFeedback: rating,
+    updatedAt: new Date().toISOString(),
+  };
+  memoryFallback.set(userId, next);
+  writeMemoryFile(fileMemory);
+  return next;
+}
+
+async function clearMemory(userId = 'guest') {
+  if (!userId || userId === 'guest') return {};
+
+  if (isMongoReady()) {
+    try {
+      await MentorMemory.deleteOne({ userId });
+    } catch (error) {
+      console.warn(`Mentor memory Mongo delete failed: ${error.message}`);
+    }
+  }
+
+  const fileMemory = readMemoryFile();
+  if (fileMemory.users && fileMemory.users[userId]) {
+    delete fileMemory.users[userId];
+    writeMemoryFile(fileMemory);
+  }
+  memoryFallback.delete(userId);
+
+  return createEmptyUser(userId);
+}
+
+async function backfillJsonToMongo() {
+  if (!isMongoReady()) {
+    console.log('Skipping backfill: MongoDB not connected.');
+    return;
+  }
+
+  try {
+    const fileMemory = readMemoryFile();
+    const users = fileMemory.users || {};
+    const userIds = Object.keys(users);
+    
+    if (userIds.length === 0) {
+      console.log('No users found in JSON for backfilling.');
+      return;
+    }
+
+    console.log(`Starting backfill of ${userIds.length} users from JSON to MongoDB...`);
+    let backfilledCount = 0;
+    
+    for (const userId of userIds) {
+      const existingInMongo = await MentorMemory.findOne({ userId }).lean();
+      if (!existingInMongo) {
+        const merged = users[userId];
+        await MentorMemory.create({
+          userId,
+          version: merged.version || 2,
+          promptCount: merged.promptCount || 0,
+          education: merged.education || '',
+          preferredBranch: merged.preferredBranch || '',
+          preferences: merged.preferences || {},
+          interests: toMongoMap(merged.interests),
+          branches: toMongoMap(merged.branches),
+          emotions: toMongoMap(merged.emotions),
+          intents: toMongoMap(merged.intents),
+          languages: toMongoMap(merged.languages),
+          recentNeeds: merged.recentNeeds || [],
+          meta: merged.meta || {},
+        });
+        backfilledCount++;
+      }
+    }
+    
+    console.log(`Backfill completed. Processed ${userIds.length} users, inserted ${backfilledCount} new users into MongoDB.`);
+  } catch (error) {
+    console.error(`Backfill failed: ${error.message}`);
+  }
+}
+
 module.exports = {
   buildLearningSummary,
   buildLearningSummaryAsync,
@@ -319,7 +621,10 @@ module.exports = {
   extractSignals,
   getMemory,
   getUserLearning,
+  learnFromFeedback,
   learnFromPrompt,
   mergeMemory,
   updateMemory,
+  clearMemory,
+  backfillJsonToMongo,
 };

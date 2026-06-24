@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Linux & Scripting",
+    "duration": "Month 1-2",
+    "tasks": [
+      "Advanced Linux administration",
+      "Shell scripting or Python automation",
+      "Networking & Security fundamentals",
+      "Setup local Nginx/Apache web server"
+    ]
+  },
+  {
+    "title": "Containers & CI/CD",
+    "duration": "Month 3-4",
+    "tasks": [
+      "Docker containerization",
+      "Kubernetes cluster configuration",
+      "Jenkins or GitHub Actions pipelines",
+      "Deploy a multi-container app with CI/CD"
+    ]
+  },
+  {
+    "title": "Infrastructure as Code & Cloud",
+    "duration": "Month 5-6",
+    "tasks": [
+      "Terraform provisioning",
+      "Ansible configuration management",
+      "AWS/GCP cloud services (EC2, EKS, IAM)",
+      "Setup Prometheus & Grafana monitoring"
+    ]
+  }
+]

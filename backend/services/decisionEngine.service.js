@@ -19,33 +19,12 @@ function shouldUseLocalEmotion(input = {}) {
 
 function selectResponseRoute(input = {}, { hasCache = false, hasTemplate = false } = {}) {
   const emotion = getEmotion(input);
+  const behaviorMode = input.behavior?.mode;
 
   if (emotion.needsImmediateSafety) {
     return {
       route: 'crisis-local',
       reason: 'Immediate safety signal detected',
-      useLocalFallback: true,
-      skipCache: true,
-      skipTemplate: true,
-      skipAI: true,
-    };
-  }
-
-  if (input.conversationState?.needsMentorClarification) {
-    return {
-      route: 'conversation-state-local',
-      reason: `Conversation stage requires ${input.conversationState.stage} before solution`,
-      useLocalFallback: true,
-      skipCache: true,
-      skipTemplate: true,
-      skipAI: true,
-    };
-  }
-
-  if (shouldUseLocalEmotion(input)) {
-    return {
-      route: 'emotion-local',
-      reason: 'Support/stress message should be answered locally first',
       useLocalFallback: true,
       skipCache: true,
       skipTemplate: true,

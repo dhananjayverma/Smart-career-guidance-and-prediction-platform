@@ -55,6 +55,29 @@ export interface ChatResponse {
     pipeline?: string;
     templateId?: string;
     fallbackReason?: string;
+    ui?: {
+      decisionCard?: boolean;
+      careerCard?: boolean;
+      skillGap?: boolean;
+      roadmapCard?: boolean;
+    };
+    behavior?: {
+      mode?: 'ASK' | 'SUPPORT' | 'GUIDE' | 'PLAN';
+      reason?: string;
+    };
+    understanding?: {
+      emotion?: string;
+      intent?: string;
+      problem?: string;
+      target?: string;
+      userType?: string;
+      confidence?: number;
+    };
+    conversationState?: {
+      stage?: string;
+      currentProblem?: string;
+      problemKey?: string;
+    };
     decision?: {
       bestPath?: {
         id: string;
@@ -73,6 +96,11 @@ export interface ChatResponse {
           nextSkill: string;
         };
         roadmapPreview: { title: string; duration: string; tasks: { title: string }[] }[];
+        salary?: string;
+        growth?: string;
+        difficulty?: string;
+        skills?: string[];
+        roadmapDuration?: string;
       } | null;
       backupPath?: {
         id: string;
@@ -206,6 +234,29 @@ export function saveCareerToSession<T = SessionSnapshot>(
 export function clearChatSessionMessages<T = SessionSnapshot>(userId: string) {
   return request<T>(`/api/chat/session/${encodeURIComponent(userId)}/messages`, {
     method: 'DELETE',
+  });
+}
+
+export function clearUserMemory<T = any>(userId: string) {
+  return request<T>(`/api/chat/session/${encodeURIComponent(userId)}/memory`, {
+    method: 'DELETE',
+  });
+}
+
+export function sendChatFeedback<T = { rating: 'up' | 'down'; learned: boolean }>(
+  userId: string,
+  input: {
+    messageId: string;
+    rating: 'up' | 'down';
+    intent?: string;
+    problem?: string;
+    behaviorMode?: string;
+    pattern?: string;
+  }
+) {
+  return request<T>(`/api/chat/session/${encodeURIComponent(userId)}/feedback`, {
+    method: 'POST',
+    body: JSON.stringify(input),
   });
 }
 

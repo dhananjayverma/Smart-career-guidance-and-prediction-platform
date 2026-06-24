@@ -65,6 +65,11 @@ function buildCareerDecision(careers = [], { emotion, confusion, knownSkills = [
       outcome: best.outcome,
       skillGap: best.skillGap,
       roadmapPreview: createRoadmap(best.title).milestones.slice(0, 2),
+      salary: best.salary,
+      growth: best.growth,
+      difficulty: best.difficulty,
+      skills: best.skills,
+      roadmapDuration: best.roadmapDuration,
     } : null,
     backupPath: backup ? {
       id: backup.id,

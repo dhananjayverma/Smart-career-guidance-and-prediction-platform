@@ -5,12 +5,46 @@
     "icon": "Briefcase",
     "investment": "Rs 5-20 Lakhs",
     "risk": "Low",
+    "year1Salary": "Rs 4-6 LPA",
+    "year3Salary": "Rs 12-18 LPA",
+    "requiredSkills": ["Algorithms & DS", "Web Frameworks", "System Design", "Git & CI/CD", "Databases (SQL/NoSQL)"],
+    "dailyRoutine": [
+      "Standup meeting and task planning",
+      "Coding features and fixing backend/frontend bugs",
+      "Writing unit tests and code reviews",
+      "Collaborating with product managers and DevOps teams"
+    ],
+    "competitionLevel": "Medium",
     "outcomes": [
-      { "year": 1, "title": "Junior Developer", "salary": "Rs 4-6 LPA", "status": "growth", "description": "Learning phase" },
-      { "year": 2, "title": "Developer", "salary": "Rs 7-10 LPA", "status": "growth", "description": "Got 1-2 appraisals" },
-      { "year": 3, "title": "Senior Developer", "salary": "Rs 12-18 LPA", "status": "growth", "description": "Leading projects" },
-      { "year": 4, "title": "Tech Lead", "salary": "Rs 18-25 LPA", "status": "stable", "description": "Managing teams" },
-      { "year": 5, "title": "Engineering Manager", "salary": "Rs 30-50 LPA", "status": "growth", "description": "High growth track" }
+      { "year": 1, "title": "Junior Developer", "salary": "Rs 4-6 LPA", "status": "growth", "description": "Learning phase, focus on DSA, languages, and writing clean code" },
+      { "year": 2, "title": "Developer", "salary": "Rs 7-10 LPA", "status": "growth", "description": "Got 1-2 appraisals, leading sub-features, API integrations" },
+      { "year": 3, "title": "Senior Developer", "salary": "Rs 12-18 LPA", "status": "growth", "description": "Leading projects, writing system architectures, mentoring juniors" },
+      { "year": 4, "title": "Tech Lead", "salary": "Rs 18-25 LPA", "status": "stable", "description": "Managing teams, aligning business specs, cross-team sync" },
+      { "year": 5, "title": "Engineering Manager", "salary": "Rs 30-50 LPA", "status": "growth", "description": "High growth track, budgets, resource planning, org level execution" }
+    ]
+  },
+  {
+    "id": "frontend-developer",
+    "title": "Frontend Developer",
+    "icon": "Briefcase",
+    "investment": "Rs 20K-2 Lakhs",
+    "risk": "Medium",
+    "year1Salary": "Rs 3-6 LPA",
+    "year3Salary": "Rs 10-18 LPA",
+    "requiredSkills": ["HTML/CSS", "JavaScript", "React", "TypeScript", "API integration", "Responsive UI"],
+    "dailyRoutine": [
+      "Build UI screens from Figma or product requirements",
+      "Write React components and connect APIs",
+      "Fix responsive bugs and performance issues",
+      "Review pull requests and collaborate with backend/design teams"
+    ],
+    "competitionLevel": "High",
+    "outcomes": [
+      { "year": 1, "title": "Junior Frontend Developer", "salary": "Rs 3-6 LPA", "status": "growth", "description": "React basics, UI implementation, bug fixing, and portfolio building" },
+      { "year": 2, "title": "Frontend Developer", "salary": "Rs 6-10 LPA", "status": "growth", "description": "Owns pages, API flows, state management, and production fixes" },
+      { "year": 3, "title": "Strong Frontend Engineer", "salary": "Rs 10-18 LPA", "status": "growth", "description": "TypeScript, performance, design systems, testing, and interview readiness" },
+      { "year": 4, "title": "Senior Frontend Engineer", "salary": "Rs 18-28 LPA", "status": "stable", "description": "Leads UI architecture, mentoring, accessibility, and scalable component systems" },
+      { "year": 5, "title": "Frontend Lead / Full-stack Bridge", "salary": "Rs 25-40 LPA", "status": "growth", "description": "Owns product surfaces, frontend architecture, and cross-team delivery" }
     ]
   },
   {
@@ -19,12 +53,22 @@
     "icon": "Award",
     "investment": "Rs 30K-3 Lakhs",
     "risk": "High",
+    "year1Salary": "Rs 0 (Prep Phase)",
+    "year3Salary": "Rs 5-8 LPA",
+    "requiredSkills": ["General Studies & GK", "Quantitative Aptitude", "Logical Reasoning", "Answer Writing & Interview Prep", "Patience & Consistency"],
+    "dailyRoutine": [
+      "8-10 hours of focused textbook and newspaper reading",
+      "Solving mock test papers and previous years papers",
+      "Writing essay answers and seeking feedback",
+      "Attending online classes/group discussions"
+    ],
+    "competitionLevel": "Very High",
     "outcomes": [
-      { "year": 1, "title": "Preparation", "salary": "Rs 0", "status": "struggle", "description": "Full-time study" },
-      { "year": 2, "title": "Exam Attempts", "salary": "Rs 0", "status": "struggle", "description": "Multiple exams" },
-      { "year": 3, "title": "Selection", "salary": "Rs 4-8 LPA", "status": "stable", "description": "Job offer received" },
-      { "year": 4, "title": "Probation", "salary": "Rs 5-10 LPA", "status": "growth", "description": "Confirmed post" },
-      { "year": 5, "title": "Established", "salary": "Rs 7-15 LPA", "status": "stable", "description": "Job security" }
+      { "year": 1, "title": "Preparation", "salary": "Rs 0", "status": "struggle", "description": "Full-time study, notes formulation, syllabus walkthrough" },
+      { "year": 2, "title": "Exam Attempts", "salary": "Rs 0", "status": "struggle", "description": "Multiple exams (prelims/mains level attempts)" },
+      { "year": 3, "title": "Selection", "salary": "Rs 4-8 LPA", "status": "stable", "description": "Job offer received, document verification, joining call" },
+      { "year": 4, "title": "Probation", "salary": "Rs 5-10 LPA", "status": "growth", "description": "Confirmed post, field training, early postings" },
+      { "year": 5, "title": "Established", "salary": "Rs 7-15 LPA", "status": "stable", "description": "Job security, administrative responsibility, benefits" }
     ]
   },
   {
@@ -33,12 +77,22 @@
     "icon": "Rocket",
     "investment": "Rs 5-50 Lakhs",
     "risk": "High",
+    "year1Salary": "Rs 0 (Bootstrapping)",
+    "year3Salary": "Rs 3-10 LPA (Early Stage)",
+    "requiredSkills": ["Sales & Pitching", "Product MVP Development", "Customer Discovery", "Financial Planning & Fundraising", "Hiring & Team Leadership"],
+    "dailyRoutine": [
+      "Pitching to potential clients and collecting feedback",
+      "Coding the MVP or guiding design/dev iteration",
+      "Managing cash flow and applying for grants/pitches",
+      "Recruiting early hires and alignment meetings"
+    ],
+    "competitionLevel": "High",
     "outcomes": [
-      { "year": 1, "title": "Idea and MVP", "salary": "Rs 0", "status": "struggle", "description": "Building product" },
-      { "year": 2, "title": "Market Entry", "salary": "Rs 1-3 LPA", "status": "struggle", "description": "First customers" },
-      { "year": 3, "title": "Pivot or Growth", "salary": "Rs 3-10 LPA", "status": "struggle", "description": "Critical phase" },
-      { "year": 4, "title": "Scaling", "salary": "Rs 10-50 LPA", "status": "growth", "description": "If survived" },
-      { "year": 5, "title": "Founder", "salary": "Rs 20 LPA-1Cr+", "status": "growth", "description": "Success or restart" }
+      { "year": 1, "title": "Idea and MVP", "salary": "Rs 0", "status": "struggle", "description": "Building product, talking to users, validating thesis" },
+      { "year": 2, "title": "Market Entry", "salary": "Rs 1-3 LPA", "status": "struggle", "description": "First customers, early revenue or scaling challenges" },
+      { "year": 3, "title": "Pivot or Growth", "salary": "Rs 3-10 LPA", "status": "struggle", "description": "Critical phase, raising seed capital, finding product-market fit" },
+      { "year": 4, "title": "Scaling", "salary": "Rs 10-50 LPA", "status": "growth", "description": "If survived: building leadership team, marketing campaigns" },
+      { "year": 5, "title": "Founder", "salary": "Rs 20 LPA-1Cr+", "status": "growth", "description": "Success exit, stable cash cow, or starting the next venture" }
     ]
   }
 ]

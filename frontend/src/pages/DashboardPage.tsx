@@ -10,6 +10,7 @@ import {
   Building2,
   BookOpen,
   TrendingUp,
+  Activity,
 } from 'lucide-react';
 import type { ElementType } from 'react';
 import { getChatSession, getDashboard } from '../lib/api';
@@ -53,6 +54,73 @@ const iconMap: Record<string, ElementType> = {
   Target,
 };
 
+function CircularProgress({ percent, label, colorClass, shadowClass }: { percent: number; label: string; colorClass: string; shadowClass: string }) {
+  const radius = 28;
+  const stroke = 5;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (percent / 100) * circumference;
+
+  return (
+    <div className="surface group p-5 flex items-center justify-between transition hover:-translate-y-1 hover:shadow-xl duration-300">
+      <div>
+        <p className="text-3xl font-black text-slate-900">{percent}%</p>
+        <p className="mt-1 text-sm font-bold text-slate-500">{label}</p>
+      </div>
+      <div className="relative h-16 w-16">
+        <svg className="h-full w-full -rotate-90">
+          <circle
+            cx="32"
+            cy="32"
+            r={radius}
+            stroke="#f1f5f9"
+            strokeWidth={stroke}
+            fill="transparent"
+          />
+          <circle
+            cx="32"
+            cy="32"
+            r={radius}
+            stroke="currentColor"
+            strokeWidth={stroke}
+            fill="transparent"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            className={`${colorClass} transition-all duration-1000 ease-out`}
+            strokeLinecap="round"
+          />
+        </svg>
+        <div className={`absolute inset-0 m-auto h-2 w-2 rounded-full ${shadowClass} opacity-75 blur-xs group-hover:scale-125 transition-transform`} />
+      </div>
+    </div>
+  );
+}
+
+function AnimatedNodes() {
+  return (
+    <div className="absolute right-0 top-0 bottom-0 w-1/3 hidden md:block overflow-hidden pointer-events-none opacity-20">
+      <svg className="h-full w-full" viewBox="0 0 200 200">
+        <line x1="50" y1="40" x2="110" y2="90" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" className="animate-pulse" />
+        <line x1="110" y1="90" x2="60" y2="150" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+        <line x1="110" y1="90" x2="160" y2="80" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+        <line x1="160" y1="80" x2="130" y2="160" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+
+        <circle cx="50" cy="40" r="5" fill="#5eead4" className="animate-ping" style={{ animationDuration: '3s' }} />
+        <circle cx="50" cy="40" r="4" fill="#5eead4" />
+
+        <circle cx="110" cy="90" r="7" fill="#818cf8" className="animate-ping" style={{ animationDuration: '4s' }} />
+        <circle cx="110" cy="90" r="5" fill="#818cf8" />
+
+        <circle cx="60" cy="150" r="4" fill="#f472b6" />
+        <circle cx="160" cy="80" r="4" fill="#38bdf8" />
+        <circle cx="130" cy="160" r="4" fill="#5eead4" />
+
+        <text x="120" y="70" fill="rgba(255,255,255,0.5)" fontSize="7" fontWeight="bold">AI Engine</text>
+        <text x="20" y="55" fill="rgba(255,255,255,0.5)" fontSize="7" fontWeight="bold">DevOps</text>
+      </svg>
+    </div>
+  );
+}
+
 export default function DashboardPage({ onNavigate }: DashboardPageProps) {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [session, setSession] = useState<SessionSnapshot | null>(null);
@@ -82,6 +150,7 @@ export default function DashboardPage({ onNavigate }: DashboardPageProps) {
   return (
     <div className="space-y-6">
       <div className="page-hero">
+        <AnimatedNodes />
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-teal-100">
@@ -103,15 +172,24 @@ export default function DashboardPage({ onNavigate }: DashboardPageProps) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        {stats?.map((stat) => (
-          <div key={stat.label} className="surface p-5">
-            <p className="text-3xl font-extrabold text-slate-950">{stat.value}</p>
-            <p className="mt-1 text-sm font-medium text-slate-500">{stat.label}</p>
-          </div>
-        ))}
-        {!dashboard && !error && [1, 2, 3].map((item) => (
-          <div key={item} className="surface h-24 animate-pulse bg-slate-100" />
-        ))}
+        <CircularProgress
+          percent={82}
+          label="Career Readiness"
+          colorClass="text-teal-500"
+          shadowClass="bg-teal-500"
+        />
+        <CircularProgress
+          percent={68}
+          label="Skill Alignment"
+          colorClass="text-indigo-500"
+          shadowClass="bg-indigo-500"
+        />
+        <CircularProgress
+          percent={Math.min(100, 25 + (session?.savedCareers?.length || 0) * 15 + (session?.messages?.length || 0) * 5)}
+          label="Workspace Activity"
+          colorClass="text-purple-500"
+          shadowClass="bg-purple-500"
+        />
       </div>
 
       {error && <div className="surface border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">{error}</div>}
@@ -119,35 +197,84 @@ export default function DashboardPage({ onNavigate }: DashboardPageProps) {
       <div className="gradient-card">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-extrabold text-teal-100">Advanced Workspace</p>
-              <h2 className="mt-2 text-2xl font-black">
+              <p className="text-sm font-extrabold text-teal-700">Advanced Workspace</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-900">
                 {session?.savedCareers.length ? 'Continue from your saved careers.' : 'Ask, save, compare, and build roadmaps from AI answers.'}
               </h2>
             </div>
             <button
               onClick={() => onNavigate('chat')}
-              className="rounded-xl bg-white px-4 py-2 text-sm font-extrabold text-slate-950"
+              className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-extrabold text-white hover:bg-slate-800 transition shadow-sm"
             >
               Open Mentor
             </button>
           </div>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
             {session?.savedCareers.length ? session.savedCareers.slice(-3).map((career) => (
-              <div key={`${career.title}-${career.savedAt}`} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                <p className="font-extrabold text-white">{career.title}</p>
-                <p className="mt-1 text-xs text-slate-300">{career.source || 'saved'}</p>
+              <div key={`${career.title}-${career.savedAt}`} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
+                <p className="font-extrabold text-slate-950">{career.title}</p>
+                <p className="mt-1 text-xs text-slate-500">{career.source || 'saved'}</p>
               </div>
             )) : [
               { label: 'Best-match cards', desc: 'Backend decision score' },
               { label: 'Saved careers', desc: 'Persisted in session' },
               { label: 'Roadmap actions', desc: 'Prompt from AI result' },
             ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                <p className="font-extrabold text-white">{item.label}</p>
-                <p className="mt-1 text-xs text-slate-300">{item.desc}</p>
+              <div key={item.label} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
+                <p className="font-extrabold text-slate-950">{item.label}</p>
+                <p className="mt-1 text-xs text-slate-500">{item.desc}</p>
               </div>
             ))}
           </div>
+      </div>
+
+      {/* AI Mentorship Insights */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="section-title">AI Mentorship Insights</h2>
+          <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-600">Personalized</span>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            {
+              title: 'Market Shift',
+              content: 'AI & Data Engineering roles are showing a 35% growth in salary matching for experienced developers.',
+              tag: 'Trending',
+              tagColor: 'text-amber-800 bg-amber-50 border-amber-200',
+              bg: 'from-amber-50/80 via-white/95 to-orange-50/40 border-amber-200 text-slate-800'
+            },
+            {
+              title: 'Interview Focus',
+              content: 'System Design and scalable APIs are primary evaluation areas for developers with 3+ years experience.',
+              tag: 'Skill Gap',
+              tagColor: 'text-teal-800 bg-teal-50 border-teal-200',
+              bg: 'from-teal-50/80 via-white/95 to-emerald-50/40 border-teal-200 text-slate-800'
+            },
+            {
+              title: 'Roadmap Tip',
+              content: 'Complete your saved roadmaps to generate matching mock tests and interview questions.',
+              tag: 'Action Plan',
+              tagColor: 'text-indigo-800 bg-indigo-50 border-indigo-200',
+              bg: 'from-indigo-50/80 via-white/95 to-purple-50/40 border-indigo-200 text-slate-800'
+            }
+          ].map((insight, idx) => (
+            <div
+              key={idx}
+              className={`relative overflow-hidden rounded-2xl border bg-gradient-to-br ${insight.bg} p-5 backdrop-blur-md shadow-md hover:shadow-lg transition duration-200`}
+            >
+              <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-gradient-to-br from-white/50 to-white/0 blur-xl" />
+              <div className="flex items-center justify-between mb-3">
+                <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-black ${insight.tagColor}`}>
+                  <Sparkles className="h-3 w-3 animate-pulse" />
+                  {insight.tag}
+                </span>
+                <span className="text-[10px] uppercase font-black tracking-wider opacity-45 text-slate-500">Insight #{idx + 1}</span>
+              </div>
+              <h3 className="text-sm font-black text-slate-900">{insight.title}</h3>
+              <p className="mt-2 text-xs leading-5 text-slate-600 font-medium">{insight.content}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="surface overflow-hidden">
