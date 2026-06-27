@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Send,
   Bot,
@@ -18,6 +18,8 @@ import {
   ThumbsUp,
   Volume2,
   VolumeX,
+  Phone,
+  PhoneOff,
 } from 'lucide-react';
 import {
   clearChatSessionMessages,
@@ -27,6 +29,7 @@ import {
   saveCareerToSession,
   sendChatFeedback,
   sendChatMessageStream,
+  synthesizeVoice,
 } from '../lib/api';
 import type { ChatResponse, RoadmapPhase, SessionSnapshot } from '../lib/api';
 import {
@@ -35,6 +38,9 @@ import {
   SalaryTimeline,
   GrowthMeter
 } from '../components/CareerCharts';
+import MentorAvatar from '../components/MentorAvatar';
+import { useVoiceConversation } from '../hooks/useVoiceConversation';
+import { useTextToSpeech } from '../hooks/useTextToSpeech';
 
 interface Message {
   id: string;
@@ -232,154 +238,28 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
   const [chatUserId] = useState(getChatUserId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const autoClearCheckedRef = useRef(false);
-  const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const textToSpeech = useTextToSpeech(userProfile.language);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const submitMessage = useCallback(async (outgoing: string, options?: { skipUserBubble?: boolean; autoSpeak?: boolean }) => {
+    const textToSend = outgoing.trim();
+    if (!textToSend) return { message: '' };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const rec = new SpeechRecognition();
-      rec.continuous = false;
-      rec.interimResults = false;
-      rec.lang = userProfile.language === 'english' ? 'en-IN' : 'hi-IN';
-
-      rec.onstart = () => {
-        setIsListening(true);
-        setToast('Listening... Bolna shuru kijiye');
+    if (!options?.skipUserBubble) {
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: textToSend,
+        timestamp: new Date(),
       };
-
-      rec.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        if (transcript) {
-          setToast(`Captured: "${transcript}"`);
-          handleSend(transcript);
-        }
-      };
-
-      rec.onerror = (e: any) => {
-        console.error('Speech recognition error:', e);
-        setIsListening(false);
-        setToast('Voice input error. Try again.');
-      };
-
-      rec.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current = rec;
+      setMessages((prev) => [...prev, userMessage]);
     }
-  }, [userProfile.language]);
-
-  const toggleListening = () => {
-    if (!recognitionRef.current) {
-      setToast('Voice input not supported in this browser');
-      return;
-    }
-
-    if (isListening) {
-      recognitionRef.current.stop();
-    } else {
-      window.speechSynthesis?.cancel();
-      setSpeakingMessageId('');
-      recognitionRef.current.start();
-    }
-  };
-
-  useEffect(() => {
-    getQuickQuestions<string[]>()
-      .then(setQuickQuestions)
-      .catch((error) => console.warn('Quick questions unavailable:', error));
-
-    const shouldAutoClearNow = autoClear && !autoClearCheckedRef.current;
-    const loadSession = shouldAutoClearNow
-      ? clearChatSessionMessages(chatUserId)
-      : getChatSession(chatUserId);
-
-    autoClearCheckedRef.current = true;
-
-    loadSession.then((data) => {
-      setSession(data);
-      if (!shouldAutoClearNow && data.messages?.length) {
-        setMessages(sessionToMessages(data.messages));
-      } else {
-        setMessages([getWelcomeMessage(userProfile)]);
-      }
-      if (shouldAutoClearNow) setToast('Auto clear: fresh chat started');
-    })
-      .catch((error) => {
-        console.warn('Chat session unavailable:', error);
-        setMessages([getWelcomeMessage(userProfile)]);
-      });
-  }, [autoClear, chatUserId, userProfile]);
-
-  useEffect(() => {
-    if (!toast) return;
-    const timeout = window.setTimeout(() => setToast(''), 2200);
-    return () => window.clearTimeout(timeout);
-  }, [toast]);
-
-  useEffect(() => () => {
-    window.speechSynthesis?.cancel();
-  }, []);
-
-  useEffect(() => {
-    const prefetch = window.localStorage.getItem('chat_input_prefetch');
-    if (prefetch) {
-      window.localStorage.removeItem('chat_input_prefetch');
-      setInput(prefetch);
-    }
-  }, []);
-
-  const speakMessage = (message: Message) => {
-    if (!('speechSynthesis' in window)) {
-      setToast('Voice not supported in this browser');
-      return;
-    }
-
-    window.speechSynthesis.cancel();
-
-    if (speakingMessageId === message.id) {
-      setSpeakingMessageId('');
-      return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(message.content.replace(/\*\*/g, ''));
-    utterance.lang = userProfile.language === 'english' ? 'en-IN' : 'hi-IN';
-    utterance.rate = 0.96;
-    utterance.pitch = 1;
-    utterance.onend = () => setSpeakingMessageId('');
-    utterance.onerror = () => setSpeakingMessageId('');
-    setSpeakingMessageId(message.id);
-    window.speechSynthesis.speak(utterance);
-  };
-
-  const handleSend = async (customText?: string) => {
-    const textToSend = customText !== undefined ? customText : input;
-    if (!textToSend.trim()) return;
-
-    const outgoing = textToSend.trim();
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: outgoing,
-      timestamp: new Date(),
-    };
 
     const assistantId = (Date.now() + 1).toString();
-    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
 
     const chatInput = {
-      message: outgoing,
+      message: textToSend,
       userId: chatUserId,
       education: userProfile.education,
       language: userProfile.language,
@@ -440,10 +320,22 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
       }
 
       setMessages((prev) => [...prev.filter((msg) => msg.id !== assistantId), assistantMessage]);
-      if (voiceEnabled && assistantMessage.content) {
-        window.setTimeout(() => speakMessage(assistantMessage), 150);
-      }
       getChatSession(chatUserId).then(setSession).catch(() => undefined);
+
+      const shouldSpeak = options?.autoSpeak ?? voiceEnabled;
+      if (shouldSpeak && assistantMessage.content) {
+        window.setTimeout(async () => {
+          const tts = await synthesizeVoice(assistantMessage.content, userProfile.language).catch(() => null);
+          setSpeakingMessageId(assistantMessage.id);
+          await textToSpeech.speak(assistantMessage.content, {
+            base64: tts?.audio,
+            mimeType: tts?.mimeType,
+          });
+          setSpeakingMessageId('');
+        }, 150);
+      }
+
+      return { message: assistantMessage.content };
     } catch (error) {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -454,8 +346,155 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
       };
       console.warn('Chat API unavailable:', error);
       setMessages((prev) => [...prev, assistantMessage]);
+      return { message: assistantMessage.content };
     } finally {
       setIsTyping(false);
+    }
+  }, [chatUserId, textToSpeech, userProfile, voiceEnabled]);
+
+  const voiceConversation = useVoiceConversation({
+    language: userProfile.language,
+    userId: chatUserId,
+    education: userProfile.education,
+    profile: {
+      name: userProfile.name,
+      interests: userProfile.interests,
+    },
+    onTranscript: (text) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `voice-user-${Date.now()}`,
+          role: 'user',
+          content: text,
+          timestamp: new Date(),
+        },
+      ]);
+    },
+    onResponse: (text) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `voice-ai-${Date.now()}`,
+          role: 'assistant',
+          content: text,
+          timestamp: new Date(),
+          source: 'NextStep AI',
+        },
+      ]);
+      getChatSession(chatUserId).then(setSession).catch(() => undefined);
+    },
+    onError: (message) => setToast(message),
+    onStatus: (message) => setToast(message),
+    sendTextMessage: (text) => submitMessage(text, { skipUserBubble: true, autoSpeak: false }),
+  });
+
+  const displayAvatarState = voiceConversation.talkMode
+    ? voiceConversation.avatarState
+    : voiceConversation.isListening
+      ? 'listening'
+      : textToSpeech.isSpeaking
+        ? 'speaking'
+        : isTyping
+          ? 'thinking'
+          : 'idle';
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    getQuickQuestions<string[]>()
+      .then(setQuickQuestions)
+      .catch((error) => console.warn('Quick questions unavailable:', error));
+
+    const shouldAutoClearNow = autoClear && !autoClearCheckedRef.current;
+    const loadSession = shouldAutoClearNow
+      ? clearChatSessionMessages(chatUserId)
+      : getChatSession(chatUserId);
+
+    autoClearCheckedRef.current = true;
+
+    loadSession.then((data) => {
+      setSession(data);
+      if (!shouldAutoClearNow && data.messages?.length) {
+        setMessages(sessionToMessages(data.messages));
+      } else {
+        setMessages([getWelcomeMessage(userProfile)]);
+      }
+      if (shouldAutoClearNow) setToast('Auto clear: fresh chat started');
+    })
+      .catch((error) => {
+        console.warn('Chat session unavailable:', error);
+        setMessages([getWelcomeMessage(userProfile)]);
+      });
+  }, [autoClear, chatUserId, userProfile]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timeout = window.setTimeout(() => setToast(''), 2200);
+    return () => window.clearTimeout(timeout);
+  }, [toast]);
+
+  useEffect(() => () => {
+    textToSpeech.stopSpeaking();
+    voiceConversation.stopTalkMode();
+  }, [textToSpeech, voiceConversation]);
+
+  useEffect(() => {
+    const prefetch = window.localStorage.getItem('chat_input_prefetch');
+    if (prefetch) {
+      window.localStorage.removeItem('chat_input_prefetch');
+      setInput(prefetch);
+    }
+  }, []);
+
+  const speakMessage = async (message: Message) => {
+    if (speakingMessageId === message.id) {
+      textToSpeech.stopSpeaking();
+      voiceConversation.stopSpeaking();
+      setSpeakingMessageId('');
+      return;
+    }
+
+    setSpeakingMessageId(message.id);
+    const tts = await synthesizeVoice(message.content, userProfile.language).catch(() => null);
+    await textToSpeech.speak(message.content, {
+      base64: tts?.audio,
+      mimeType: tts?.mimeType,
+    });
+    setSpeakingMessageId('');
+  };
+
+  const handleSend = async (customText?: string) => {
+    const textToSend = customText !== undefined ? customText : input;
+    if (!textToSend.trim() || isTyping) return;
+    await submitMessage(textToSend.trim());
+  };
+
+  const toggleListening = async () => {
+    if (voiceConversation.talkMode) {
+      setToast('Stop talk mode first');
+      return;
+    }
+
+    if (voiceConversation.isListening) {
+      voiceConversation.stopListening();
+      return;
+    }
+
+    textToSpeech.stopSpeaking();
+    setSpeakingMessageId('');
+    setToast('Listening... Bolna shuru kijiye');
+
+    const transcript = await voiceConversation.listenOnceAsync((message) => setToast(message));
+    if (transcript) {
+      setToast(`Captured: "${transcript}"`);
+      await handleSend(transcript);
     }
   };
 
@@ -549,13 +588,32 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
             ))}
             <button
               onClick={() => {
+                if (voiceConversation.talkMode) {
+                  voiceConversation.stopTalkMode();
+                  return;
+                }
+                voiceConversation.startTalkMode();
+              }}
+              className={`inline-flex items-center gap-1 rounded-2xl border px-3 py-2 text-xs font-bold transition ${
+                voiceConversation.talkMode
+                  ? 'border-rose-200 bg-rose-200 text-slate-950'
+                  : 'border-white/10 bg-white/10 text-white hover:bg-white/15'
+              }`}
+              title="Talk directly with mentor"
+            >
+              {voiceConversation.talkMode ? <PhoneOff className="h-3.5 w-3.5" /> : <Phone className="h-3.5 w-3.5" />}
+              {voiceConversation.talkMode ? 'Stop Talk' : 'Talk'}
+            </button>
+            <button
+              onClick={() => {
                 const next = !voiceEnabled;
                 setVoiceEnabled(next);
                 if (!next) {
-                  window.speechSynthesis?.cancel();
+                  textToSpeech.stopSpeaking();
+                  voiceConversation.stopSpeaking();
                   setSpeakingMessageId('');
                 }
-                setToast(next ? 'Voice mentor enabled' : 'Voice mentor disabled');
+                setToast(next ? 'Voice replies enabled' : 'Voice replies disabled');
               }}
               className={`inline-flex items-center gap-1 rounded-2xl border px-3 py-2 text-xs font-bold transition ${
                 voiceEnabled
@@ -591,8 +649,16 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
         </div>
       </div>
 
-      <div className="surface mb-3 min-h-0 flex-1 overflow-hidden">
-        <div className="h-full overflow-hidden p-3">
+      <div className="surface mb-3 min-h-0 flex-1 overflow-hidden flex flex-col">
+        <div className="border-b border-slate-100 bg-gradient-to-br from-teal-50 via-white to-indigo-50 px-4 py-2 shrink-0">
+          <MentorAvatar
+            state={displayAvatarState}
+            audioLevel={voiceConversation.talkMode ? voiceConversation.audioLevel : textToSpeech.audioLevel}
+            mentorName="NextStep AI"
+            compact
+          />
+        </div>
+        <div className="min-h-0 flex-1 overflow-hidden p-3">
           {messages.length <= 1 && messages[0]?.id === 'welcome' && (
             <div className="mb-3 rounded-2xl bg-gradient-to-br from-teal-50 via-white to-indigo-50 p-4 text-center">
               <div>
@@ -783,12 +849,12 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
                     <button
                       onClick={() => speakMessage(message)}
                       className={`grid h-7 w-7 place-items-center rounded-lg bg-white text-slate-600 transition hover:text-indigo-700 ${
-                        speakingMessageId === message.id ? 'text-indigo-700 ring-1 ring-indigo-200' : ''
+                        speakingMessageId === message.id || textToSpeech.isSpeaking ? 'text-indigo-700 ring-1 ring-indigo-200' : ''
                       }`}
                       aria-label={speakingMessageId === message.id ? 'Stop voice' : 'Speak response'}
                       title={speakingMessageId === message.id ? 'Stop voice' : 'Speak response'}
                     >
-                      {speakingMessageId === message.id ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+                      {speakingMessageId === message.id || textToSpeech.isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
                     </button>
                     <button
                       onClick={() => sendFeedback(message, 'up')}
@@ -841,15 +907,16 @@ export default function ChatPage({ userProfile }: { userProfile: UserProfile }) 
         <div className="flex gap-2">
           <button
             onClick={toggleListening}
+            disabled={voiceConversation.talkMode}
             className={`grid h-11 w-11 place-items-center rounded-xl transition ${
-              isListening
+              voiceConversation.isListening
                 ? 'bg-rose-600 text-white animate-pulse shadow-lg shadow-rose-600/30 hover:bg-rose-700'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50'
             }`}
             aria-label="Voice input"
-            title="Start voice input"
+            title={voiceConversation.talkMode ? 'Mic disabled during talk mode' : 'Start voice input'}
           >
-            <Mic className={`w-5 h-5 ${isListening ? 'animate-bounce' : ''}`} />
+            <Mic className={`w-5 h-5 ${voiceConversation.isListening ? 'animate-bounce' : ''}`} />
           </button>
           <input
             type="text"

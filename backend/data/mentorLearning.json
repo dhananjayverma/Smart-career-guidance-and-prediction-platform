@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-24T11:16:13.969Z",
+  "updatedAt": "2026-06-27T05:51:26.985Z",
   "users": {
     "user-cb3b8b19-437b-4bbb-acd7-a198ba16cf99": {
       "userId": "user-cb3b8b19-437b-4bbb-acd7-a198ba16cf99",
@@ -149,6 +149,44 @@
       "updatedAt": "2026-06-24T11:16:13.885Z",
       "education": "12th",
       "preferredBranch": "BCA"
+    },
+    "user-bc5ad8f5-f504-480e-976e-6e3d0f1149b1": {
+      "userId": "user-bc5ad8f5-f504-480e-976e-6e3d0f1149b1",
+      "version": 2,
+      "promptCount": 2,
+      "interests": {},
+      "branches": {},
+      "professions": {},
+      "problems": {},
+      "emotions": {},
+      "intents": {
+        "general_guidance": {
+          "count": 2,
+          "weight": 1,
+          "lastUsed": "2026-06-27T05:51:26.897Z",
+          "source": "behavioral"
+        }
+      },
+      "languages": {
+        "hinglish": {
+          "count": 2,
+          "weight": 0.95,
+          "lastUsed": "2026-06-27T05:51:26.897Z",
+          "source": "behavioral"
+        }
+      },
+      "feedback": {},
+      "recentNeeds": [],
+      "preferences": {
+        "askedQuestions": []
+      },
+      "meta": {
+        "lastIntent": "general_guidance",
+        "lastEmotion": "neutral"
+      },
+      "updatedAt": "2026-06-27T05:51:26.897Z",
+      "education": "",
+      "preferredBranch": ""
     }
   },
   "globalPatterns": {

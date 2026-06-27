@@ -326,3 +326,71 @@ export function getQuickQuestions<T>() {
 export function getSimulations<T>() {
   return request<T>('/api/content/simulations');
 }
+
+export interface VoiceChatResult extends ChatResponse {
+  transcript: string;
+  sttSource?: string;
+  voice?: {
+    audio?: string | null;
+    mimeType?: string | null;
+    source?: string;
+    text?: string;
+  };
+}
+
+export async function sendVoiceChatMessage(input: {
+  audio: Blob;
+  userId: string;
+  education?: string;
+  language?: string;
+  profile?: { name?: string; interests?: string[] };
+}) {
+  const formData = new FormData();
+  formData.append('audio', input.audio, 'voice.webm');
+  formData.append('userId', input.userId);
+  if (input.education) formData.append('education', input.education);
+  if (input.language) formData.append('language', input.language);
+  if (input.profile) formData.append('profile', JSON.stringify(input.profile));
+
+  const response = await fetch(`${API_BASE_URL}/api/chat/voice/chat`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Voice chat failed: ${response.status} ${errorText.slice(0, 160)}`);
+  }
+
+  const payload = await response.json();
+  return (payload.data ?? payload) as VoiceChatResult;
+}
+
+export async function synthesizeVoice(text: string, language?: string) {
+  return request<{ audio?: string | null; mimeType?: string | null; source?: string; text?: string }>(
+    '/api/chat/voice/tts',
+    {
+      method: 'POST',
+      body: JSON.stringify({ text, language }),
+    }
+  );
+}
+
+export async function transcribeVoice(audio: Blob, language?: string) {
+  const formData = new FormData();
+  formData.append('audio', audio, 'voice.webm');
+  if (language) formData.append('language', language);
+
+  const response = await fetch(`${API_BASE_URL}/api/chat/voice/stt`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Transcription failed: ${response.status} ${errorText.slice(0, 160)}`);
+  }
+
+  const payload = await response.json();
+  return (payload.data ?? payload) as { transcript: string; source?: string };
+}

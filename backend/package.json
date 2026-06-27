@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "health": "node -e \"fetch('http://localhost:5001/health').then(r=>r.json()).then(console.log).catch(()=>process.exit(1))\""
+    "health": "node -e \"fetch('http://localhost:5001/health').then(r=>r.json()).then(console.log).catch(()=>process.exit(1))\"",
+    "migrate:memory": "node scripts/migrateMemory.js",
+    "test:pipeline": "node scripts/test_pipeline.js"
   },
   "keywords": [],
   "author": "",

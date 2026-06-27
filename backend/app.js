@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const chatRoutes = require('./routes/chat.routes');
+const voiceRoutes = require('./routes/voice.routes');
 const careerRoutes = require('./routes/career.routes');
 const roadmapRoutes = require('./routes/roadmap.routes');
 const collegeRoutes = require('./routes/college.routes');
@@ -42,6 +43,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/chat', chatRoutes);
+app.use('/api/chat/voice', voiceRoutes);
 app.use('/api/career', careerRoutes);
 app.use('/api/roadmap', roadmapRoutes);
 app.use('/api/colleges', collegeRoutes);
